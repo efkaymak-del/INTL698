@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="INTL698">
+<link rel="manifest" href="manifest.json">
+<title>INTL698 – Doctoral Seminar</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0f1117;color:#e0e0e0;min-height:100vh;overflow-x:hidden;}
+
+/* ── Install Banner ── */
+.install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1a1a2e,#0f3460);padding:.8rem 1rem;border-top:2px solid #e94560;z-index:9999;animation:slideUp .4s ease;}
+.install-banner.show{display:flex;align-items:center;gap:.8rem;}
+.install-banner p{flex:1;font-size:.82rem;color:#d0d0e0;line-height:1.3;}
+.install-banner button{background:#e94560;color:#fff;border:none;padding:.5rem 1rem;border-radius:6px;cursor:pointer;font-size:.82rem;white-space:nowrap;}
+.install-banner .dismiss{background:transparent;color:#888;border:1px solid #333;padding:.4rem .7rem;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* ── Top Bar ── */
+.topbar{position:fixed;top:0;left:0;right:0;height:50px;background:#13141b;border-bottom:1px solid #2a2a3a;display:flex;align-items:center;padding:0 1rem;z-index:100;}
+.topbar .back-btn{background:none;border:none;color:#e94560;font-size:1.3rem;cursor:pointer;padding:.2rem .5rem;display:none;}
+.topbar h1{flex:1;font-size:.95rem;color:#fff;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar .status{width:8px;height:8px;border-radius:50%;background:#4caf50;flex-shrink:0;}
+.topbar .status.offline{background:#e94560;}
+body{padding-top:50px;}
+
+/* ── Home Screen ── */
+#home{padding:1rem;max-width:800px;margin:0 auto;}
+.home-header{text-align:center;padding:1.5rem .5rem 1rem;border-bottom:1px solid #1a1a2a;margin-bottom:1rem;}
+.home-header h2{font-size:1.4rem;color:#fff;margin-bottom:.3rem;}
+.home-header p{font-size:.85rem;color:#a0a0b8;line-height:1.5;}
+.module-list{display:flex;flex-direction:column;gap:.6rem;}
+.module-btn{display:flex;align-items:center;gap:1rem;background:#1a1b26;border:1px solid #2a2a3a;border-radius:10px;padding:1rem;cursor:pointer;transition:.2s;text-align:left;}
+.module-btn:hover,.module-btn:active{border-color:#e94560;background:#1e1e2e;}
+.module-btn .num{width:36px;height:36px;border-radius:50%;background:#e94560;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0;}
+.module-btn .info{flex:1;min-width:0;}
+.module-btn .info h3{font-size:.92rem;color:#fff;margin-bottom:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.module-btn .info p{font-size:.78rem;color:#888;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.module-btn .chevron{color:#e94560;font-size:1.1rem;flex-shrink:0;}
+
+/* ── Module View ── */
+.module-view{display:none;padding-bottom:2rem;}
+.module-view.active{display:block;}
+
+/* ── Module Internal Nav ── */
+.mod-nav{display:flex;flex-wrap:wrap;gap:.3rem;padding:.6rem .8rem;background:#13141b;border-bottom:1px solid #2a2a3a;position:sticky;top:50px;z-index:50;overflow-x:auto;}
+.mod-nav button{background:#1e1e2e;color:#a0a0b8;border:1px solid #2a2a3a;padding:.4rem .7rem;border-radius:5px;cursor:pointer;font-size:.76rem;transition:.2s;white-space:nowrap;}
+.mod-nav button:hover{background:#2a2a4a;color:#fff;}
+.mod-nav button.active{background:#e94560;color:#fff;border-color:#e94560;}
+
+/* ── Module Content ── */
+.mod-content{padding:1rem;max-width:900px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+h2.sec-title{color:#fff;font-size:1.15rem;margin-bottom:.5rem;}
+.sec-intro{color:#b0b0c0;font-size:.88rem;line-height:1.6;margin-bottom:1rem;}
+
+/* ── Shared Components ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.8rem;margin-top:.8rem;}
+.card{background:#1a1b26;border:1px solid #2a2a3a;border-radius:8px;padding:1rem;cursor:pointer;transition:.2s;}
+.card:hover{border-color:#e94560;}
+.card h3{color:#e94560;font-size:.92rem;margin-bottom:.3rem;}
+.card p{font-size:.84rem;color:#b0b0c0;line-height:1.45;}
+.card .detail{display:none;margin-top:.6rem;padding-top:.6rem;border-top:1px solid #2a2a3a;font-size:.82rem;color:#c8c8d8;line-height:1.55;}
+.card.open .detail{display:block;}
+
+.accordion{margin-top:.8rem;}
+.acc-item{border:1px solid #2a2a3a;border-radius:7px;margin-bottom:.5rem;overflow:hidden;}
+.acc-header{background:#1a1b26;padding:.8rem 1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.acc-header:hover{background:#1e1e2e;}
+.acc-header h4{color:#e94560;font-size:.88rem;}
+.acc-header .arrow{color:#e94560;transition:.3s;font-size:1rem;}
+.acc-item.open .acc-header .arrow{transform:rotate(180deg);}
+.acc-body{display:none;padding:.8rem 1rem;background:#15161e;font-size:.84rem;color:#c8c8d8;line-height:1.55;}
+.acc-item.open .acc-body{display:block;}
+
+.flow{margin-top:.8rem;}
+.flow-step{display:flex;align-items:flex-start;gap:.8rem;padding-bottom:1.2rem;position:relative;}
+.flow-step:last-child{padding-bottom:0;}
+.flow-dot{width:30px;height:30px;border-radius:50%;border:2px solid #e94560;background:#1a1b26;color:#e94560;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;position:relative;z-index:2;}
+.flow-step:not(:last-child)::before{content:'';position:absolute;left:14px;top:30px;width:2px;height:calc(100% - 30px);background:#2a2a3a;}
+.flow-body{background:#1a1b26;border:1px solid #2a2a3a;border-radius:7px;padding:.8rem 1rem;flex:1;cursor:pointer;transition:.2s;}
+.flow-body:hover{border-color:#e94560;}
+.flow-body h4{color:#e94560;font-size:.88rem;margin-bottom:.2rem;}
+.flow-body p{font-size:.82rem;color:#b0b0c0;line-height:1.45;}
+.flow-body .flow-detail{display:none;margin-top:.5rem;padding-top:.5rem;border-top:1px solid #2a2a3a;font-size:.82rem;color:#c8c8d8;line-height:1.55;}
+.flow-body.open .flow-detail{display:block;}
+
+/* ── Forms & Builders ── */
+.builder label{display:block;color:#e94560;font-size:.84rem;font-weight:600;margin:.8rem 0 .2rem;}
+.builder textarea,.builder input[type="text"],.builder select{width:100%;background:#1a1b26;border:1px solid #2a2a3a;color:#e0e0e0;padding:.6rem;border-radius:5px;font-size:.84rem;font-family:inherit;resize:vertical;}
+.builder textarea{min-height:60px;}
+.builder textarea:focus,.builder input:focus,.builder select:focus{outline:none;border-color:#e94560;}
+.btn-row{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap;}
+.btn-p{background:#e94560;color:#fff;border:none;padding:.5rem 1rem;border-radius:5px;cursor:pointer;font-size:.82rem;}
+.btn-p:hover{background:#c73650;}
+.btn-s{background:#2a2a3a;color:#e0e0e0;border:1px solid #3a3a4a;padding:.5rem 1rem;border-radius:5px;cursor:pointer;font-size:.82rem;}
+.btn-s:hover{background:#3a3a4a;}
+.output{margin-top:1rem;background:#13141b;border:1px solid #2a2a3a;border-radius:7px;padding:1rem;font-size:.84rem;color:#d0d0e0;line-height:1.6;white-space:pre-wrap;display:none;}
+.output.show{display:block;}
+
+.tip{background:#1a2a1a;border:1px solid #4caf50;border-radius:7px;padding:.8rem 1rem;margin-top:.8rem;font-size:.82rem;color:#a0e0b0;line-height:1.5;}
+.tip strong{color:#4caf50;}
+.warn{background:#3a2a1a;border:1px solid #ff9800;border-radius:7px;padding:.8rem 1rem;margin-top:.8rem;font-size:.82rem;color:#f0d0a0;line-height:1.5;}
+.warn strong{color:#ff9800;}
+
+/* ── Scenario Game ── */
+.scenario-text{font-size:.86rem;color:#d0d0e0;line-height:1.5;padding:.8rem;background:#13141b;border-radius:7px;border-left:3px solid #e94560;margin:.8rem 0;}
+.opt-btn{display:block;width:100%;text-align:left;background:#1e1e2e;border:1px solid #2a2a3a;color:#c8c8d8;padding:.7rem .8rem;border-radius:7px;margin-bottom:.4rem;cursor:pointer;font-size:.82rem;transition:.2s;}
+.opt-btn:hover{border-color:#e94560;}
+.opt-btn.correct{background:#1a3a2a;border-color:#4caf50;color:#a0e0b0;}
+.opt-btn.wrong{background:#3a1a1a;border-color:#e94560;color:#e0a0a0;}
+.opt-btn.disabled{pointer-events:none;opacity:.7;}
+.feedback{margin-top:.6rem;padding:.8rem;border-radius:7px;font-size:.82rem;line-height:1.5;display:none;}
+.feedback.show{display:block;}
+.feedback.good{background:#1a3a2a;border:1px solid #4caf50;color:#a0e0b0;}
+.feedback.bad{background:#3a1a1a;border:1px solid #e94560;color:#e0a0a0;}
+
+/* ── Checklist ── */
+.check-item{display:flex;align-items:flex-start;gap:.6rem;padding:.7rem .8rem;background:#1a1b26;border:1px solid #2a2a3a;border-radius:7px;margin-bottom:.4rem;cursor:pointer;transition:.2s;}
+.check-item:hover{border-color:#e94560;}
+.check-box{width:20px;height:20px;border:2px solid #e94560;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.check-item.checked .check-box{background:#e94560;}
+.check-box::after{content:'✓';color:#fff;font-size:.75rem;opacity:0;}
+.check-item.checked .check-box::after{opacity:1;}
+.check-label h4{color:#e0e0e0;font-size:.85rem;margin-bottom:.1rem;}
+.check-label p{color:#a0a0b8;font-size:.78rem;line-height:1.35;}
+.progress-bar{margin-top:.8rem;background:#1a1b26;border-radius:7px;overflow:hidden;height:24px;border:1px solid #2a2a3a;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#e94560,#ff6b81);transition:.4s;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff;font-weight:600;}
+
+/* ── Sliders (Wellbeing) ── */
+.wb-card{background:#1a1b26;border:1px solid #2a2a3a;border-radius:8px;padding:1rem;margin-bottom:.6rem;}
+.wb-card h4{color:#4a90d9;font-size:.88rem;margin-bottom:.4rem;}
+.wb-row{display:flex;align-items:center;gap:.6rem;}
+.wb-slider{flex:1;-webkit-appearance:none;appearance:none;height:5px;background:#2a2a3a;border-radius:3px;outline:none;}
+.wb-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#4a90d9;border-radius:50%;cursor:pointer;}
+.wb-val{font-size:.8rem;color:#a0a0b8;min-width:24px;text-align:center;}
+
+/* ── Star Rating ── */
+.stars{display:flex;gap:2px;}
+.star{width:20px;height:20px;cursor:pointer;fill:#2a2a3a;transition:.15s;}
+.star.filled{fill:#e94560;}
+
+/* ── Tables ── */
+.tbl-wrap{overflow-x:auto;margin-top:.8rem;}
+table.tbl{width:100%;border-collapse:collapse;font-size:.78rem;}
+table.tbl th{background:#1a1b26;color:#e94560;padding:.5rem .6rem;text-align:left;border-bottom:2px solid #e94560;white-space:nowrap;}
+table.tbl td{padding:.5rem .6rem;border-bottom:1px solid #2a2a3a;color:#c8c8d8;vertical-align:top;}
+.filter-row{display:flex;flex-wrap:wrap;gap:.3rem;margin:.8rem 0 .4rem;}
+.filter-btn{background:#1e1e2e;color:#a0a0b8;border:1px solid #2a2a3a;padding:.3rem .6rem;border-radius:4px;cursor:pointer;font-size:.72rem;}
+.filter-btn.active{background:#e94560;color:#fff;border-color:#e94560;}
+.tag{display:inline-block;background:#2a2a3a;color:#ff6b81;padding:.1rem .4rem;border-radius:3px;font-size:.7rem;margin:.1rem .15rem;}
+
+/* ── Highlight Box ── */
+.highlight{background:linear-gradient(135deg,#1a1b26,#1e2a3a);border:2px solid #4a90d9;border-radius:10px;padding:1.2rem;margin-top:1rem;}
+.highlight h3{color:#4a90d9;font-size:1rem;margin-bottom:.4rem;}
+.highlight p{font-size:.86rem;color:#b0c0d0;line-height:1.55;}
+
+/* ── ECPR Box ── */
+.ecpr-box{background:linear-gradient(135deg,#1a1b26,#1e2a3a);border:2px solid #4a90d9;border-radius:10px;padding:1.2rem;margin-top:.8rem;}
+.ecpr-box h3{color:#4a90d9;font-size:1rem;margin-bottom:.6rem;}
+
+/* ── Slide Preview ── */
+.slide-card{background:#13141b;border:1px solid #2a2a3a;border-radius:8px;padding:1rem;margin-bottom:.6rem;position:relative;}
+.slide-card h4{color:#e94560;font-size:.82rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem;}
+.slide-card p{font-size:.84rem;color:#d0d0e0;line-height:1.5;}
+.slide-card .snote{margin-top:.4rem;padding-top:.4rem;border-top:1px dashed #2a2a3a;font-size:.78rem;color:#a0a0b8;font-style:italic;}
+.slide-num{position:absolute;top:.6rem;right:.8rem;font-size:.7rem;color:#555;}
+
+/* ── Reflect Grid ── */
+.reflect-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.8rem;margin-top:.8rem;}
+.reflect-card{background:#1a1b26;border:1px solid #2a2a3a;border-radius:8px;padding:1rem;}
+.reflect-card h4{color:#e94560;font-size:.86rem;margin-bottom:.4rem;}
+.reflect-card textarea{width:100%;background:#13141b;border:1px solid #2a2a3a;color:#e0e0e0;padding:.5rem;border-radius:5px;font-size:.82rem;font-family:inherit;min-height:70px;resize:vertical;}
+.reflect-card textarea:focus{outline:none;border-color:#e94560;}
+
+/* ── Path Cards ── */
+.path-card{background:#1a1b26;border:1px solid #2a2a3a;border-radius:8px;padding:1rem;cursor:pointer;transition:.2s;}
+.path-card:hover{border-color:#4a90d9;}
+.path-card h3{color:#4a90d9;font-size:.92rem;margin-bottom:.3rem;}
+.path-card p{font-size:.82rem;color:#b0b0c0;line-height:1.45;}
+.path-card .path-detail{display:none;margin-top:.6rem;padding-top:.6rem;border-top:1px solid #2a2a3a;font-size:.82rem;color:#c8c8d8;line-height:1.55;}
+.path-card.open .path-detail{display:block;}
+
+/* ── Milestone Planner ── */
+.ms-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem;}
+.ms-row input,.ms-row select{background:#1a1b26;border:1px solid #2a2a3a;color:#e0e0e0;padding:.4rem .6rem;border-radius:5px;font-size:.82rem;font-family:inherit;}
+.ms-row input[type="text"]{flex:2;min-width:150px;}
+.ms-row input[type="date"]{flex:1;min-width:120px;}
+.ms-row select{flex:0 0 90px;}
+.ms-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:#1a1b26;border:1px solid #2a2a3a;border-radius:7px;margin-bottom:.4rem;}
+.ms-item.done h4{text-decoration:line-through;color:#666;}
+.ms-item h4{color:#e0e0e0;font-size:.84rem;flex:1;}
+.ms-item .ms-del{color:#666;cursor:pointer;font-size:1rem;}
+.ms-item .ms-del:hover{color:#e94560;}
+.ms-pri{display:inline-block;padding:.1rem .35rem;border-radius:3px;font-size:.68rem;margin-left:.3rem;}
+.ms-pri.high{background:#3a1a1a;color:#e94560;}
+.ms-pri.medium{background:#3a2a1a;color:#f0c060;}
+.ms-pri.low{background:#1a2a1a;color:#80c080;}
+
+@media(max-width:600px){
+  .card-grid{grid-template-columns:1fr;}
+  .reflect-grid{grid-template-columns:1fr;}
+  .mod-nav{gap:.2rem;padding:.4rem .5rem;}
+  .mod-nav button{font-size:.7rem;padding:.3rem .5rem;}
+  .ms-row{flex-direction:column;}
+  .ms-row input,.ms-row select{width:100%;flex:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- Install Banner -->
+<div class="install-banner" id="installBanner">
+  <p>Install <strong>INTL698</strong> on your device for quick access.</p>
+  <button id="installBtn">Install</button>
+  <button class="dismiss" id="dismissBtn">Later</button>
+</div>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <button class="back-btn" id="backBtn" onclick="goHome()">←</button>
+  <h1 id="topTitle">INTL698 – Doctoral Seminar</h1>
+  <div class="status" id="statusDot"></div>
+</div>
+
+<!-- Home Screen -->
+<div id="home">
+  <div class="home-header">
+    <h2>INTL698</h2>
+    <p>Doctoral Seminar in International Relations — Eastern Mediterranean University</p>
+  </div>
+  <div class="module-list" id="moduleList"></div>
+</div>
+
+<!-- Module Views (generated by JS) -->
+<div id="moduleContainer"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   MODULE DATA — All 10 modules defined here
+   ═══════════════════════════════════════ */
+
+const M = [
+// ──────── MODULE 1 ────────
+{
+  num:1, title:"IR as a Scientific Discipline",
+  short:"Genealogy of IR, great debates, Waltz, Morgenthau, Wæver, geography of the discipline.",
+  tabs:["Great Debates","Traditions","Waltz & System","Morgenthau","Geography of IR","Crossovers"],
+  content:[
+    // Tab 0: Great Debates
+    `<h2 class="sec-title">The Great Debates</h2>
+    <p class="sec-intro">IR has been shaped by a series of intellectual confrontations — 'great debates' — that defined the field's questions, methods, and identity. Each debate shifted the boundaries of what IR scholars study and how.</p>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-dot">1</div><div class="flow-body" onclick="tf(this)"><h4>1919 — Birth of the Discipline</h4><p>First IR department at Aberystwyth. Early scholars were idealists who believed institutions and international law could prevent war.</p><div class="flow-detail">The devastation of World War I created urgent demand for a 'science of peace.' The Woodrow Wilson Chair at Aberystwyth (1919) marked IR's institutional beginning. Early work focused on international law, the League of Nations, and disarmament — driven by moral conviction that war was a solvable problem.</div></div></div>
+      <div class="flow-step"><div class="flow-dot">2</div><div class="flow-body" onclick="tf(this)"><h4>First Debate — Realism vs. Idealism</h4><p>Carr and Morgenthau challenged idealism, insisting on power, self-interest, and an anarchic system.</p><div class="flow-detail">E.H. Carr's <em>The Twenty Years' Crisis</em> (1939) and Hans Morgenthau's <em>Politics Among Nations</em> (1948) argued that idealists ignored the realities of power. International politics, they claimed, is governed by the struggle for power in an anarchic system with no world government. This 'realist turn' dominated the discipline for decades and still forms the baseline against which other theories position themselves.</div></div></div>
+      <div class="flow-step"><div class="flow-dot">3</div><div class="flow-body" onclick="tf(this)"><h4>Second Debate — Science vs. Tradition (1960s)</h4><p>Behaviouralists pushed for quantitative, hypothesis-testing approaches. Traditionalists defended historical interpretation.</p><div class="flow-detail">The second debate was methodological, not theoretical. Scholars like Kaplan and Singer argued IR should adopt the methods of natural science — formal models, statistical analysis, falsifiable hypotheses. The English School (Bull, Wight) countered that international politics is a realm of meaning and judgment that cannot be reduced to variables. This debate never fully resolved; it simply produced two co-existing traditions.</div></div></div>
+      <div class="flow-step"><div class="flow-dot">4</div><div class="flow-body" onclick="tf(this)"><h4>Third Debate & Beyond (1980s–present)</h4><p>Constructivism, critical theory, feminism, and post-colonialism challenge the rationalist mainstream.</p><div class="flow-detail">The 'third debate' (or 'fourth' depending on who counts) brought ontological and epistemological diversity. Constructivists (Wendt, Onuf) argued that the international system is socially constructed — 'anarchy is what states make of it.' Critical theorists (Cox, Linklater) questioned whose interests mainstream IR serves. Feminist scholars highlighted gendered assumptions. Post-colonial scholars challenged Eurocentrism. The field became pluralist, contested, and far richer as a result.</div></div></div>
+    </div>`,
+
+    // Tab 1: Traditions
+    `<h2 class="sec-title">Theoretical Traditions</h2>
+    <p class="sec-intro">IR is organised around several major theoretical traditions. Each offers a different lens for understanding why the international world works as it does. Click each card for key figures and core claims.</p>
+    <div class="card-grid">
+      <div class="card" onclick="tc(this)"><h3>Realism</h3><p>Power, self-interest, and survival in an anarchic system.</p><div class="detail"><strong>Key figures:</strong> Thucydides, Machiavelli, Morgenthau, Waltz, Mearsheimer.<br><br><strong>Core claims:</strong> States are the primary actors. The international system is anarchic (no world government). States pursue power and security. Cooperation is possible but fragile. Human nature (classical realism) or systemic structure (neorealism) drives conflict.</div></div>
+      <div class="card" onclick="tc(this)"><h3>Liberalism</h3><p>Institutions, interdependence, and democracy foster cooperation.</p><div class="detail"><strong>Key figures:</strong> Kant, Keohane, Nye, Doyle, Ikenberry.<br><br><strong>Core claims:</strong> International institutions reduce uncertainty and transaction costs. Economic interdependence raises the cost of conflict. Democracies rarely fight each other (democratic peace thesis). Progress is possible through institutional design.</div></div>
+      <div class="card" onclick="tc(this)"><h3>Constructivism</h3><p>Ideas, norms, and identities shape the international system.</p><div class="detail"><strong>Key figures:</strong> Wendt, Onuf, Finnemore, Katzenstein, Adler.<br><br><strong>Core claims:</strong> The international system is socially constructed, not given. Anarchy does not have a single logic — it depends on shared ideas. Norms, identities, and culture matter as much as material power. 'Anarchy is what states make of it' (Wendt, 1992).</div></div>
+      <div class="card" onclick="tc(this)"><h3>Marxism / Critical Theory</h3><p>Global capitalism, inequality, and class structure.</p><div class="detail"><strong>Key figures:</strong> Marx, Gramsci, Cox, Wallerstein, Linklater.<br><br><strong>Core claims:</strong> The international system reflects and reproduces global capitalism. 'Theory is always for someone and for some purpose' (Cox). World-systems theory maps core-periphery exploitation. Emancipation, not just explanation, is the goal.</div></div>
+      <div class="card" onclick="tc(this)"><h3>Feminist IR</h3><p>Gender as a category of analysis in international politics.</p><div class="detail"><strong>Key figures:</strong> Enloe, Tickner, Sjoberg, Elshtain, Shepherd.<br><br><strong>Core claims:</strong> Mainstream IR renders women invisible and naturalises masculine assumptions about power, security, and the state. Gender shapes who fights, who is protected, who makes decisions, and whose experiences count as knowledge.</div></div>
+      <div class="card" onclick="tc(this)"><h3>Post-Colonial IR</h3><p>Challenging Eurocentrism and centring non-Western perspectives.</p><div class="detail"><strong>Key figures:</strong> Said, Spivak, Acharya, Hobson, Seth.<br><br><strong>Core claims:</strong> IR's concepts and theories emerged from European imperial experience and universalise a particular historical trajectory. A 'Global IR' requires listening to non-Western voices, histories, and intellectual traditions.</div></div>
+    </div>`,
+
+    // Tab 2: Waltz
+    `<h2 class="sec-title">Waltz and the Third Image</h2>
+    <p class="sec-intro">Kenneth Waltz's work attempted to make IR a science unto itself by focusing analysis on the international system's structure — what he called the 'third image.'</p>
+    <div class="card-grid">
+      <div class="card" onclick="tc(this)"><h3>First Image — Human Nature</h3><p>War stems from human selfishness, aggression, or stupidity.</p><div class="detail">Classical realists like Morgenthau located the cause of conflict in human nature — the will to power (<em>Macht</em>) inherent in all people. Waltz acknowledged this tradition but argued it was unfalsifiable and analytically weak: if human nature is constant, it cannot explain variation in war and peace.</div></div>
+      <div class="card" onclick="tc(this)"><h3>Second Image — Domestic Politics</h3><p>War is caused by the internal structure of states.</p><div class="detail">Liberal theories and democratic peace arguments operate at this level: regime type, domestic institutions, and political culture shape foreign policy. Waltz recognised this but argued it could not explain systemic patterns — why states with very different domestic structures behave similarly in similar systemic positions.</div></div>
+      <div class="card" onclick="tc(this)"><h3>Third Image — The International System</h3><p>The anarchic structure of the system constrains and shapes state behaviour.</p><div class="detail">Waltz's <em>Theory of International Politics</em> (1979) argued that the system's structure — defined by anarchy and the distribution of capabilities — is the primary determinant of international outcomes. States behave as they do not because of human nature or domestic politics but because the system's structure compels them. This 'structural realism' or 'neorealism' made IR theoretically autonomous from comparative politics and psychology.</div></div>
+      <div class="card" onclick="tc(this)"><h3>Critiques of Waltz</h3><p>The field eventually pushed back against systemic narrowness.</p><div class="detail">By privileging the systemic level, Waltz sidelined domestic politics, ideas, culture, identity, and agency. Constructivists responded that structure is not purely material — it is also ideational. Liberals argued that domestic institutions matter independently. Feminists and post-colonialists noted that Waltz's 'system' was a view from nowhere that actually reflected Western, masculine, great-power assumptions. The field eventually moved toward multi-level analysis, and political science 'reclaimed' IR from Waltz's autonomous vision.</div></div>
+    </div>`,
+
+    // Tab 3: Morgenthau
+    `<h2 class="sec-title">Morgenthau and the German Roots</h2>
+    <p class="sec-intro">Hans Morgenthau did not invent realism in a vacuum. He imported — or exported — a rich German intellectual tradition into the American academy, translating European concepts into the language of a new superpower.</p>
+    <div class="accordion">
+      <div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>From Weimar to Washington</h4><span class="arrow">▼</span></div><div class="acc-body">Morgenthau was a German-Jewish jurist who fled Nazi Germany. He carried with him the intellectual tradition of German <em>Staatsrechtslehre</em> (state law theory), Weber's sociology of power, and Nietzsche's tragic worldview. When he arrived in the United States in the 1930s, American political science was dominated by legalism and idealism. Morgenthau's <em>Politics Among Nations</em> (1948) introduced a continental European sensibility — power as the central category of politics — to an American audience that was just becoming a global superpower.</div></div>
+      <div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Key German Concepts</h4><span class="arrow">▼</span></div><div class="acc-body"><strong>Macht</strong> (power): Not just military capability but the capacity to influence, dominate, and shape outcomes. For Morgenthau, <em>Macht</em> was the currency of all politics, domestic and international.<br><br><strong>Realpolitik</strong>: Politics based on practical power considerations rather than ideological or moral principles. Coined in the 19th century by Ludwig von Rochau, it became central to Bismarckian statecraft and, through Morgenthau, to American IR.<br><br><strong>Machtpolitik</strong>: Power politics — the conduct of foreign policy through the assertion and balancing of power.<br><br><strong>Staatsräson</strong> (reason of state): The idea that the state's survival and interests can justify actions that would be immoral for individuals.</div></div>
+      <div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>The American Translation</h4><span class="arrow">▼</span></div><div class="acc-body">In the American context, these German concepts were stripped of their philosophical complexity and became operational tools for Cold War strategy. <em>Realpolitik</em> became a label for hard-nosed foreign policy; <em>Macht</em> was reduced to material capability; the tragic sensibility of European realism was replaced by a confident, policy-oriented pragmatism. Morgenthau himself grew disillusioned — he opposed the Vietnam War, arguing that American policymakers had misunderstood his ideas. The gap between European realism-as-philosophy and American realism-as-policy-tool remains a live tension in the field.</div></div>
+    </div>`,
+
+    // Tab 4: Geography of IR
+    `<h2 class="sec-title">Is IR an American Science?</h2>
+    <p class="sec-intro">Stanley Hoffmann (1977) famously called IR an 'American social science.' Ole Wæver's 1998 study of publishing, citation, and institutional patterns confirmed that American dominance was real — but also showed that IR looks different in different places.</p>
+    <div class="card-grid">
+      <div class="card" onclick="tc(this)"><h3>Wæver's Sociology of the Discipline</h3><p>IR is not one field — it is multiple fields shaped by national and regional contexts.</p><div class="detail">In his landmark article 'The Sociology of a Not So International Discipline' (<em>International Organization</em>, 1998), Wæver mapped how IR was organised differently across countries. American IR was dominated by positivism, hypothesis testing, and security studies — shaped by Cold War funding and the proximity of universities to government. European IR was more theoretically diverse, more reflective, and more open to interpretive and critical approaches. Wæver introduced the concept of <strong>geo-epistemology</strong>: the idea that where you do IR shapes what IR looks like.</div></div>
+      <div class="card" onclick="tc(this)"><h3>The American Mainstream</h3><p>Positivist, security-focused, quantitative, and policy-connected.</p><div class="detail">The Cold War created massive investment in IR research, concentrated in elite American universities (Harvard, Columbia, Princeton, Chicago). Journals like <em>International Organization</em> and <em>International Studies Quarterly</em> set methodological standards. The revolving door between academia and government (Kissinger, Brzezinski, Rice) reinforced a policy-oriented, problem-solving approach. Rational choice, game theory, and large-N statistical studies became markers of 'serious' scholarship.</div></div>
+      <div class="card" onclick="tc(this)"><h3>The English School</h3><p>International society, historical interpretation, and the middle ground.</p><div class="detail">The English School (Bull, Wight, Watson, later Buzan) offered a distinctive alternative: the concept of 'international society' — states share norms, rules, and institutions that constitute a society, not just a system. Methodologically interpretive and historically grounded, the English School resists both American positivism and continental critical theory, occupying a pragmatic middle ground.</div></div>
+      <div class="card" onclick="tc(this)"><h3>The Copenhagen School</h3><p>Securitisation theory — security as a speech act.</p><div class="detail">Ole Wæver, together with Barry Buzan and Jaap de Wilde, developed <strong>securitisation theory</strong> at the Copenhagen Peace Research Institute. Their framework (<em>Security: A New Framework for Analysis</em>, 1998) argued that security is not an objective condition but a <strong>speech act</strong>: an issue becomes a 'security' issue when a securitising actor successfully frames it as an existential threat, justifying extraordinary measures. This widened security studies beyond military affairs to include environmental, economic, societal, and political security — and became one of the most cited frameworks in European IR.</div></div>
+      <div class="card" onclick="tc(this)"><h3>Continental & Scandinavian Traditions</h3><p>Peace research, critical security, French sociology, German Realpolitik legacy.</p><div class="detail">Scandinavian peace research (Galtung, PRIO) pioneered the study of structural violence and positive peace. French IR draws on sociology (Bourdieu, Aron) and maintains closer ties to political theory and philosophy than the Anglo-American mainstream. German IR carries the legacy of <em>Realpolitik</em> and <em>Ostpolitik</em> but has also developed distinctive constructivist and normative traditions. Each national context produces different questions, methods, and assumptions.</div></div>
+      <div class="card" onclick="tc(this)"><h3>Global South & 'Global IR'</h3><p>Challenging Eurocentrism, building inclusive knowledge.</p><div class="detail">Amitav Acharya and Barry Buzan's call for a 'Global IR' argues that the discipline must incorporate non-Western histories, concepts, and perspectives — not as exotic additions but as constitutive contributions. Scholars in Latin America, Africa, and Asia are developing IR theories grounded in their own experiences of colonialism, development, and regional order. The question is no longer whether IR is an American science but whether it can become a truly global one.</div></div>
+    </div>`,
+
+    // Tab 5: Crossovers
+    `<h2 class="sec-title">IR's Neighbours — Interdisciplinary Crossovers</h2>
+    <p class="sec-intro">IR has never been hermetically sealed. Despite Waltz's attempt to make it a self-contained systemic science, the discipline constantly borrows from and contributes to neighbouring fields. Your own research likely sits at one of these intersections.</p>
+    <div class="accordion">
+      <div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Comparative Politics</h4><span class="arrow">▼</span></div><div class="acc-body">The most important neighbour. Putnam's 'two-level games' framework showed that international negotiations cannot be understood without domestic politics — and vice versa. Today, much of the best IR scholarship is also comparative: studying how regime type affects foreign policy, how domestic institutions shape treaty compliance, or how ethnic politics drives secessionism. The boundary between IR and comparative is increasingly artificial.</div></div>
+      <div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>International Political Economy (IPE)</h4><span class="arrow">▼</span></div><div class="acc-body">Trade, finance, development, sanctions, global supply chains — IPE studies the intersection of politics and economics at the international level. It draws on both IR theory (hegemonic stability, regime theory) and economics (trade theory, development economics). Some scholars see IPE as a subfield of IR; others see it as an independent discipline.</div></div>
+      <div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Security Studies</h4><span class="arrow">▼</span></div><div class="acc-body">Traditionally focused on military threats and strategy, security studies has expanded to include terrorism, cyber security, environmental security, health security, and human security. The Copenhagen School's securitisation framework sits at this intersection. Security studies draws on IR theory but also on strategic studies, criminology, and technology studies.</div></div>
+      <div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>International Law</h4><span class="arrow">▼</span></div><div class="acc-body">IR and international law share origins but diverged in the 20th century. They are converging again: scholars study how international courts shape state behaviour, how legal norms are created and enforced, and how the 'legalisation' of international politics affects cooperation and conflict.</div></div>
+      <div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Area Studies, Migration, Environment</h4><span class="arrow">▼</span></div><div class="acc-body">Area studies provide deep regional knowledge that IR theories need but often lack. Migration studies bridge IR, sociology, and human geography. Environmental politics connects IR to natural sciences and sustainability studies. These intersections are where some of the most innovative current research is happening.</div></div>
+    </div>
+    <div class="tip" style="margin-top:1rem;"><strong>Takeaway:</strong> Locate your research not only within an IR tradition but also at the intersection with neighbouring fields. This enriches your work and broadens your potential audience.</div>`
+  ]
+},
+
+// ──────── MODULE 2 ────────
+{num:2,title:"Formulating Your Research",short:"From topic to puzzle to research question — building a focused, answerable question.",tabs:["Topic vs Question","The Puzzle","Building Your RQ","Common Pitfalls"],content:[
+`<h2 class="sec-title">Topic vs. Research Question</h2><p class="sec-intro">A topic is a territory; a research question is a path through it. 'EU foreign policy' is a topic. 'Why has the EU failed to develop a coherent policy toward the Eastern Mediterranean?' is a research question. The difference between a wandering thesis and a focused one begins here.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>A Topic Is Not Enough</h3><p>Topics are starting points, not destinations.</p><div class="detail">Many students begin with a topic they care about — Cyprus, migration, NATO enlargement — but struggle to turn that interest into a researchable question. A topic tells you the area; a question tells you what specifically you want to know, why existing answers are insufficient, and what kind of evidence would constitute an answer. Without a question, you read endlessly without direction.</div></div>
+<div class="card" onclick="tc(this)"><h3>What Makes a Good Question?</h3><p>Clear, focused, significant, and answerable.</p><div class="detail"><strong>Clear:</strong> Anyone in your field should understand what you are asking after one reading.<br><strong>Focused:</strong> Narrow enough to answer within the scope of your thesis.<br><strong>Significant:</strong> The answer matters — it advances scholarly understanding or addresses a real-world puzzle.<br><strong>Answerable:</strong> You can imagine what evidence would answer it and that evidence is accessible.</div></div>
+<div class="card" onclick="tc(this)"><h3>Types of Questions</h3><p>Descriptive, explanatory, interpretive, normative.</p><div class="detail"><strong>Descriptive:</strong> What is happening? (How has EU migration policy changed since 2015?)<br><strong>Explanatory:</strong> Why did it happen? (Why did Germany open its borders in 2015?)<br><strong>Interpretive:</strong> How is it understood? (How do refugees narrate their experience of EU border practices?)<br><strong>Normative:</strong> What should happen? (Should the EU adopt a common asylum policy?)<br><br>Most theses combine types, but your primary question should be clear about which mode it operates in.</div></div>
+</div>`,
+`<h2 class="sec-title">Finding the Puzzle</h2><p class="sec-intro">The best research questions emerge from puzzles — observations that surprise, contradict expectations, or reveal gaps in existing knowledge. A puzzle gives your research energy and purpose.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Empirical Puzzles</h4><span class="arrow">▼</span></div><div class="acc-body">Something happened that existing theories cannot explain. Why do some small states punch above their weight in international organisations? Why did a seemingly stable regime collapse unexpectedly? Why do states comply with some treaties but not others? The gap between expectation and observation is your puzzle.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Theoretical Puzzles</h4><span class="arrow">▼</span></div><div class="acc-body">Two theories make contradictory predictions about the same phenomenon. Realism predicts that NATO should have dissolved after the Cold War; liberalism predicts it should have persisted. It persisted — but realism still explains some of its behaviour. The tension between theoretical expectations is your puzzle.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Gaps in the Literature</h4><span class="arrow">▼</span></div><div class="acc-body">An important case, region, or dimension has simply not been studied. Maybe securitisation theory has been applied extensively in Northern Europe but rarely in the Eastern Mediterranean. Maybe a major policy shift has occurred too recently for the literature to catch up. The absence of research is your puzzle.</div></div>
+</div>`,
+`<h2 class="sec-title">Building Your Research Question</h2><p class="sec-intro">Use this tool to work through the process of refining your question. Fill in each step and generate a draft.</p>
+<div class="builder">
+<label>1. Your broad topic or area of interest</label>
+<textarea id="rq1" placeholder="e.g., EU foreign policy in the Eastern Mediterranean"></textarea>
+<label>2. What puzzles or surprises you about this topic?</label>
+<textarea id="rq2" placeholder="e.g., Despite shared interests, EU member states cannot agree on a common approach to..."></textarea>
+<label>3. What do existing explanations say — and what do they miss?</label>
+<textarea id="rq3" placeholder="e.g., Realist accounts focus on great-power rivalry but ignore domestic coalition politics..."></textarea>
+<label>4. Draft your research question (one sentence)</label>
+<textarea id="rq4" placeholder="e.g., Why has the EU failed to develop a coherent foreign policy toward the Eastern Mediterranean despite...?" style="min-height:50px;"></textarea>
+<label>5. What type of question is this?</label>
+<select id="rq5"><option value="">— Select —</option><option>Descriptive (what?)</option><option>Explanatory (why?)</option><option>Interpretive (how understood?)</option><option>Normative (what should?)</option><option>Comparative (why different?)</option></select>
+<div class="btn-row"><button class="btn-p" onclick="genRQ()">Generate Summary</button><button class="btn-s" onclick="copyO('rqOut')">Copy</button><button class="btn-s" onclick="clr(['rq1','rq2','rq3','rq4','rq5'],'rqOut')">Clear</button></div>
+<div class="output" id="rqOut"></div>
+</div>`,
+`<h2 class="sec-title">Common Pitfalls</h2><p class="sec-intro">Recognise these traps early — they account for most of the difficulty students have with research design.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>Too Broad</h3><p>"What causes war?" — unanswerable in a single thesis.</p><div class="detail">Narrow by specifying the case, time period, and aspect: "Why did the 2020 Nagorno-Karabakh war escalate despite international mediation efforts?" Broad questions produce shallow answers.</div></div>
+<div class="card" onclick="tc(this)"><h3>Too Narrow</h3><p>"What did Ambassador X say on 14 March 2019?" — trivial.</p><div class="detail">Your question should have significance beyond the specific case. If the answer interests only you, it is too narrow. Connect the specific to a broader debate.</div></div>
+<div class="card" onclick="tc(this)"><h3>Not a Question</h3><p>"This thesis examines EU migration policy" — that is a statement of topic.</p><div class="detail">Force yourself to use a question mark. What about EU migration policy? Why did it change? How do migrants experience it? What explains variation across member states?</div></div>
+<div class="card" onclick="tc(this)"><h3>Loaded / Normative</h3><p>"Why has NATO's aggressive expansion destabilised Europe?"</p><div class="detail">This presupposes the answer (aggressive, destabilised). A research question should be open enough to allow for multiple possible answers. Rephrase: "How has NATO enlargement affected European security dynamics?"</div></div>
+</div>`
+]},
+
+// ──────── MODULE 3 (abbreviated for size) ────────
+{num:3,title:"Research Methodology",short:"Epistemology, methodology vs. methods, qualitative and quantitative toolkits, method finder.",tabs:["Epistemology","Methods vs Methodology","Methods Toolkit","Method Finder"],content:[
+`<h2 class="sec-title">The Epistemological Spectrum</h2><p class="sec-intro">Before choosing methods, consider your assumptions about what knowledge is and how it can be obtained. Your position on this spectrum shapes everything that follows.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>Positivism</h3><p>The social world can be studied like the natural world.</p><div class="detail">Seeks causal regularities, hypothesis testing, generalisable findings. Favours quantitative methods, large-N studies, formal models. Assumes an observable, measurable reality independent of the observer.</div></div>
+<div class="card" onclick="tc(this)"><h3>Post-Positivism</h3><p>Reality exists but our access to it is imperfect.</p><div class="detail">Accepts the goal of explanation but acknowledges that all observation is theory-laden. Emphasises falsification over verification, triangulation, and methodological pluralism.</div></div>
+<div class="card" onclick="tc(this)"><h3>Interpretivism</h3><p>Meaning, not causation, is the goal.</p><div class="detail">The social world is constituted by meanings, beliefs, and interpretations. Methods: discourse analysis, ethnography, hermeneutics. Understanding how actors make sense of their world, not predicting behaviour.</div></div>
+<div class="card" onclick="tc(this)"><h3>Critical Theory</h3><p>Knowledge is never neutral — it serves interests.</p><div class="detail">All research is political. The goal is not just to explain the world but to change it. Questions: whose interests does this theory serve? What structures of power does it reproduce or challenge?</div></div>
+<div class="card" onclick="tc(this)"><h3>Pragmatism</h3><p>Let the question dictate the method.</p><div class="detail">Rejects rigid epistemological commitments. Mixed methods, problem-driven research design. Choose whatever approach best answers your specific question.</div></div>
+</div>`,
+`<h2 class="sec-title">Methodology vs. Methods</h2><p class="sec-intro">These terms are often confused. The distinction matters because it connects your philosophical assumptions to your practical choices.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>Methodology</h3><p>The overall logic and strategy of your research.</p><div class="detail">Methodology answers <strong>why</strong> you chose your approach. It connects your ontological and epistemological assumptions to your research design. Think of it as the blueprint: it justifies why a case study (rather than a survey) is appropriate for your question, given your assumptions about knowledge.</div></div>
+<div class="card" onclick="tc(this)"><h3>Methods</h3><p>The specific tools and techniques you use.</p><div class="detail">Methods answer <strong>what</strong> you actually do: conduct interviews, run regressions, analyse documents, code discourse. They are the tools in your toolbox. The same method (e.g., interviews) can serve very different methodologies (positivist data collection vs. interpretivist meaning-making).</div></div>
+</div>
+<div class="tip"><strong>Analogy:</strong> Methodology is the architect's vision (why this building should look this way). Methods are the construction techniques (how to pour the concrete). You need both, and they must be consistent.</div>`,
+`<h2 class="sec-title">Methods Toolkit</h2><p class="sec-intro">A concise overview of the most common methods in IR research. Click each for when to use it, strengths, and limitations.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Case Study</h4><span class="arrow">▼</span></div><div class="acc-body">In-depth analysis of one or a few cases. Ideal for 'how' and 'why' questions, generating hypotheses, and exploring complex causal processes. Strength: depth and contextual richness. Limitation: generalisability concerns. IR example: Allison's study of the Cuban Missile Crisis.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Process Tracing</h4><span class="arrow">▼</span></div><div class="acc-body">Tracing the step-by-step causal chain linking a cause to an outcome. Essential for establishing causal mechanisms, not just correlations. Strength: causal depth. Limitation: labour-intensive, single-case focus. IR example: tracing how a norm of humanitarian intervention emerged and was applied.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Comparative Method</h4><span class="arrow">▼</span></div><div class="acc-body">Systematic comparison of two or more cases (most-similar or most-different design). Strength: controlled comparison isolates key variables. Limitation: finding truly comparable cases is difficult. IR example: comparing EU accession processes in different candidate countries.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Interviews</h4><span class="arrow">▼</span></div><div class="acc-body">Semi-structured interviews with practitioners, officials, experts. Strength: access to perspectives, motivations, and insider knowledge unavailable in documents. Limitation: recall bias, strategic responses, access difficulties. Triangulate with other sources.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Discourse Analysis</h4><span class="arrow">▼</span></div><div class="acc-body">Examines how language constructs reality — how problems are framed, identities constituted, policies legitimised. Central for constructivist and critical work. Strength: reveals power and meaning. Limitation: can seem subjective without rigorous method.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Statistical / Large-N Analysis</h4><span class="arrow">▼</span></div><div class="acc-body">Quantitative analysis of many cases using statistical methods. Strength: generalisability, pattern identification. Limitation: requires suitable data, statistical training, and cannot easily capture causal mechanisms. IR example: democratic peace studies.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Mixed Methods</h4><span class="arrow">▼</span></div><div class="acc-body">Combining quantitative and qualitative approaches. Strength: breadth plus depth. Limitation: demanding — requires competence in both traditions and a clear rationale for combining them.</div></div>
+</div>`,
+`<h2 class="sec-title">Method Finder</h2><p class="sec-intro">Answer a few questions and this tool will suggest methods that may fit your research.</p>
+<div class="builder">
+<label>What type of knowledge are you seeking?</label>
+<select id="mf1"><option value="">— Select —</option><option value="causal">Causal explanation (why did X happen?)</option><option value="meaning">Understanding meaning (how is X understood?)</option><option value="pattern">Identifying patterns (how common is X?)</option><option value="process">Tracing a process (how did X unfold?)</option></select>
+<label>How many cases?</label>
+<select id="mf2"><option value="">— Select —</option><option value="one">One (deep dive)</option><option value="few">A few (2–5, comparative)</option><option value="many">Many (20+, statistical)</option></select>
+<label>What is your primary material?</label>
+<select id="mf3"><option value="">— Select —</option><option value="people">People (interviews, ethnography)</option><option value="texts">Texts (documents, speeches, media)</option><option value="data">Numerical data (statistics, surveys)</option><option value="mixed">A mix of the above</option></select>
+<div class="btn-row"><button class="btn-p" onclick="findMethod()">Suggest Methods</button></div>
+<div class="output" id="mfOut"></div>
+</div>`
+]},
+
+// ──────── MODULES 4–10 (compact summaries with key interactive content) ────────
+{num:4,title:"The Literature Review",short:"Strategic reading, citation tools, writing a critical synthesis — not a summary.",tabs:["What It Is","Search Strategies","Good vs Bad","Annotated Bib Builder"],content:[
+`<h2 class="sec-title">What a Literature Review Is (and Isn't)</h2><p class="sec-intro">A literature review is not a list of summaries. It is a critical, argumentative synthesis that maps existing knowledge, identifies gaps, and justifies your research question.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>Not a Book Report</h3><p>You are not summarising what each author said.</p><div class="detail">Organise thematically, not author-by-author. Group sources by debate, argument, or methodological approach. Show how they relate to each other and to your question.</div></div>
+<div class="card" onclick="tc(this)"><h3>An Argument</h3><p>Your review makes a case for why your study is needed.</p><div class="detail">The literature review should lead logically to your research question. By the end, the reader should think: 'Yes, I see the gap — this study is necessary.' Structure: context → debates → gaps → your contribution.</div></div>
+<div class="card" onclick="tc(this)"><h3>A Living Document</h3><p>You will revise it as your research develops.</p><div class="detail">Your first literature review will change as you read more, refine your question, and develop your argument. This is normal. Do not aim for a final version on the first attempt.</div></div>
+</div>`,
+`<h2 class="sec-title">Search Strategies</h2><p class="sec-intro">Systematic reading is more efficient than wandering. Use these strategies to build a focused, comprehensive knowledge of your field.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Start with Anchor Texts</h4><span class="arrow">▼</span></div><div class="acc-body">Ask your supervisor for 3–5 essential works. These are your entry points. Read them carefully and mine their reference lists.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Citation Chaining</h4><span class="arrow">▼</span></div><div class="acc-body"><strong>Backward chaining:</strong> Follow the references in your anchor texts — who did they cite? <strong>Forward chaining:</strong> Use Google Scholar's 'Cited by' feature to find newer works that cite your anchors. This maps the conversation over time.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Databases</h4><span class="arrow">▼</span></div><div class="acc-body">Google Scholar (broad, free), JSTOR (archival), Web of Science (citation tracking), Scopus (broad coverage), SSRN (working papers). Use Boolean operators, quotation marks, and set up alerts for key terms.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Use a Citation Manager from Day One</h4><span class="arrow">▼</span></div><div class="acc-body"><strong>Zotero</strong> (free, browser extension, Word plugin) is the recommended starting point. Mendeley and EndNote are alternatives. The key is consistency: every source you read goes into the manager immediately. This saves dozens of hours at the writing stage.</div></div>
+</div>`,
+`<h2 class="sec-title">Good vs. Bad Literature Review Writing</h2><p class="sec-intro">Compare these two approaches to the same material.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)" style="border-left:3px solid #e94560;"><h3>Weak Approach</h3><p>"Smith (2010) argues that... Jones (2012) found that... Brown (2015) suggests..."</p><div class="detail">This is a list of summaries — a book report. Each author gets a paragraph, but the reader has no idea how they relate to each other, what the overall debate looks like, or why any of this matters to your research. There is no argument, no synthesis, no critical voice.</div></div>
+<div class="card" onclick="tc(this)" style="border-left:3px solid #4caf50;"><h3>Strong Approach</h3><p>"The debate over X has produced two main camps. The first, represented by Smith and Jones, argues... The second, led by Brown, challenges this on the grounds that... Neither, however, accounts for..."</p><div class="detail">This is synthesis. The writer organises by debate, not by author. They show where scholars agree, where they disagree, and where the gaps are. The reader can see the conversation and understands why the writer's research is needed. The critical voice is clear but respectful.</div></div>
+</div>`,
+`<h2 class="sec-title">Annotated Bibliography Builder</h2><p class="sec-intro">Track your key sources here. For each, note the reference, main argument, method, and relevance to your work.</p>
+<div class="builder" id="bibBuilder">
+<label>Full Reference</label><input type="text" id="bib1" placeholder="Author (Year). Title. Journal/Publisher.">
+<label>Main Argument</label><textarea id="bib2" placeholder="What does this source argue?"></textarea>
+<label>Method</label><input type="text" id="bib3" placeholder="e.g., Case study of Turkey, discourse analysis">
+<label>Relevance to Your Research</label><textarea id="bib4" placeholder="How does this source connect to your question?"></textarea>
+<div class="btn-row"><button class="btn-p" onclick="addBib()">Add Entry</button><button class="btn-s" onclick="copyO('bibOut')">Copy All</button><button class="btn-s" onclick="clearBib()">Clear All</button></div>
+<div class="output" id="bibOut"></div>
+</div>`
+]},
+
+{num:5,title:"Finding Your Voice — Academic Writing",short:"Paragraph structure, clarity, writing habits, before-and-after revisions.",tabs:["Text Anatomy","Clarity Tips","Before & After","Writing Exercise"],content:[
+`<h2 class="sec-title">Anatomy of an Academic Text</h2><p class="sec-intro">Academic writing has a clear structure at every level — from the whole thesis down to individual paragraphs.</p>
+<div class="flow">
+<div class="flow-step"><div class="flow-dot">1</div><div class="flow-body" onclick="tf(this)"><h4>Introduction</h4><p>State your question, its significance, your argument, and a roadmap.</p><div class="flow-detail">The introduction is often written last but read first. It must tell the reader: What is the question? Why does it matter? What do you argue? How is the text organised? Aim for 10–15% of total length.</div></div></div>
+<div class="flow-step"><div class="flow-dot">2</div><div class="flow-body" onclick="tf(this)"><h4>Body</h4><p>Develop your argument with evidence, theory, and analysis.</p><div class="flow-detail">Each chapter or section should make one main point that advances the overall argument. Within each section, each paragraph makes one sub-point. The structure should be visible: the reader should never wonder 'why am I reading this?'</div></div></div>
+<div class="flow-step"><div class="flow-dot">3</div><div class="flow-body" onclick="tf(this)"><h4>Conclusion</h4><p>Summarise, reflect on significance, and look ahead.</p><div class="flow-detail">Restate your argument (briefly), summarise what you showed, acknowledge limitations, and discuss implications — for the field, for policy, for future research. No new evidence in the conclusion.</div></div></div>
+</div>`,
+`<h2 class="sec-title">Clarity Tips</h2><p class="sec-intro">Clear writing is not simple writing — it is writing where every sentence earns its place.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>One Idea Per Paragraph</h4><span class="arrow">▼</span></div><div class="acc-body">Each paragraph has a topic sentence (the claim), supporting sentences (evidence and explanation), and a closing/transition sentence. If you find multiple ideas in one paragraph, split it.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Short Sentences</h4><span class="arrow">▼</span></div><div class="acc-body">If a sentence exceeds 25–30 words, consider splitting it. Academic writing does not require long sentences — it requires precise ones.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Cut Padding</h4><span class="arrow">▼</span></div><div class="acc-body">'It is important to note that' → delete. 'In order to' → 'to'. 'Due to the fact that' → 'because'. 'At this point in time' → 'now'. Every filler phrase weakens your prose.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Active Voice</h4><span class="arrow">▼</span></div><div class="acc-body">'The decision was made by the council' → 'The council decided.' Active voice is shorter, clearer, and more direct. Use passive only when the actor is genuinely unknown or irrelevant.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Write Daily, Edit Later</h4><span class="arrow">▼</span></div><div class="acc-body">Separate writing from editing. First draft: get ideas down, accept imperfection. Second pass: restructure and clarify. Third pass: polish sentences and check references. Trying to write perfectly on the first attempt produces paralysis.</div></div>
+</div>`,
+`<h2 class="sec-title">Before & After</h2><p class="sec-intro">See how simple revisions transform academic prose.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)" style="border-left:3px solid #e94560;"><h3>Before: Padding</h3><p>"It is important to note that in the context of international relations, the concept of sovereignty has undergone significant changes."</p><div class="detail"><strong>After:</strong> "The concept of sovereignty has changed significantly."<br><br>16 words eliminated. No meaning lost. The revision is stronger because it moves directly to the point.</div></div>
+<div class="card" onclick="tc(this)" style="border-left:3px solid #e94560;"><h3>Before: Vague</h3><p>"Many scholars have discussed this topic and there are different views."</p><div class="detail"><strong>After:</strong> "Realists and constructivists disagree on whether norms constrain state behaviour: realists argue interests dominate; constructivists argue norms reshape interests."<br><br>The revision names the scholars, states the disagreement, and conveys the substance.</div></div>
+<div class="card" onclick="tc(this)" style="border-left:3px solid #e94560;"><h3>Before: Passive & Long</h3><p>"It has been argued by several authors that the role that was played by international institutions in the process of conflict resolution was not sufficiently examined by previous studies."</p><div class="detail"><strong>After:</strong> "Previous studies underexamined the role of international institutions in conflict resolution."<br><br>One sentence. Active voice. Same meaning. Fourteen words instead of thirty-one.</div></div>
+</div>`,
+`<h2 class="sec-title">Writing Exercise</h2><p class="sec-intro">Draft a 200–300 word introduction to your thesis. State the question, its significance, and your argument (even if preliminary). Use the word counter to track your progress.</p>
+<div class="builder">
+<label>Your Introduction Draft</label>
+<textarea id="we1" placeholder="Begin writing here..." style="min-height:150px;" oninput="weCnt()"></textarea>
+<div id="weStat" style="font-size:.78rem;color:#888;margin-top:.3rem;">Words: 0 | Sentences: ~0</div>
+<div class="btn-row"><button class="btn-s" onclick="copyO('we1')">Copy</button><button class="btn-s" onclick="document.getElementById('we1').value='';weCnt()">Clear</button></div>
+</div>`
+]},
+
+{num:6,title:"Playing by the Rules — Ethics & Integrity",short:"Plagiarism, informed consent, AI and integrity, ethics scenario game.",tabs:["Why Ethics Matter","Plagiarism","Research Ethics","AI & Integrity","Scenario Game"],content:[
+`<h2 class="sec-title">Why Ethics Matter</h2><p class="sec-intro">Academic research rests on trust. Readers trust your data is real, your sources are acknowledged, and your findings are honestly reported. When trust breaks, the damage extends far beyond a single paper.</p>
+<div class="flow">
+<div class="flow-step"><div class="flow-dot">1</div><div class="flow-body" onclick="tf(this)"><h4>Trust</h4><p>Scholarship is a collective enterprise built on honesty.</p><div class="flow-detail">Every citation assumes the cited author reported truthfully. Every reviewer assumes you collected your data as described. Without baseline trust, peer review and cumulative knowledge are impossible.</div></div></div>
+<div class="flow-step"><div class="flow-dot">2</div><div class="flow-body" onclick="tf(this)"><h4>Accountability</h4><p>Researchers are accountable to participants, peers, funders, and the public.</p><div class="flow-detail">If you interview people affected by conflict, you bear responsibility for their wellbeing and privacy. Accountability also means acknowledging mistakes openly.</div></div></div>
+<div class="flow-step"><div class="flow-dot">3</div><div class="flow-body" onclick="tf(this)"><h4>Fairness</h4><p>Give credit where due; do not take credit for others' work.</p><div class="flow-detail">Proper attribution acknowledges the labour of other scholars and allows readers to trace the development of ideas.</div></div></div>
+<div class="flow-step"><div class="flow-dot">4</div><div class="flow-body" onclick="tf(this)"><h4>Consequences</h4><p>Breaches carry real penalties — retraction, degree revocation, career damage.</p><div class="flow-detail">High-profile cases remind us that ethical breaches are discovered, often years later. The most damaging consequence is often invisible: policy made on fabricated evidence.</div></div></div>
+</div>`,
+`<h2 class="sec-title">Understanding Plagiarism</h2><p class="sec-intro">Plagiarism is presenting someone else's words, ideas, or findings as your own. Learning to recognise and avoid it is essential.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>Direct Copying</h3><p>Exact words without quotation marks and citation.</p><div class="detail">Even a single distinctive phrase requires quotation marks and a page reference.</div></div>
+<div class="card" onclick="tc(this)"><h3>Paraphrasing Without Citation</h3><p>Restating an idea without citing the source.</p><div class="detail">If you could not have written it without reading that source, cite it.</div></div>
+<div class="card" onclick="tc(this)"><h3>Patch-Writing</h3><p>Following the source's structure while swapping words.</p><div class="detail">Read the source, close it, write from memory in your own structure — and still cite.</div></div>
+<div class="card" onclick="tc(this)"><h3>Self-Plagiarism</h3><p>Resubmitting previously assessed work without disclosure.</p><div class="detail">You may build on your own work but must disclose and cite the earlier version.</div></div>
+<div class="card" onclick="tc(this)"><h3>How to Avoid It</h3><p>Practical habits that protect you.</p><div class="detail">1. Record sources immediately. 2. Use quotation marks in notes. 3. Paraphrase from memory. 4. Use a citation manager. 5. When in doubt, cite.</div></div>
+</div>`,
+`<h2 class="sec-title">Research Ethics — Working with People</h2><p class="sec-intro">If your research involves human participants, you have ethical obligations beyond citation.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Informed Consent</h4><span class="arrow">▼</span></div><div class="acc-body">Participants must understand the research, how their data will be used, and that they can withdraw at any time. Document consent. For sensitive topics, consider whether even requesting consent could put someone at risk.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Confidentiality</h4><span class="arrow">▼</span></div><div class="acc-body">Use pseudonyms, remove identifying details, store data securely. In small communities, even anonymised data can be identifiable if contextual details are too specific.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Do No Harm</h4><span class="arrow">▼</span></div><div class="acc-body">Consider physical, psychological, social, and economic risks. In conflict zones, even associating with a foreign researcher can carry risks.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Ethics Committee</h4><span class="arrow">▼</span></div><div class="acc-body">Submit ethics applications early — reviews take weeks or months. Treat the process as a useful exercise in thinking through your design.</div></div>
+</div>`,
+`<h2 class="sec-title">AI Tools & Academic Integrity</h2><p class="sec-intro">AI writing tools are part of the landscape. The guiding principle is transparency.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)" style="border-left:3px solid #4caf50;"><h3 style="color:#4caf50;">Acceptable</h3><p>Brainstorming, grammar checks, translation aid, formatting.</p><div class="detail">These treat AI as a tool — like a dictionary. The ideas, arguments, and analysis remain yours.</div></div>
+<div class="card" onclick="tc(this)" style="border-left:3px solid #ff9800;"><h3 style="color:#ff9800;">Grey Area — Disclose</h3><p>Summarising, generating outlines, restructuring drafts.</p><div class="detail">If AI contributed meaningfully, disclose it. Many journals now require an AI-use declaration.</div></div>
+<div class="card" onclick="tc(this)" style="border-left:3px solid #e94560;"><h3>Not Acceptable</h3><p>Submitting AI text as yours, AI-generated analysis, fabricated citations.</p><div class="detail">Your degree certifies your ability to think and produce knowledge — not your ability to prompt a machine.</div></div>
+</div>`,
+`<h2 class="sec-title">Ethics Scenario Game</h2><p class="sec-intro">Test your ethical judgment. Read each scenario and choose the best course of action.</p>
+<div id="ethGame"></div>`
+]},
+
+{num:7,title:"How Academia Works — Publishing & Peer Review",short:"Journal landscape, submission pipeline, reviewer criteria, abstract builder.",tabs:["Publishing Landscape","Submission Pipeline","What Reviewers Want","Abstract Builder"],content:[
+`<h2 class="sec-title">The Publishing Landscape</h2><p class="sec-intro">Publishing is the thesis translated into the currency of academic life.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>Why Publish During a PhD?</h3><p>It sharpens arguments, builds your CV, and the revision process teaches you.</p><div class="detail">Publishing forces you to meet external standards. The feedback loop between submission, review, revision, and resubmission is one of the most effective learning experiences available.</div></div>
+<div class="card" onclick="tc(this)"><h3>Types of Publication</h3><p>Articles, chapters, monographs, working papers, book reviews.</p><div class="detail">Journal articles are the primary currency. Book reviews are an underrated entry point — easier to place and they get your name in front of editors.</div></div>
+<div class="card" onclick="tc(this)"><h3>Predatory Journals</h3><p>Not all journals are legitimate — learn to spot fakes.</p><div class="detail">Warning signs: unsolicited email invitations, fast 'review,' no recognisable board, no indexing. A predatory publication is worse than no publication.</div></div>
+<div class="card" onclick="tc(this)"><h3>Rejection is Normal</h3><p>Top IR journals reject 90–95% of submissions.</p><div class="detail">Most published articles were rejected at least once. Revise and resubmit elsewhere. Persistence is a professional skill.</div></div>
+</div>`,
+`<h2 class="sec-title">The Submission Pipeline</h2><p class="sec-intro">From manuscript to publication — what happens at each stage.</p>
+<div class="flow">
+<div class="flow-step"><div class="flow-dot">1</div><div class="flow-body" onclick="tf(this)"><h4>Pre-Submission</h4><p>Finalise, choose journal, format, prepare cover letter.</p><div class="flow-detail">Read author guidelines. Remove identifying info for blind review. Ask a colleague to read before submitting.</div></div></div>
+<div class="flow-step"><div class="flow-dot">2</div><div class="flow-body" onclick="tf(this)"><h4>Desk Review (1–4 weeks)</h4><p>Editor decides whether to send for review.</p><div class="flow-detail">Desk rejections are fast and common. They reflect editorial priorities, not personal judgment.</div></div></div>
+<div class="flow-step"><div class="flow-dot">3</div><div class="flow-body" onclick="tf(this)"><h4>Peer Review (2–6 months)</h4><p>2–3 anonymous experts evaluate the manuscript.</p><div class="flow-detail">Outcomes: accept (rare first time), minor revisions (good news), major revisions (potential), reject.</div></div></div>
+<div class="flow-step"><div class="flow-dot">4</div><div class="flow-body" onclick="tf(this)"><h4>Decision & Revision</h4><p>Address every reviewer point in a response memo.</p><div class="flow-detail">Engage with every point seriously. Even when you disagree, explain why with evidence.</div></div></div>
+<div class="flow-step"><div class="flow-dot">5</div><div class="flow-body" onclick="tf(this)"><h4>Acceptance & Publication</h4><p>Copyediting, proofs, online-first, then print.</p><div class="flow-detail">Total time from submission to print: typically 12–24 months. Plan accordingly.</div></div></div>
+</div>
+<div class="warn"><strong>Rule:</strong> Never submit the same manuscript to two journals simultaneously.</div>`,
+`<h2 class="sec-title">What Reviewers Look For</h2><p class="sec-intro">Understanding reviewer criteria helps you write stronger papers.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Clear Research Question</h4><span class="arrow">▼</span></div><div class="acc-body">Stated early, unambiguously, connected to a wider debate. A competent paper with an unclear question will be rejected.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Literature Engagement</h4><span class="arrow">▼</span></div><div class="acc-body">Cite the right things, not everything. Missing a major recent contribution is a common reason for negative reviews.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Theoretical Contribution</h4><span class="arrow">▼</span></div><div class="acc-body">"Filling a gap" is necessary but not sufficient — reviewers want to know why filling this gap matters.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Methodological Rigour</h4><span class="arrow">▼</span></div><div class="acc-body">Appropriate design, transparent methods, sufficient evidence. A paper that acknowledges limitations honestly is stronger than one that pretends to have none.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Clear Writing</h4><span class="arrow">▼</span></div><div class="acc-body">Unclear writing usually signals unclear thinking. Reviewers favour clear, well-organised prose.</div></div>
+</div>`,
+`<h2 class="sec-title">Abstract Builder</h2><p class="sec-intro">Build a structured abstract: context → gap → question → method → finding → contribution.</p>
+<div class="builder">
+<label>Context (1–2 sentences)</label><textarea id="ab1" placeholder="What broad topic?" oninput="abCnt()"></textarea>
+<label>Gap (1 sentence)</label><textarea id="ab2" placeholder="What is missing?" oninput="abCnt()"></textarea>
+<label>Research Question</label><textarea id="ab3" placeholder="Your question" style="min-height:45px;" oninput="abCnt()"></textarea>
+<label>Method</label><textarea id="ab4" placeholder="How do you answer it?" style="min-height:45px;" oninput="abCnt()"></textarea>
+<label>Finding / Argument</label><textarea id="ab5" placeholder="What do you find?" oninput="abCnt()"></textarea>
+<label>Contribution</label><textarea id="ab6" placeholder="Why does it matter?" style="min-height:45px;" oninput="abCnt()"></textarea>
+<div id="abWc" style="font-size:.78rem;color:#888;margin-top:.3rem;">Words: 0 / 250</div>
+<div class="btn-row"><button class="btn-p" onclick="genAb()">Generate</button><button class="btn-s" onclick="copyO('abOut')">Copy</button><button class="btn-s" onclick="clr(['ab1','ab2','ab3','ab4','ab5','ab6'],'abOut')">Clear</button></div>
+<div class="output" id="abOut"></div>
+</div>`
+]},
+
+{num:8,title:"Getting Out There — Conferences & Networking",short:"Conference explorer, ECPR gateway and funding, presenting, networking, building a profile.",tabs:["Why Conferences","ECPR Gateway","Presenting Tips","Networking","Build Your Profile"],content:[
+`<h2 class="sec-title">Why Attend Conferences?</h2><p class="sec-intro">Conferences are where the academic world comes alive beyond the page.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>Live Feedback</h3><p>Real-time responses from scholars outside your committee.</p><div class="detail">A twenty-minute presentation followed by questions can advance your thinking by weeks. The feedback is more direct than written peer review.</div></div>
+<div class="card" onclick="tc(this)"><h3>Enter the Community</h3><p>Meet the people whose names you see in footnotes.</p><div class="detail">Meeting scholars transforms the literature from abstract text into a living conversation you are joining.</div></div>
+<div class="card" onclick="tc(this)"><h3>Build Your CV</h3><p>Presentations count — and they lead to publications.</p><div class="detail">Many published articles began as conference papers. The feedback loop between presentation and revision is how scholarship develops.</div></div>
+<div class="card" onclick="tc(this)"><h3>Motivation</h3><p>Break the isolation of thesis writing.</p><div class="detail">Conferences inject energy. You remember why you chose this topic and return with renewed focus.</div></div>
+</div>`,
+`<h2 class="sec-title">Your ECPR Gateway</h2><p class="sec-intro">Your department's ECPR membership opens doors to Europe's largest political science community.</p>
+<div class="ecpr-box">
+<h3>ECPR Events</h3>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>General Conference</h3><p>Europe's largest annual political science gathering.</p><div class="detail">Late August/September. 2,000+ participants. Open calls across all subfields. Welcoming to graduate students.</div></div>
+<div class="card" onclick="tc(this)"><h3>Joint Sessions</h3><p>Intensive small-group workshops over several days.</p><div class="detail">~15 participants per workshop. Papers discussed in depth. Workshop papers often become edited volumes or special issues.</div></div>
+<div class="card" onclick="tc(this)"><h3>Graduate Student Conference</h3><p>By students, for students — ideal first conference.</p><div class="detail">Low-pressure, supportive. Senior scholars serve as discussants. Builds a peer network across Europe.</div></div>
+<div class="card" onclick="tc(this)"><h3>Methods Schools</h3><p>Summer and winter intensive training.</p><div class="detail">Ljubljana (summer), Bamberg (winter). Courses from introductory to advanced. Strengthens your thesis and your CV.</div></div>
+</div>
+<div style="margin-top:1rem;padding:.8rem;background:#13141b;border:1px solid #2a3a4a;border-radius:7px;">
+<h4 style="color:#4a90d9;margin-bottom:.3rem;font-size:.88rem;">Funding</h4>
+<p style="font-size:.82rem;color:#b0c0d0;line-height:1.4;">Apply for registration, travel, and accommodation funding at <strong>ecpr.eu/Funding</strong> (email: funding@ecpr.eu). Apply early.</p>
+</div>
+</div>`,
+`<h2 class="sec-title">Presenting Tips</h2><p class="sec-intro">A conference presentation is a pitch for attention and feedback — not a lecture.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Structure (15 min)</h4><span class="arrow">▼</span></div><div class="acc-body">Opening/hook (2 min) → Context (2–3 min) → Argument (3 min) → Evidence (5 min) → Conclusion (2 min). Prepare for 12–13 minutes. Never go over time.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Slides</h4><span class="arrow">▼</span></div><div class="acc-body">10–15 slides max. Large font, one idea per slide. Do not read from slides. They illustrate — your voice argues.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Handling Questions</h4><span class="arrow">▼</span></div><div class="acc-body">Listen fully before responding. It is fine to say "I haven't fully worked that out yet." Honesty is valued more than bluffing.</div></div>
+</div>`,
+`<h2 class="sec-title">Networking Without the Awkwardness</h2><p class="sec-intro">Academic networking is simply having conversations about shared intellectual interests.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Before the Conference</h4><span class="arrow">▼</span></div><div class="acc-body">Identify 3–5 panels and 2–3 scholars to meet. Read their recent work. Having a shortlist gives you purpose.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Starting Conversations</h4><span class="arrow">▼</span></div><div class="acc-body">Ask a question during Q&A, then approach afterwards. "I'm a PhD student at EMU working on [topic] — I had a question about [X]." This is what conferences are for.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Follow Up</h4><span class="arrow">▼</span></div><div class="acc-body">Within a week, send a brief email referencing the conversation. This turns encounters into professional contacts.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>As an Introvert</h4><span class="arrow">▼</span></div><div class="acc-body">Set modest goals: two meaningful conversations per day. Use panels as conversation starters. Invite someone for coffee one-on-one.</div></div>
+</div>`,
+`<h2 class="sec-title">Build Your Academic Profile</h2><p class="sec-intro">Check off each platform as you set it up.</p>
+<div id="profileChecks"></div>
+<div class="progress-bar"><div class="progress-fill" id="profProg" style="width:0%;">0 / 6</div></div>`
+]},
+
+{num:9,title:"The Long Road — Supervision & Wellbeing",short:"PhD phases, supervisor relationship, difficult moments, wellbeing check-in, milestone planner.",tabs:["PhD Phases","Supervision","Difficult Moments","Wellbeing Check","Survival Strategies","Milestone Planner"],content:[
+`<h2 class="sec-title">The PhD Journey</h2><p class="sec-intro">Understanding the typical phases helps you recognise that what you feel is normal.</p>
+<div class="flow">
+<div class="flow-step"><div class="flow-dot">1</div><div class="flow-body" onclick="tf(this)"><h4>Enthusiasm</h4><p>Everything feels possible and exciting.</p><div class="flow-detail">The temptation is to keep reading without narrowing. Enjoy the energy but start making decisions about scope.</div></div></div>
+<div class="flow-step"><div class="flow-dot">2</div><div class="flow-body" onclick="tf(this)"><h4>Doubt</h4><p>The honeymoon ends — choosing means giving things up.</p><div class="flow-detail">Imposter syndrome often appears. Commit to a workable question, not the perfect one. Talk to your supervisor.</div></div></div>
+<div class="flow-step"><div class="flow-dot">3</div><div class="flow-body" onclick="tf(this)"><h4>The Messy Middle</h4><p>Data collection, writing, rewriting — the long stretch.</p><div class="flow-detail">Progress is real but hard to see daily. Set small goals (300 words/day) and track progress visually.</div></div></div>
+<div class="flow-step"><div class="flow-dot">4</div><div class="flow-body" onclick="tf(this)"><h4>Coming Together</h4><p>The pieces start to connect.</p><div class="flow-detail">Focus on coherence and argument, not perfection. Good enough and finished beats perfect and incomplete.</div></div></div>
+<div class="flow-step"><div class="flow-dot">5</div><div class="flow-body" onclick="tf(this)"><h4>Finishing</h4><p>The final push and the strange grief of completion.</p><div class="flow-detail">Allow yourself rest after submission. You have produced original knowledge.</div></div></div>
+</div>
+<div class="tip"><strong>For our MA student:</strong> These phases apply in compressed form to your dissertation too.</div>`,
+`<h2 class="sec-title">Working with Your Supervisor</h2><p class="sec-intro">The most important professional relationship of your doctoral career.</p>
+<div class="card-grid">
+<div class="card" onclick="tc(this)"><h3>What They Do</h3><p>Guide, challenge, support — not write your thesis.</p><div class="detail">They provide intellectual guidance, institutional support, and professional socialisation. The thesis is yours.</div></div>
+<div class="card" onclick="tc(this)"><h3>Set Expectations Early</h3><p>Have the "how do we work" conversation in month one.</p><div class="detail">Meeting frequency, communication style, draft turnaround time, feedback format. Most frustrations stem from unspoken assumptions.</div></div>
+<div class="card" onclick="tc(this)"><h3>Make Meetings Productive</h3><p>Send an agenda, take notes, follow up.</p><div class="detail">Ask specific questions. Send a brief summary of what was agreed afterwards.</div></div>
+<div class="card" onclick="tc(this)"><h3>When Things Get Difficult</h3><p>Talk directly first. Escalate if needed.</p><div class="detail">Speak to your co-supervisor or graduate director if direct conversation fails. Changing supervisors is possible and sometimes necessary.</div></div>
+</div>`,
+`<h2 class="sec-title">Difficult Moments</h2><p class="sec-intro">Every doctoral journey includes crisis, doubt, or frustration. Recognising these situations makes them less paralysing.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Imposter Syndrome</h4><span class="arrow">▼</span></div><div class="acc-body">"Everyone else knows what they're doing." The feeling is real; the belief is false. You were admitted because qualified people found your work promising. Track your accomplishments to counter it.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Writer's Block</h4><span class="arrow">▼</span></div><div class="acc-body">Usually about thinking, not writing. Lower the bar: write badly on purpose. Write as if explaining to a friend. Separate writing from editing.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Comparison with Peers</h4><span class="arrow">▼</span></div><div class="acc-body">PhDs are not races. Different projects have different timelines. The only meaningful comparison: where you are now vs. six months ago.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Burnout</h4><span class="arrow">▼</span></div><div class="acc-body">Not laziness — the result of sustained overwork without recovery. Rest is not a reward for productivity; it is a prerequisite. If exhaustion persists, speak to a counsellor.</div></div>
+</div>`,
+`<h2 class="sec-title">Wellbeing Check-In</h2><p class="sec-intro">A private reflection tool. Nothing is recorded or shared.</p>
+<div id="wbChecks"></div>
+<div class="btn-row" style="justify-content:center;"><button class="btn-p" onclick="wbReflect()" style="background:#4a90d9;">Reflect</button><button class="btn-s" onclick="wbReset()">Reset</button></div>
+<div class="output" id="wbOut"></div>
+<div class="warn" style="margin-top:.8rem;"><strong>Important:</strong> This is self-reflection, not clinical assessment. If you are struggling, please reach out to a counsellor.</div>`,
+`<h2 class="sec-title">Survival Strategies</h2><p class="sec-intro">Simple habits that, practised consistently, make the difference between finishing and not finishing.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Write Every Day</h4><span class="arrow">▼</span></div><div class="acc-body">30–60 minutes, before email. Even 200 words/day = 73,000 words/year. A thesis is built sentence by sentence.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Track Progress Visually</h4><span class="arrow">▼</span></div><div class="acc-body">A simple chart of daily word count. When you feel stuck, look at the chart — progress is usually larger than you think.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Set Boundaries</h4><span class="arrow">▼</span></div><div class="acc-body">Decide when you work and when you don't. Rest is productive.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Find Your People</h4><span class="arrow">▼</span></div><div class="acc-body">2–3 peers who understand. Meet regularly. The four of you in this seminar share a rare experience — support each other.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Move Your Body</h4><span class="arrow">▼</span></div><div class="acc-body">Exercise reduces anxiety, improves sleep, and enhances concentration. Schedule it like a meeting.</div></div>
+</div>`,
+`<h2 class="sec-title">Milestone Planner</h2><p class="sec-intro">Break your thesis into manageable milestones.</p>
+<div class="ms-row"><input type="text" id="msT" placeholder="Task (e.g., Complete lit review)"><input type="date" id="msD"><select id="msP"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select><button class="btn-p" onclick="addMs()">+ Add</button></div>
+<div id="msList"></div>
+<div class="progress-bar" id="msBar" style="display:none;"><div class="progress-fill" id="msFill" style="width:0%;">0%</div></div>
+<div class="btn-row"><button class="btn-s" onclick="copyMs()">Copy Plan</button><button class="btn-s" onclick="clearMs()">Clear</button></div>`
+]},
+
+{num:10,title:"Show and Tell — Presenting & Looking Ahead",short:"Final presentation structure, peer feedback, career paths, viva guide, seminar reflection.",tabs:["Presentation Structure","Outline Builder","Peer Feedback","Looking Ahead","The Viva","Reflection"],content:[
+`<h2 class="sec-title">Structuring Your Final Presentation</h2><p class="sec-intro">15 minutes to present, followed by questions and peer feedback. Here's how to make those minutes count.</p>
+<div class="flow">
+<div class="flow-step"><div class="flow-dot">1</div><div class="flow-body" onclick="tf(this)"><h4>The Hook (2 min)</h4><p>Grab attention, state your puzzle.</p><div class="flow-detail">Do not begin with "In this presentation I will..." Start with the puzzle. A concrete example or surprising statistic. End with your research question in one sentence.</div></div></div>
+<div class="flow-step"><div class="flow-dot">2</div><div class="flow-body" onclick="tf(this)"><h4>Context (3 min)</h4><p>Position your work — briefly.</p><div class="flow-detail">"The existing literature says X; I argue Y because Z." That's all the audience needs.</div></div></div>
+<div class="flow-step"><div class="flow-dot">3</div><div class="flow-body" onclick="tf(this)"><h4>Argument (3 min)</h4><p>State your claim clearly.</p><div class="flow-detail">The audience should leave able to summarise your argument in one sentence.</div></div></div>
+<div class="flow-step"><div class="flow-dot">4</div><div class="flow-body" onclick="tf(this)"><h4>Evidence (4 min)</h4><p>Your strongest evidence.</p><div class="flow-detail">One well-chosen example is worth more than a flood of information. Be transparent about limitations.</div></div></div>
+<div class="flow-step"><div class="flow-dot">5</div><div class="flow-body" onclick="tf(this)"><h4>Conclusion (3 min)</h4><p>Restate, reflect, invite feedback.</p><div class="flow-detail">Tell the audience what feedback you need: "I'm particularly interested in your thoughts on my case selection."</div></div></div>
+</div>`,
+`<h2 class="sec-title">Outline Builder</h2><p class="sec-intro">Draft your presentation structure here.</p>
+<div class="builder">
+<label>Title</label><input type="text" id="ob1" placeholder="Your presentation title">
+<label>Hook (2–3 sentences)</label><textarea id="ob2" placeholder="Opening puzzle or question"></textarea>
+<label>Research Question</label><textarea id="ob3" placeholder="One clear sentence" style="min-height:45px;"></textarea>
+<label>Context & Literature</label><textarea id="ob4" placeholder="Key debate and gap (3–4 sentences)"></textarea>
+<label>Your Argument</label><textarea id="ob5" placeholder="Your central claim (2–3 sentences)"></textarea>
+<label>Method & Evidence</label><textarea id="ob6" placeholder="Cases, data, key findings"></textarea>
+<label>Limitations</label><textarea id="ob7" placeholder="Main limitations" style="min-height:40px;"></textarea>
+<label>Feedback Needed</label><textarea id="ob8" placeholder="What feedback do you want?" style="min-height:40px;"></textarea>
+<div class="btn-row"><button class="btn-p" onclick="genOB()">Generate Outline</button><button class="btn-s" onclick="copyO('obOut')">Copy</button></div>
+<div class="output" id="obOut"></div>
+</div>`,
+`<h2 class="sec-title">Peer Feedback</h2><p class="sec-intro">Use this to provide structured feedback on peers' presentations.</p>
+<div class="builder">
+<label>Presenter</label><input type="text" id="pf0" placeholder="Name">
+<label>Research Question — clear and significant?</label><textarea id="pf1" placeholder="Feedback..." style="min-height:45px;"></textarea>
+<label>Argument — convincing?</label><textarea id="pf2" placeholder="Feedback..." style="min-height:45px;"></textarea>
+<label>Method — appropriate?</label><textarea id="pf3" placeholder="Feedback..." style="min-height:45px;"></textarea>
+<label>Presentation — clear, well-timed?</label><textarea id="pf4" placeholder="Feedback..." style="min-height:45px;"></textarea>
+<label>Key Strengths</label><textarea id="pf5" placeholder="What worked well?"></textarea>
+<label>Key Suggestions</label><textarea id="pf6" placeholder="2–3 specific improvements"></textarea>
+<div class="btn-row"><button class="btn-p" onclick="genPF()">Generate Report</button><button class="btn-s" onclick="copyO('pfOut')">Copy</button></div>
+<div class="output" id="pfOut"></div>
+</div>`,
+`<h2 class="sec-title">Looking Ahead</h2><p class="sec-intro">The seminar ends, but your journey continues. Here are the paths ahead.</p>
+<div class="card-grid">
+<div class="path-card" onclick="this.classList.toggle('open')"><h3>The Academic Path</h3><p>Postdocs, lectureships, tenure track.</p><div class="path-detail">Competition is intense. Publications, teaching experience, conference presentations, a clear research agenda, and strong references distinguish successful candidates. Start building now.</div></div>
+<div class="path-card" onclick="this.classList.toggle('open')"><h3>Policy & International Orgs</h3><p>Think tanks, UN, EU, NGOs, government.</p><div class="path-detail">Values analytical skills, area expertise, languages, and clear communication. Build a LinkedIn presence and write occasional policy briefs.</div></div>
+<div class="path-card" onclick="this.classList.toggle('open')"><h3>Consultancy & Private Sector</h3><p>Political risk, strategic analysis.</p><div class="path-detail">Firms like Control Risks, Eurasia Group value your ability to analyse complex situations and write clearly.</div></div>
+<div class="path-card" onclick="this.classList.toggle('open')"><h3>Public Scholarship</h3><p>Writing for wider audiences, media, commentary.</p><div class="path-detail">Foreign Affairs, The Conversation, podcasts. The skills from this seminar — clear writing, structured argument — are exactly what this requires.</div></div>
+<div class="path-card" onclick="this.classList.toggle('open')"><h3>The Portfolio Career</h3><p>Combining roles — increasingly the norm.</p><div class="path-detail">Part teaching, part research, part consultancy. The PhD's versatile skills — analysis, project management, communication — transfer everywhere.</div></div>
+</div>
+<div class="highlight" style="margin-top:1rem;"><h3>Next Six Months</h3><p>Submit one abstract. Revise one piece of writing. Update your profiles. Schedule writing time. Stay in touch with peers. Meet your supervisor to set milestones.</p></div>`,
+`<h2 class="sec-title">The Viva / Defence</h2><p class="sec-intro">The final oral examination — a sustained conversation about your work with scholars who have read it carefully.</p>
+<div class="accordion">
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>What Is a Viva?</h4><span class="arrow">▼</span></div><div class="acc-body">1–3 hour oral exam. Internal and external examiners question you. Not hostile — scholarly conversation. Outcomes: pass, minor corrections, major corrections, or (rarely) referral.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>How to Prepare</h4><span class="arrow">▼</span></div><div class="acc-body">Re-read your thesis. Anticipate questions. Practise aloud. Know the examiners' work.</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>Common Questions</h4><span class="arrow">▼</span></div><div class="acc-body">Summarise in 3–5 minutes. Original contribution? Why this method? Limitations? What would you change? Policy implications? Where next?</div></div>
+<div class="acc-item" onclick="ta(this)"><div class="acc-header"><h4>On the Day</h4><span class="arrow">▼</span></div><div class="acc-body">Arrive early. Bring annotated thesis. Think before speaking. Ask for clarification. Admit when unsure.</div></div>
+</div>
+<div class="tip"><strong>For our MA student:</strong> Your defence will be shorter and less formal, but the principles are identical.</div>`,
+`<h2 class="sec-title">Seminar Reflection</h2><p class="sec-intro">Reflect on the ten weeks. Share in the Module 10 Teams channel if comfortable.</p>
+<div class="reflect-grid">
+<div class="reflect-card"><h4>Most Valuable Insight</h4><textarea id="rf1" placeholder="The most useful thing you learned..."></textarea></div>
+<div class="reflect-card"><h4>How Your Research Changed</h4><textarea id="rf2" placeholder="Has your question, method, or framing shifted?"></textarea></div>
+<div class="reflect-card"><h4>Skills Developed</h4><textarea id="rf3" placeholder="Writing, presenting, reading critically..."></textarea></div>
+<div class="reflect-card"><h4>What You Still Need</h4><textarea id="rf4" placeholder="Gaps remaining..."></textarea></div>
+<div class="reflect-card"><h4>Goal: Next Three Months</h4><textarea id="rf5" placeholder="One concrete goal..."></textarea></div>
+<div class="reflect-card"><h4>Message to Peers</h4><textarea id="rf6" placeholder="Anything to say to the group..."></textarea></div>
+</div>
+<div class="btn-row" style="justify-content:center;"><button class="btn-p" onclick="genRef()">Generate</button><button class="btn-s" onclick="copyO('rfOut')">Copy</button></div>
+<div class="output" id="rfOut"></div>
+<div class="highlight" style="margin-top:1rem;"><h3>Thank You</h3><p>This seminar was built around the idea that doctoral research is a human endeavour as much as an intellectual one. The four of you share something that will connect you long after this course ends. Stay in touch, support each other, and remember: the best research is done by people who take care of themselves and each other.</p></div>`
+]}
+];
+
+/* ═══════════════════════════════════════
+   RENDERING ENGINE
+   ═══════════════════════════════════════ */
+
+// Home screen module list
+const ml = document.getElementById('moduleList');
+M.forEach((m,i)=>{
+  ml.innerHTML += `<div class="module-btn" onclick="openModule(${i})"><div class="num">${m.num}</div><div class="info"><h3>${m.title}</h3><p>${m.short}</p></div><div class="chevron">›</div></div>`;
+});
+
+// Build module views
+const mc = document.getElementById('moduleContainer');
+M.forEach((m,i)=>{
+  let nav = m.tabs.map((t,j)=>`<button class="${j===0?'active':''}" onclick="showSec(${i},${j})">${t}</button>`).join('');
+  let secs = m.content.map((c,j)=>`<div class="section ${j===0?'active':''}" id="sec_${i}_${j}">${c}</div>`).join('');
+  mc.innerHTML += `<div class="module-view" id="mod_${i}"><div class="mod-nav" id="nav_${i}">${nav}</div><div class="mod-content">${secs}</div></div>`;
+});
+
+/* ═══ Navigation ═══ */
+function openModule(i){
+  document.getElementById('home').style.display='none';
+  document.querySelectorAll('.module-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('mod_'+i).classList.add('active');
+  document.getElementById('topTitle').textContent = 'Module '+M[i].num+' – '+M[i].title;
+  document.getElementById('backBtn').style.display='block';
+  window.scrollTo(0,0);
+  // Init dynamic content
+  if(i===5) initEthGame();
+  if(i===7) initProfile();
+  if(i===8) initWb();
+}
+
+function goHome(){
+  document.querySelectorAll('.module-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('home').style.display='block';
+  document.getElementById('topTitle').textContent='INTL698 – Doctoral Seminar';
+  document.getElementById('backBtn').style.display='none';
+  window.scrollTo(0,0);
+}
+
+function showSec(mod,sec){
+  document.querySelectorAll(`#mod_${mod} .section`).forEach(s=>s.classList.remove('active'));
+  document.getElementById(`sec_${mod}_${sec}`).classList.add('active');
+  document.querySelectorAll(`#nav_${mod} button`).forEach((b,j)=>b.classList.toggle('active',j===sec));
+}
+
+/* ═══ Toggle helpers ═══ */
+function tc(el){el.classList.toggle('open');}
+function ta(el){el.classList.toggle('open');}
+function tf(el){el.classList.toggle('open');}
+
+/* ═══ Copy helper ═══ */
+function copyO(id){
+  const el=document.getElementById(id);
+  const text=el.value||el.textContent;
+  if(!text){alert('Nothing to copy yet.');return;}
+  navigator.clipboard.writeText(text).then(()=>alert('Copied!')).catch(()=>{const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('Copied!');});
+}
+
+/* ═══ Clear helper ═══ */
+function clr(ids,outId){
+  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  if(outId){const o=document.getElementById(outId);o.textContent='';o.classList.remove('show');}
+}
+
+/* ═══ Module 2 — RQ Builder ═══ */
+function genRQ(){
+  const v=id=>document.getElementById(id).value.trim();
+  if(!v('rq4')){alert('Please enter a research question.');return;}
+  let t=`RESEARCH QUESTION SUMMARY\n\nTopic: ${v('rq1')||'[Not specified]'}\nPuzzle: ${v('rq2')||'[Not specified]'}\nLiterature gap: ${v('rq3')||'[Not specified]'}\n\nRESEARCH QUESTION:\n${v('rq4')}\n\nType: ${v('rq5')||'[Not specified]'}`;
+  const o=document.getElementById('rqOut');o.textContent=t;o.classList.add('show');
+}
+
+/* ═══ Module 3 — Method Finder ═══ */
+function findMethod(){
+  const k=document.getElementById('mf1').value;
+  const n=document.getElementById('mf2').value;
+  const m=document.getElementById('mf3').value;
+  if(!k||!n||!m){alert('Please answer all three questions.');return;}
+  let suggestions=[];
+  if(k==='causal'&&n==='one') suggestions.push('Process Tracing — trace the causal mechanism step by step within a single case.');
+  if(k==='causal'&&n==='few') suggestions.push('Comparative Case Study (Most-Similar/Most-Different Design) — isolate causal factors across cases.');
+  if(k==='causal'&&n==='many') suggestions.push('Statistical / Large-N Analysis — test causal hypotheses across many cases.');
+  if(k==='meaning') suggestions.push('Discourse Analysis or Interpretive Interview Study — explore how actors construct meaning.');
+  if(k==='pattern') suggestions.push('Large-N or Survey Research — identify regularities and distributions.');
+  if(k==='process') suggestions.push('Process Tracing — reconstruct the sequence of events and decisions.');
+  if(m==='people') suggestions.push('Semi-Structured Interviews and/or Ethnography — access insider perspectives.');
+  if(m==='texts') suggestions.push('Document / Archival Analysis — systematic reading of primary sources.');
+  if(m==='mixed') suggestions.push('Mixed Methods — combine quantitative breadth with qualitative depth.');
+  if(n==='few'&&m==='texts') suggestions.push('Comparative Historical Analysis — structured comparison of documentary evidence.');
+  const o=document.getElementById('mfOut');o.textContent='SUGGESTED METHODS:\n\n'+[...new Set(suggestions)].map((s,i)=>`${i+1}. ${s}`).join('\n\n');o.classList.add('show');
+}
+
+/* ═══ Module 4 — Bibliography ═══ */
+let bibEntries=[];
+function addBib(){
+  const ref=document.getElementById('bib1').value.trim();
+  if(!ref){alert('Enter a reference.');return;}
+  bibEntries.push({ref,arg:document.getElementById('bib2').value.trim(),meth:document.getElementById('bib3').value.trim(),rel:document.getElementById('bib4').value.trim()});
+  ['bib1','bib2','bib3','bib4'].forEach(id=>document.getElementById(id).value='');
+  renderBib();
+}
+function renderBib(){
+  const o=document.getElementById('bibOut');
+  if(!bibEntries.length){o.classList.remove('show');return;}
+  o.textContent=`ANNOTATED BIBLIOGRAPHY (${bibEntries.length} sources)\n\n`+bibEntries.map((b,i)=>`${i+1}. ${b.ref}\n   Argument: ${b.arg||'-'}\n   Method: ${b.meth||'-'}\n   Relevance: ${b.rel||'-'}`).join('\n\n');
+  o.classList.add('show');
+}
+function clearBib(){bibEntries=[];renderBib();}
+
+/* ═══ Module 5 — Word Count ═══ */
+function weCnt(){
+  const t=document.getElementById('we1').value.trim();
+  const w=t?t.split(/\s+/).length:0;
+  const s=t?(t.match(/[.!?]+/g)||[]).length:0;
+  document.getElementById('weStat').textContent=`Words: ${w} | Sentences: ~${s}`;
+}
+
+/* ═══ Module 6 — Ethics Game ═══ */
+const ethScenarios=[
+  {text:"You find a perfect summary in a classmate's paper. You want to use it.",opts:[{l:"Copy it, cite the original sources only.",c:false,f:"The summary itself was written by your classmate. Cite both the originals AND your classmate, and paraphrase."},{l:"Paraphrase and cite both original sources and your classmate.",c:true,f:"Correct. Original ideas need original citations; your classmate's synthesis needs acknowledgment too."},{l:"Quote it and cite only your classmate.",c:false,f:"The original ideas still need their original citations."}]},
+  {text:"An interviewee becomes visibly distressed during your interview.",opts:[{l:"Continue — they signed consent.",c:false,f:"Consent is ongoing. A signed form doesn't override current wellbeing."},{l:"Pause, check on them, offer to stop or reschedule.",c:true,f:"Correct. Wellbeing always takes priority over data collection."},{l:"Skip to easier questions and finish quickly.",c:false,f:"This prioritises your data over the participant's state."}]},
+  {text:"Your statistical results only become significant if you remove three outliers.",opts:[{l:"Remove them and report the significant result.",c:false,f:"Removing cases solely to get significance is data manipulation."},{l:"Report both analyses transparently.",c:true,f:"Correct. Transparency is key. Present both and explain your reasoning."},{l:"Only report the non-significant full result.",c:false,f:"Honest, but you miss the richer discussion. Report both."}]},
+  {text:"You used AI to substantially rewrite a section of your literature review.",opts:[{l:"No disclosure needed — the ideas are mine.",c:false,f:"The expression is substantially the AI's. Your degree assesses your writing ability."},{l:"Disclose AI use, then rewrite the section yourself.",c:true,f:"Correct. Use the AI draft as a guide, write it yourself, disclose."},{l:"Fine if you check for accuracy.",c:false,f:"Accuracy is necessary but not sufficient. The authorship concern remains."}]}
+];
+let ethIdx=0,ethScore=0,ethTotal=0;
+function initEthGame(){
+  ethIdx=0;ethScore=0;ethTotal=0;
+  renderEth();
+}
+function renderEth(){
+  const box=document.getElementById('ethGame');
+  if(ethIdx>=ethScenarios.length){
+    box.innerHTML=`<p style="font-size:.9rem;color:#d0d0e0;">Game complete. Score: <strong>${ethScore}/${ethScenarios.length}</strong>.</p><div class="btn-row"><button class="btn-p" onclick="initEthGame()">Play Again</button></div>`;
+    return;
+  }
+  const s=ethScenarios[ethIdx];
+  box.innerHTML=`<p style="font-size:.82rem;color:#888;margin-bottom:.5rem;">Scenario ${ethIdx+1} of ${ethScenarios.length}</p><div class="scenario-text">${s.text}</div>${s.opts.map((o,i)=>`<button class="opt-btn" onclick="ethPick(${i})">${o.l}</button>`).join('')}<div class="feedback" id="ethFb"></div><div class="btn-row" id="ethNav" style="display:none;"><button class="btn-p" onclick="ethIdx++;renderEth()">Next →</button></div>`;
+}
+function ethPick(i){
+  const s=ethScenarios[ethIdx];
+  document.querySelectorAll('#ethGame .opt-btn').forEach((b,j)=>{b.classList.add('disabled');if(s.opts[j].c)b.classList.add('correct');else if(j===i)b.classList.add('wrong');});
+  const fb=document.getElementById('ethFb');
+  fb.className=`feedback show ${s.opts[i].c?'good':'bad'}`;
+  fb.textContent=s.opts[i].f;
+  if(s.opts[i].c)ethScore++;
+  ethTotal++;
+  document.getElementById('ethNav').style.display='block';
+}
+
+/* ═══ Module 7 — Abstract Builder ═══ */
+function abCnt(){
+  const ids=['ab1','ab2','ab3','ab4','ab5','ab6'];
+  const w=ids.reduce((s,id)=>{const v=document.getElementById(id).value.trim();return s+(v?v.split(/\s+/).length:0);},0);
+  const el=document.getElementById('abWc');
+  el.textContent=`Words: ${w} / 250`;
+  el.style.color=w>250?'#e94560':w>=200?'#4caf50':'#888';
+}
+function genAb(){
+  const v=id=>document.getElementById(id).value.trim();
+  if(!v('ab3')){alert('Enter at least a research question.');return;}
+  let t=[v('ab1'),v('ab2'),v('ab3'),v('ab4'),v('ab5'),v('ab6')].filter(Boolean).join(' ');
+  const o=document.getElementById('abOut');o.textContent=t;o.classList.add('show');
+}
+
+/* ═══ Module 8 — Profile Checklist ═══ */
+const profiles=[
+  {name:'ORCID',desc:'Permanent researcher ID — orcid.org'},
+  {name:'Google Scholar',desc:'Auto-tracks citations — scholar.google.com'},
+  {name:'LinkedIn',desc:'Academic + professional visibility'},
+  {name:'ResearchGate',desc:'Upload papers, follow peers'},
+  {name:'Academia.edu',desc:'Additional discoverability'},
+  {name:'Personal Webpage',desc:'One page: name, research, CV, contact'}
+];
+function initProfile(){
+  const el=document.getElementById('profileChecks');
+  if(el.innerHTML) return;
+  el.innerHTML=profiles.map(p=>`<div class="check-item" onclick="this.classList.toggle('checked');updProf()"><div class="check-box"></div><div class="check-label"><h4>${p.name}</h4><p>${p.desc}</p></div></div>`).join('');
+}
+function updProf(){
+  const t=profiles.length;
+  const c=document.querySelectorAll('#profileChecks .check-item.checked').length;
+  const f=document.getElementById('profProg');
+  f.style.width=Math.round(c/t*100)+'%';
+  f.textContent=`${c} / ${t}`;
+}
+
+/* ═══ Module 9 — Wellbeing ═══ */
+const wbDims=[{id:'wbMot',name:'Motivation',lo:'Very low',hi:'Very high'},{id:'wbProg',name:'Progress',lo:'Stuck',hi:'On track'},{id:'wbSup',name:'Supervisor',lo:'Struggling',hi:'Excellent'},{id:'wbBal',name:'Work-Life Balance',lo:'All work',hi:'Balanced'},{id:'wbSoc',name:'Social Connection',lo:'Isolated',hi:'Connected'},{id:'wbAll',name:'Overall Wellbeing',lo:'Struggling',hi:'Thriving'}];
+function initWb(){
+  const el=document.getElementById('wbChecks');
+  if(el.innerHTML) return;
+  el.innerHTML=wbDims.map(d=>`<div class="wb-card"><h4>${d.name}</h4><div class="wb-row"><input type="range" class="wb-slider" id="${d.id}" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent=this.value"><span class="wb-val">5</span></div><div style="display:flex;justify-content:space-between;font-size:.68rem;color:#555;"><span>${d.lo}</span><span>${d.hi}</span></div></div>`).join('');
+}
+function wbReflect(){
+  const vals=wbDims.map(d=>parseInt(document.getElementById(d.id).value));
+  const avg=(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+  const low=[],high=[];
+  vals.forEach((v,i)=>{if(v<=3)low.push(wbDims[i].name);if(v>=8)high.push(wbDims[i].name);});
+  let t=`WELLBEING REFLECTION\n\nAverage: ${avg} / 10\n`;
+  if(high.length) t+=`\nStrengths: ${high.join(', ')}\n`;
+  if(low.length) t+=`\nNeeds attention: ${low.join(', ')}\n`;
+  t+=avg>=7?'\nYou seem in a good place. Protect what is working.':avg>=4.5?'\nMixed — focus on the lowest area. One small change this week.':'\nYou may be going through a difficult period. Please talk to someone you trust.';
+  const o=document.getElementById('wbOut');o.textContent=t;o.classList.add('show');
+}
+function wbReset(){
+  wbDims.forEach(d=>{const s=document.getElementById(d.id);if(s){s.value=5;s.nextElementSibling.textContent='5';}});
+  const o=document.getElementById('wbOut');o.textContent='';o.classList.remove('show');
+}
+
+/* ═══ Module 9 — Milestones ═══ */
+let msList=[];
+function addMs(){
+  const task=document.getElementById('msT').value.trim();
+  if(!task){alert('Enter a task.');return;}
+  msList.push({task,date:document.getElementById('msD').value,pri:document.getElementById('msP').value,done:false,id:Date.now()});
+  document.getElementById('msT').value='';
+  renderMs();
+}
+function renderMs(){
+  const el=document.getElementById('msList');
+  el.innerHTML=msList.map(m=>`<div class="ms-item ${m.done?'done':''}" onclick="toggleMs(${m.id})"><div class="check-box" style="width:18px;height:18px;border:2px solid #e94560;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;${m.done?'background:#e94560;':''}"><span style="color:#fff;font-size:.7rem;${m.done?'':'opacity:0;'}">✓</span></div><h4>${m.task}<span class="ms-pri ${m.pri}">${m.pri}</span></h4><span class="ms-del" onclick="event.stopPropagation();delMs(${m.id})">✕</span></div>`).join('');
+  const bar=document.getElementById('msBar');
+  if(msList.length){
+    bar.style.display='block';
+    const d=msList.filter(m=>m.done).length;
+    const p=Math.round(d/msList.length*100);
+    const f=document.getElementById('msFill');f.style.width=p+'%';f.textContent=`${d}/${msList.length}`;
+  } else bar.style.display='none';
+}
+function toggleMs(id){const m=msList.find(x=>x.id===id);if(m)m.done=!m.done;renderMs();}
+function delMs(id){msList=msList.filter(x=>x.id!==id);renderMs();}
+function clearMs(){msList=[];renderMs();}
+function copyMs(){
+  if(!msList.length){alert('Add milestones first.');return;}
+  const t='MILESTONE PLAN\n\n'+msList.map((m,i)=>`${i+1}. [${m.done?'✓':'○'}] ${m.task} (${m.pri}) ${m.date||''}`).join('\n');
+  navigator.clipboard.writeText(t).then(()=>alert('Copied!')).catch(()=>{});
+}
+
+/* ═══ Module 10 — Outline Builder ═══ */
+function genOB(){
+  const v=id=>document.getElementById(id).value.trim();
+  if(!v('ob3')){alert('Enter at least a research question.');return;}
+  let t=`PRESENTATION OUTLINE\n\n`;
+  t+=`Title: ${v('ob1')||'[Untitled]'}\n\n`;
+  t+=`1. HOOK\n${v('ob2')||'[Your opening]'}\n\n`;
+  t+=`2. RESEARCH QUESTION\n${v('ob3')}\n\n`;
+  t+=`3. CONTEXT\n${v('ob4')||'[Literature positioning]'}\n\n`;
+  t+=`4. ARGUMENT\n${v('ob5')||'[Your claim]'}\n\n`;
+  t+=`5. METHOD & EVIDENCE\n${v('ob6')||'[Your approach]'}\n\n`;
+  t+=`6. LIMITATIONS\n${v('ob7')||'[Main limitations]'}\n\n`;
+  t+=`7. FEEDBACK NEEDED\n${v('ob8')||'[What feedback?]'}`;
+  const o=document.getElementById('obOut');o.textContent=t;o.classList.add('show');
+}
+
+/* ═══ Module 10 — Peer Feedback ═══ */
+function genPF(){
+  const v=id=>document.getElementById(id).value.trim();
+  let t=`PEER FEEDBACK — ${v('pf0')||'Presenter'}\n\n`;
+  t+=`Research Question: ${v('pf1')||'-'}\nArgument: ${v('pf2')||'-'}\nMethod: ${v('pf3')||'-'}\nPresentation: ${v('pf4')||'-'}\n\nStrengths: ${v('pf5')||'-'}\nSuggestions: ${v('pf6')||'-'}`;
+  const o=document.getElementById('pfOut');o.textContent=t;o.classList.add('show');
+}
+
+/* ═══ Module 10 — Reflection ═══ */
+function genRef(){
+  const fields=[{id:'rf1',l:'Most Valuable Insight'},{id:'rf2',l:'How Research Changed'},{id:'rf3',l:'Skills Developed'},{id:'rf4',l:'What I Still Need'},{id:'rf5',l:'Goal: Next 3 Months'},{id:'rf6',l:'Message to Peers'}];
+  let t='INTL698 SEMINAR REFLECTION\n\n';
+  let has=false;
+  fields.forEach(f=>{const v=document.getElementById(f.id).value.trim();if(v){t+=`${f.l.toUpperCase()}\n${v}\n\n`;has=true;}});
+  if(!has){alert('Fill in at least one field.');return;}
+  const o=document.getElementById('rfOut');o.textContent=t;o.classList.add('show');
+}
+
+/* ═══ PWA Install ═══ */
+let deferredPrompt;
+const banner=document.getElementById('installBanner');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;if(!sessionStorage.getItem('dismissed'))banner.classList.add('show');});
+document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;banner.classList.remove('show');});
+document.getElementById('dismissBtn').addEventListener('click',()=>{banner.classList.remove('show');sessionStorage.setItem('dismissed','1');});
+
+/* ═══ Online/Offline ═══ */
+function updStatus(){
+  const d=document.getElementById('statusDot');
+  d.className='status '+(navigator.onLine?'':'offline');
+}
+window.addEventListener('online',updStatus);
+window.addEventListener('offline',updStatus);
+updStatus();
+
+/* ═══ Service Worker ═══ */
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+</body>
+</html>
