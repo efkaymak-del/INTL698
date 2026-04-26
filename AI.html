@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI in Academia: Guidance for Doctoral Researchers</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Segoe UI,system-ui,sans-serif;background:#0f172a;color:#e2e8f0;overflow:hidden;height:100vh}
+.slide{display:none;width:100vw;height:100vh;padding:40px 60px;overflow-y:auto;position:relative}
+.slide.active{display:flex;flex-direction:column;justify-content:center}
+.slide h1{font-size:2.2em;color:#fff;margin-bottom:12px;line-height:1.2}
+.slide h2{font-size:1.7em;color:#60a5fa;margin-bottom:16px;line-height:1.2}
+.slide h3{font-size:1.2em;color:#93c5fd;margin-bottom:10px}
+.slide p{font-size:1.05em;line-height:1.7;margin-bottom:12px;max-width:850px}
+.slide ul{margin:10px 0 14px 24px;max-width:850px}
+.slide li{font-size:1em;line-height:1.7;margin-bottom:8px}
+.slide .sub{font-size:.85em;color:#94a3b8;margin-top:4px}
+.big{font-size:1.8em;color:#fbbf24;font-weight:700;margin:16px 0}
+.quote{border-left:4px solid #fbbf24;padding:14px 20px;margin:16px 0;background:rgba(251,191,36,.08);font-style:italic;font-size:1.1em;max-width:850px;border-radius:0 8px 8px 0}
+.quote .attr{font-style:normal;font-size:.85em;color:#94a3b8;margin-top:6px}
+.red{color:#f87171}
+.green{color:#4ade80}
+.yellow{color:#fbbf24}
+.blue{color:#60a5fa}
+.box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:18px;margin:12px 0;max-width:850px}
+.tbl{width:100%;max-width:850px;border-collapse:collapse;margin:12px 0;font-size:.92em}
+.tbl th,.tbl td{padding:10px 14px;border:1px solid rgba(255,255,255,.12);text-align:left}
+.tbl th{background:rgba(96,165,250,.15);color:#93c5fd;font-weight:600}
+.tbl tr:nth-child(even){background:rgba(255,255,255,.03)}
+.nav{position:fixed;bottom:20px;right:30px;display:flex;gap:10px;z-index:100}
+.nav button{padding:10px 20px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(255,255,255,.08);color:#e2e8f0;font-size:.9em;cursor:pointer}
+.nav button:hover{background:rgba(255,255,255,.15)}
+.counter{position:fixed;bottom:24px;left:30px;font-size:.82em;color:#64748b}
+.title-slide{text-align:center;justify-content:center;align-items:center}
+.title-slide h1{font-size:2.6em;margin-bottom:8px}
+.title-slide p{text-align:center;font-size:1.1em;color:#94a3b8}
+.warn{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:10px;padding:14px;margin:12px 0;max-width:850px}
+.ok{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.3);border-radius:10px;padding:14px;margin:12px 0;max-width:850px}
+@media(max-width:700px){.slide{padding:20px 24px}.slide h1{font-size:1.6em}.slide h2{font-size:1.3em}.slide p,.slide li{font-size:.92em}}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide title-slide active" id="s1">
+<h1>AI in Academia</h1>
+<h2 style="color:#fbbf24">Guidance for Doctoral Researchers</h2>
+<p>INTL698 Doctoral Seminar in International Relations</p>
+<p>Eastern Mediterranean University</p>
+<p style="margin-top:20px;font-size:.9em;color:#64748b">Navigate with arrow keys or buttons below</p>
+</div>
+
+<!-- SLIDE 2: WHY THIS MATTERS -->
+<div class="slide" id="s2">
+<h2>Why Are We Having This Conversation?</h2>
+<p>You are entering academia at the exact moment when the norms around AI are being written. As PhD students, you are simultaneously:</p>
+<ul>
+<li><span class="blue">Students</span> subject to academic integrity policies</li>
+<li><span class="blue">Researchers</span> who may use AI as a tool in your work</li>
+<li><span class="blue">Teachers</span> who will need to set norms for your own students</li>
+<li><span class="blue">Emerging scholars</span> who will publish under journal policies that are changing rapidly</li>
+</ul>
+<p>The rules are unsettled. The detection tools are flawed. The stakes are your career. You need a framework, not just a list of dos and don'ts.</p>
+</div>
+
+<!-- SLIDE 3: FOUR CONVERSATIONS -->
+<div class="slide" id="s3">
+<h2>Four Distinct Conversations</h2>
+<p>AI in academia is not one issue. It is at least four:</p>
+<div class="box">
+<p><span class="yellow">1. AI as a Writing Tool</span> - drafting, editing, polishing prose</p>
+<p><span class="yellow">2. AI as a Research Tool</span> - literature discovery, data analysis, coding</p>
+<p><span class="yellow">3. AI and Academic Integrity</span> - detection, disclosure, institutional policy</p>
+<p><span class="yellow">4. AI as an Object of Study</span> - what AI means for IR, governance, power</p>
+</div>
+<p>Each has different ethical considerations. Conflating them leads to confused policy and confused practice.</p>
+</div>
+
+<!-- SLIDE 4: AI AS WRITING TOOL -->
+<div class="slide" id="s4">
+<h2>AI as a Writing Tool</h2>
+<h3>The Spectrum of Use</h3>
+<table class="tbl">
+<tr><th>Use</th><th>Example</th><th>Risk Level</th></tr>
+<tr><td>Spell/grammar check</td><td>Grammarly, Word spellcheck</td><td><span class="green">Low</span></td></tr>
+<tr><td>Sentence-level polishing</td><td>"Make this paragraph clearer"</td><td><span class="yellow">Medium</span></td></tr>
+<tr><td>Structural reorganisation</td><td>"Restructure my lit review"</td><td><span class="yellow">Medium-High</span></td></tr>
+<tr><td>Generating first drafts</td><td>"Write an introduction about X"</td><td><span class="red">High</span></td></tr>
+<tr><td>Producing arguments</td><td>"What is my theoretical argument?"</td><td><span class="red">Very High</span></td></tr>
+</table>
+<p class="sub">The question is not "did AI touch this text?" but "whose thinking is this?"</p>
+</div>
+
+<!-- SLIDE 5: WHY THIS MATTERS FOR PHD -->
+<div class="slide" id="s5">
+<h2>The PhD-Specific Problem</h2>
+<div class="quote">A PhD certifies that you can construct a sustained, original argument across 80,000 words. Anything that short-circuits that development is ultimately self-defeating, even if the output looks polished.</div>
+<p>The slow, painful process of writing is where conceptual clarity develops. Using AI to skip that process is like hiring someone to do your physiotherapy exercises - the report might say you completed the programme, but your knee still does not work.</p>
+<p>You are not producing a document. You are building a capability. The document is evidence that the capability exists.</p>
+</div>
+
+<!-- SLIDE 6: AI AS RESEARCH TOOL -->
+<div class="slide" id="s6">
+<h2>AI as a Research Tool</h2>
+<p>AI can now assist with:</p>
+<ul>
+<li>Literature discovery and summarisation</li>
+<li>Coding qualitative data</li>
+<li>Identifying patterns in large datasets</li>
+<li>Translating sources</li>
+<li>Generating interview transcripts</li>
+</ul>
+<h3 style="margin-top:16px">The Epistemological Problem</h3>
+<div class="box">
+<p><span class="blue">Positivist:</span> Is AI-assisted analysis replicable and auditable?</p>
+<p><span class="yellow">Interpretivist:</span> You cannot outsource Verstehen to a language model. Meaning-making requires human judgement.</p>
+<p><span class="red">Critical:</span> Who built these tools? On what data? Embedding whose assumptions?</p>
+</div>
+</div>
+
+<!-- SLIDE 7: HALLUCINATION -->
+<div class="slide" id="s7">
+<h2>The Hallucination Problem</h2>
+<p class="big">AI fabricates confidently.</p>
+<p>Large language models generate plausible-sounding text that may be factually wrong. In academic contexts, this is catastrophic:</p>
+<div class="warn">
+<p><span class="red">Hallucinated citations:</span> AI will invent references - real author names, real journal titles, fabricated articles that do not exist. A 2025 analysis found over 100 hallucinated citations in papers accepted at a top ML conference.</p>
+</div>
+<div class="warn">
+<p><span class="red">Fabricated claims:</span> AI will generate statistical findings, historical dates, and theoretical positions that sound authoritative but are wrong.</p>
+</div>
+<p>If you use AI and do not verify every claim and every citation against the actual source, you are putting your name on someone else's lies.</p>
+</div>
+
+<!-- SLIDE 8: DETECTION - HOW IT WORKS -->
+<div class="slide" id="s8">
+<h2>How AI Detection Works</h2>
+<h3>The Technical Reality</h3>
+<p>AI detectors (Turnitin, GPTZero, Originality.ai) work by measuring two properties of text:</p>
+<div class="box">
+<p><span class="yellow">Perplexity:</span> How predictable is each word given the words before it? AI text tends to choose the most statistically likely next word, making it low-perplexity (smooth, predictable).</p>
+<p style="margin-top:8px"><span class="yellow">Burstiness:</span> How much does sentence length and complexity vary? Human writing is "bursty" - mixing short and long sentences unpredictably. AI text is more uniform.</p>
+</div>
+<p>These tools produce a <b>probability score</b>, not a verdict. There is no digital fingerprint. There is no way to definitively prove a paragraph was written by AI.</p>
+</div>
+
+<!-- SLIDE 9: TURNITIN SPECIFICALLY -->
+<div class="slide" id="s9">
+<h2>Turnitin's AI Detection</h2>
+<h3>What the Evidence Shows</h3>
+<ul>
+<li>Turnitin claims it catches ~85% of unmodified AI text with a false positive rate "below 1%"</li>
+<li>Independent testing tells a different story. A 2026 study reported a mean false positive rate of <span class="red">61.3%</span> for non-native English writing samples</li>
+<li>The Stanford HAI study (2023) found AI detectors unanimously misidentified <span class="red">19% of TOEFL essays</span> written by non-native speakers as AI-generated</li>
+<li>Turnitin itself disputed the bias claim in a 2024 study but the methodological debate continues</li>
+<li>Curtin University (Australia) <span class="yellow">disabled Turnitin's AI detection entirely</span> from January 2026, calling it unreliable</li>
+</ul>
+<p class="sub">Formal academic writing, non-native English prose, and heavily edited text all trigger false positives at elevated rates.</p>
+</div>
+
+<!-- SLIDE 10: THE FUNDAMENTAL PROBLEM -->
+<div class="slide" id="s10">
+<h2>The Fundamental Problem with Detection</h2>
+<div class="quote">Detectors don't identify AI. They identify "text that looks like text they think AI would write." Those are two very different things.<div class="attr">- Reddit user, r/Turnitinservicehelp, February 2026</div></div>
+<p>As researchers trained in methods, you should recognise this immediately:</p>
+<ul>
+<li>A probabilistic score is not evidence of misconduct</li>
+<li>The tool has known biases against specific populations (L2 writers)</li>
+<li>The tool cannot distinguish between AI-generated and AI-polished text</li>
+<li>Paraphrased or lightly edited AI text often evades detection entirely</li>
+</ul>
+<p>Treating a Turnitin AI score as proof is roughly equivalent to treating a polygraph result as proof. It is probabilistic, it is biased, and it is not something you want your career to hinge on.</p>
+</div>
+
+<!-- SLIDE 11: YOUR DEPARTMENT -->
+<div class="slide" id="s11">
+<h2>Our Institutional Reality</h2>
+<h3>What You Are Currently Subject To</h3>
+<div class="warn">
+<p>Our department currently relies on Turnitin with AI detection enabled. This is the tool that has documented false positive issues, particularly for non-native English speakers - which describes a significant portion of our student body at EMU.</p>
+</div>
+<p>The practical implications:</p>
+<ul>
+<li>You may be flagged even if you did not use AI</li>
+<li>The flag is a probability score, not proof</li>
+<li>What happens next depends on whether your institution treats the score as a smoke alarm or a verdict</li>
+<li>You need to be prepared to demonstrate your writing process</li>
+</ul>
+<h3 style="margin-top:12px">The Trend</h3>
+<p>Universities are beginning to shift from "prove you didn't use AI" toward <span class="green">process-based assessment</span>: grading drafts, oral defences, in-class checkpoints.</p>
+</div>
+
+<!-- SLIDE 12: JOURNAL POLICIES -->
+<div class="slide" id="s12">
+<h2>Journal AI Policies (2026)</h2>
+<h3>What the Major Publishers Require</h3>
+<table class="tbl">
+<tr><th>Publisher</th><th>AI for Writing</th><th>AI for Figures</th><th>Disclose Where</th><th>AI as Author?</th></tr>
+<tr><td>Nature Portfolio</td><td><span class="green">Yes + disclose</span></td><td><span class="yellow">Restricted</span></td><td>Methods / Acknowledgements</td><td><span class="red">No</span></td></tr>
+<tr><td>Elsevier</td><td><span class="green">Yes + disclose</span></td><td><span class="yellow">Restricted</span></td><td>Submission form AND manuscript</td><td><span class="red">No</span></td></tr>
+<tr><td>Wiley</td><td><span class="green">Yes + disclose</span></td><td><span class="yellow">Restricted</span></td><td>Acknowledgements / Methods</td><td><span class="red">No</span></td></tr>
+<tr><td>Cambridge UP</td><td><span class="green">Yes + disclose</span></td><td><span class="yellow">Restricted</span></td><td>Varies by journal</td><td><span class="red">No</span></td></tr>
+<tr><td>Oxford UP</td><td><span class="green">Yes + disclose</span></td><td><span class="yellow">Restricted</span></td><td>Varies by journal</td><td><span class="red">No</span></td></tr>
+<tr><td>Taylor and Francis</td><td><span class="green">Yes + disclose</span></td><td><span class="yellow">Restricted</span></td><td>Acknowledgements</td><td><span class="red">No</span></td></tr>
+<tr><td>IEEE</td><td><span class="yellow">Editing only</span></td><td><span class="red">Prohibited</span></td><td>Separate AI statement</td><td><span class="red">No</span></td></tr>
+</table>
+<p class="sub">Universal pattern: disclosure required, AI cannot be an author, you bear full responsibility for all content.</p>
+</div>
+
+<!-- SLIDE 13: COPE -->
+<div class="slide" id="s13">
+<h2>The COPE Position</h2>
+<p>The Committee on Publication Ethics (COPE) has established the baseline that most publishers follow:</p>
+<div class="box">
+<p><span class="yellow">1.</span> AI tools cannot be listed as authors because they cannot take responsibility for the work</p>
+<p><span class="yellow">2.</span> Authors must disclose AI use transparently</p>
+<p><span class="yellow">3.</span> Authors are fully accountable for accuracy, originality, and integrity of all content - including any AI-assisted portions</p>
+<p><span class="yellow">4.</span> Peer reviewers should not upload manuscripts to AI tools (confidentiality)</p>
+</div>
+<p>COPE's 2025 focus session identified a growing gap between stated policies and actual practice - many researchers are using AI but not disclosing it.</p>
+</div>
+
+<!-- SLIDE 14: DISCLOSURE TEMPLATE -->
+<div class="slide" id="s14">
+<h2>How to Disclose: A Template</h2>
+<p>When you use AI in your research or writing, disclose clearly. A safe template:</p>
+<div class="ok">
+<p style="font-style:italic">"The author(s) used [tool name, e.g., ChatGPT, GPT-4, Claude] for [specific task, e.g., language editing of the discussion section / literature search assistance / initial coding of interview transcripts]. All output was reviewed, verified, and revised by the author(s), who take full responsibility for the final manuscript."</p>
+</div>
+<p>Key elements:</p>
+<ul>
+<li><b>Name the specific tool</b> and version if known</li>
+<li><b>State the specific task</b> it performed</li>
+<li><b>Confirm human review</b> of all output</li>
+<li><b>Accept responsibility</b> for the final product</li>
+</ul>
+<p class="sub">Place the disclosure where your target journal requires it - Methods, Acknowledgements, or submission form. Check before submitting.</p>
+</div>
+
+<!-- SLIDE 15: FOUR PRINCIPLES -->
+<div class="slide" id="s15">
+<h2>Four Principles for Defensible AI Use</h2>
+<div class="box">
+<h3><span class="yellow">1. Transparency</span></h3>
+<p>Whatever you use AI for, document and disclose it. This protects you and builds trust. Non-disclosure is increasingly treated as misconduct.</p>
+</div>
+<div class="box">
+<h3><span class="yellow">2. The Value-Added Test</span></h3>
+<p>If AI did the work, what did you contribute? If you cannot articulate your intellectual contribution clearly, you have gone too far.</p>
+</div>
+<div class="box">
+<h3><span class="yellow">3. The Competence Principle</span></h3>
+<p>Do not use AI to do something you cannot evaluate. If you cannot assess whether an AI-generated analysis is correct, you should not be using it for that purpose.</p>
+</div>
+<div class="box">
+<h3><span class="yellow">4. The Development Principle</span></h3>
+<p>As a PhD student, your goal is not just to produce outputs but to build capabilities. Using AI in ways that prevent skill development is self-sabotaging.</p>
+</div>
+</div>
+
+<!-- SLIDE 16: THE RESEARCH ASSISTANT ANALOGY -->
+<div class="slide" id="s16">
+<h2>The Research Assistant Analogy</h2>
+<p>Think of AI the way you think about a research assistant:</p>
+<div class="ok">
+<p><span class="green">Acceptable:</span> An RA pulls sources, cleans data, formats references, transcribes interviews. You acknowledge their contribution.</p>
+</div>
+<div class="warn">
+<p><span class="red">Not acceptable:</span> An RA writes your theoretical argument, constructs your analysis, or develops your conclusions - and you put your name on it.</p>
+</div>
+<p>AI sits on this same spectrum. The question is always: <b>where on the spectrum is my use, and can I defend it?</b></p>
+<p>The right frame is not "will I get caught?" but "can I defend what I did to my supervisor, my examiners, and a journal editor?"</p>
+</div>
+
+<!-- SLIDE 17: PROTECT YOURSELF -->
+<div class="slide" id="s17">
+<h2>Protecting Yourself from False Positives</h2>
+<h3>Practical Steps Every PhD Student Should Take</h3>
+<ul>
+<li><b>Keep all drafts.</b> Save every version of your chapters. Use Google Docs (which has version history) or regularly save dated copies. This creates an evidence trail of your writing process.</li>
+<li><b>Keep your notes and outlines.</b> Handwritten notes, mind maps, annotated PDFs - anything that shows your thinking developed before the text appeared.</li>
+<li><b>Use track changes.</b> When revising, keep tracked changes visible in at least one saved version.</li>
+<li><b>Document your AI use.</b> If you use AI for any purpose, keep a log: date, tool, prompt, what you did with the output.</li>
+<li><b>Be ready for the conversation.</b> If flagged, you need to be able to walk someone through your argument, your sources, and your reasoning. If you wrote it, this should be easy.</li>
+</ul>
+<p class="sub">The best protection against a false positive is a documented writing process that makes the accusation implausible.</p>
+</div>
+
+<!-- SLIDE 18: WHAT CHANGES -->
+<div class="slide" id="s18">
+<h2>What AI Changes About Your Value as a Scholar</h2>
+<p>If AI can produce competent literature reviews, data summaries, and polished prose, then what makes a scholar valuable shifts toward:</p>
+<ul>
+<li><span class="yellow">Original theorising</span> - AI cannot generate new theoretical frameworks</li>
+<li><span class="yellow">Creative research design</span> - AI cannot design a study that asks an interesting question in a novel way</li>
+<li><span class="yellow">Critical judgement</span> - AI cannot evaluate whether an argument is persuasive, an interpretation is defensible, or a finding is significant</li>
+<li><span class="yellow">Deep contextual knowledge</span> - AI cannot do fieldwork, build relationships, or read an archive with sensitivity to what matters</li>
+<li><span class="yellow">Ethical reasoning</span> - AI cannot navigate the political and moral dimensions of research</li>
+</ul>
+<p>Students who develop these skills will be <span class="green">more valuable, not less</span>. The premium on genuine expertise rises as the cost of generic competence falls to zero.</p>
+</div>
+
+<!-- SLIDE 19: GREY AREAS -->
+<div class="slide" id="s19">
+<h2>Grey Areas for Discussion</h2>
+<h3>Where Do You Draw the Line?</h3>
+<div class="box">
+<p><b>Scenario 1:</b> You use AI to translate a Turkish-language primary source into English for your dissertation. You verify the translation against your own knowledge. Disclose? Acceptable?</p>
+</div>
+<div class="box">
+<p><b>Scenario 2:</b> You paste your draft literature review into ChatGPT and ask "what am I missing?" It suggests three additional scholars. You read their work and add them. Disclose?</p>
+</div>
+<div class="box">
+<p><b>Scenario 3:</b> You use AI to generate an initial coding scheme for 50 interview transcripts. You then revise the codes extensively based on your reading. Disclose? How much revision makes it "yours"?</p>
+</div>
+<div class="box">
+<p><b>Scenario 4:</b> You ask AI to "improve the clarity" of your theoretical argument section. It reorganises your paragraphs and rewrites several sentences. The ideas are yours but many of the words are not. Acceptable?</p>
+</div>
+</div>
+
+<!-- SLIDE 20: WHAT JOURNALS CATCH -->
+<div class="slide" id="s20">
+<h2>What Actually Gets You in Trouble</h2>
+<h3>Real Patterns from Integrity Committees</h3>
+<div class="warn">
+<p><b>The hallucinated reference list:</b> A research team used ChatGPT to draft an introduction. 12 of 43 references did not exist - plausible combinations of real author names and real journals. Two reviewers flagged it. Rejection + formal warning + permanent flag on the author's submission record.</p>
+</div>
+<div class="warn">
+<p><b>The generic discussion:</b> A reviewer returned a manuscript with one comment: "This reads like it was generated by a language model. Every paragraph makes broad claims without connecting to the specific results." Two additional revision rounds before eventual publication.</p>
+</div>
+<div class="warn">
+<p><b>The missing disclosure:</b> AI use discovered post-publication (whistleblower report or editor cross-check). Consequence: published correction or retraction. Reputational damage is permanent.</p>
+</div>
+</div>
+
+<!-- SLIDE 21: THE IR DIMENSION -->
+<div class="slide" id="s21">
+<h2>AI as an IR Question</h2>
+<p>As IR scholars, you should also be thinking about AI as a phenomenon within your field:</p>
+<ul>
+<li><b>Power and governance:</b> Who controls AI development? What are the geopolitical implications of AI concentration in a handful of US and Chinese firms?</li>
+<li><b>Security:</b> How does AI change warfare, surveillance, and deterrence? What happens to strategic stability when decision-making is automated?</li>
+<li><b>Political economy:</b> How does AI reshape global labour markets, trade, and development?</li>
+<li><b>Norms and institutions:</b> How are international norms around AI governance being constructed? Who is included and excluded?</li>
+<li><b>Knowledge production:</b> What does it mean for the discipline when the tools we use to study the world are themselves reshaping the world?</li>
+</ul>
+<p>Some of you may end up writing dissertations about these very questions.</p>
+</div>
+
+<!-- SLIDE 22: SUMMARY -->
+<div class="slide" id="s22">
+<h2>Key Takeaways</h2>
+<div class="box">
+<p><span class="yellow">1.</span> AI detection tools are unreliable and biased. Do not assume a Turnitin score is a verdict. Protect yourself with documented writing processes.</p>
+<p><span class="yellow">2.</span> Every major publisher now requires AI disclosure. Non-disclosure is treated as misconduct. Always disclose, always be specific.</p>
+<p><span class="yellow">3.</span> The right question is not "will I get caught?" but "can I defend what I did?" Apply the value-added test: if you cannot articulate your intellectual contribution, you have gone too far.</p>
+<p><span class="yellow">4.</span> A PhD builds capabilities, not just documents. Using AI in ways that prevent you from developing core scholarly skills is self-defeating even when it is not dishonest.</p>
+<p><span class="yellow">5.</span> The policies are evolving. Stay informed. Check your target journal's specific guidelines before every submission. Do not assume all publishers are the same.</p>
+</div>
+</div>
+
+<!-- SLIDE 23: DISCUSSION -->
+<div class="slide title-slide" id="s23">
+<h2 style="color:#fbbf24">Open Discussion</h2>
+<h1 style="font-size:1.8em">How are you currently using AI in your work?</h1>
+<p style="margin-top:16px">This is a safe space. The goal is to develop shared norms, not to police each other.</p>
+<p style="margin-top:30px;font-size:.85em;color:#64748b">Further reading: COPE AI guidelines (publicationethics.org) | Stanford HAI AI Detection Study (2023) | Turnitin AI Detection Model documentation (guides.turnitin.com)</p>
+</div>
+
+<!-- NAVIGATION -->
+<div class="counter" id="counter">1 / 23</div>
+<div class="nav">
+<button onclick="prev()">Previous</button>
+<button onclick="next()">Next</button>
+</div>
+
+<script>
+var current = 1;
+var total = 23;
+
+function show(n) {
+  if (n < 1) n = 1;
+  if (n > total) n = total;
+  for (var i = 1; i <= total; i++) {
+    var s = document.getElementById("s" + i);
+    if (i === n) s.className = "slide active" + (i === 1 || i === total ? " title-slide" : "");
+    else s.className = "slide" + (i === 1 || i === total ? " title-slide" : "");
+  }
+  current = n;
+  document.getElementById("counter").textContent = n + " / " + total;
+}
+
+function next() { show(current + 1); }
+function prev() { show(current - 1); }
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") { e.preventDefault(); next(); }
+  if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); prev(); }
+});
+
+show(1);
+</script>
+</body>
+</html>
