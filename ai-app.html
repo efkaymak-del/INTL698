@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI in Academia - Interactive Toolkit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Segoe UI,system-ui,sans-serif;background:#f5f6fa;color:#1e293b;line-height:1.6}
+h1{background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;padding:20px;text-align:center;font-size:1.4em}
+h1 span{display:block;font-size:.6em;font-weight:400;opacity:.85;margin-top:4px}
+#nav{display:flex;flex-wrap:wrap;gap:5px;padding:10px;background:#fff;border-bottom:1px solid #e2e8f0;justify-content:center;position:sticky;top:0;z-index:100}
+#nav button{padding:6px 12px;border:1px solid #cbd5e1;border-radius:20px;background:#f8fafc;color:#334155;font-size:.76em;cursor:pointer}
+#nav button.on{background:#2563eb;color:#fff;border-color:#2563eb}
+.tab{display:none;padding:16px;max-width:900px;margin:0 auto}
+.vis{display:block}
+.st{font-size:1.1em;font-weight:700;color:#1e3a5f;margin:16px 0 8px;padding-bottom:5px;border-bottom:2px solid #2563eb}
+.ib{background:#eff6ff;border-left:4px solid #2563eb;padding:12px;border-radius:0 8px 8px 0;margin:10px 0;font-size:.88em;color:#1e40af}
+.wb{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px;border-radius:0 8px 8px 0;margin:10px 0;font-size:.88em;color:#92400e}
+.rb{background:#fee2e2;border-left:4px solid #ef4444;padding:12px;border-radius:0 8px 8px 0;margin:10px 0;font-size:.88em;color:#991b1b}
+.gb{background:#d1fae5;border-left:4px solid #10b981;padding:12px;border-radius:0 8px 8px 0;margin:10px 0;font-size:.88em;color:#065f46}
+.cd{background:#fff;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:12px;overflow:hidden}
+.cd-h{padding:14px 16px;cursor:pointer;font-weight:600;font-size:.95em;color:#1e3a5f;display:flex;justify-content:space-between;align-items:center}
+.cd-h:hover{background:#f0f4ff}
+.cd-b{display:none;padding:0 16px 14px;font-size:.9em;color:#475569;border-top:1px solid #f1f5f9}
+.cd.open .cd-b{display:block}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-weight:600;color:#1e3a5f;margin-bottom:3px;font-size:.88em}
+.fg input,.fg textarea,.fg select{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px;font-size:.88em;font-family:inherit}
+.fg textarea{min-height:65px;resize:vertical}
+.bt{padding:9px 20px;border:none;border-radius:8px;font-size:.88em;cursor:pointer;font-weight:600;margin:3px}
+.bt1{background:#2563eb;color:#fff}
+.bt2{background:#e2e8f0;color:#334155}
+.bt3{background:#059669;color:#fff}
+.bt4{background:#ef4444;color:#fff}
+.ob{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-top:12px;white-space:pre-wrap;font-size:.86em;line-height:1.7;color:#334155}
+table{width:100%;border-collapse:collapse;font-size:.84em;margin:10px 0}
+th,td{padding:9px;border:1px solid #e2e8f0;text-align:left}
+th{background:#f0f4ff;color:#1e3a5f;font-weight:600}
+tr:nth-child(even){background:#f8fafc}
+.tg{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.72em;font-weight:600;margin:2px}
+.tg-g{background:#d1fae5;color:#065f46}
+.tg-y{background:#fef3c7;color:#92400e}
+.tg-r{background:#fee2e2;color:#991b1b}
+.tg-b{background:#dbeafe;color:#1e40af}
+.dt-box{background:#fff;border:2px solid #e2e8f0;border-radius:12px;padding:20px;margin:12px 0;text-align:center}
+.dt-q{font-size:1.05em;font-weight:600;color:#1e3a5f;margin-bottom:14px}
+.dt-opts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.dt-opts button{padding:10px 24px;border:2px solid #cbd5e1;border-radius:10px;background:#fff;font-size:.92em;cursor:pointer;font-weight:600;min-width:100px}
+.dt-opts button:hover{border-color:#2563eb;background:#f0f4ff}
+.dt-result{margin-top:14px;padding:16px;border-radius:10px;font-size:.92em;line-height:1.6}
+.dt-green{background:#d1fae5;border:2px solid #6ee7b7;color:#065f46}
+.dt-yellow{background:#fef3c7;border:2px solid #fcd34d;color:#92400e}
+.dt-red{background:#fee2e2;border:2px solid #fca5a5;color:#991b1b}
+.sc-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:14px}
+.sc-card h4{color:#1e3a5f;margin-bottom:6px}
+.sc-card p{font-size:.9em;color:#475569;margin-bottom:10px}
+.sc-opts button{display:block;width:100%;text-align:left;padding:10px 14px;margin:4px 0;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;cursor:pointer;font-size:.88em}
+.sc-opts button:hover{background:#f0f4ff;border-color:#93c5fd}
+.sc-fb{margin-top:10px;padding:12px;border-radius:8px;font-size:.88em;display:none}
+.log-entry{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:8px;font-size:.88em;position:relative}
+.log-entry .del{position:absolute;top:8px;right:10px;background:none;border:none;color:#ef4444;cursor:pointer;font-size:1.1em;font-weight:700}
+.ref{font-size:.8em;color:#64748b;font-style:italic;margin-top:6px}
+@media(max-width:600px){#nav{gap:3px;padding:6px}#nav button{font-size:.7em;padding:5px 8px}.dt-opts{flex-direction:column}.dt-opts button{width:100%}}
+</style>
+</head>
+<body>
+<h1>AI in Academia<span>Interactive Toolkit for Doctoral Researchers | INTL698</span></h1>
+<div id="nav"></div>
+<div id="app"></div>
+<script>
+var tabs=["Decision Tree","Journal Policies","Disclosure Generator","Detection Reality","Scenarios","AI Use Log"];
+var tabIds=["dt","jp","dg","dr","sc","lg"];
+var cur="dt";
+
+function $(x){return document.getElementById(x)}
+
+function init(){
+var n=$("nav");var h="";
+for(var i=0;i<tabs.length;i++){h+="<button id='b-"+tabIds[i]+"' onclick='go(\""+tabIds[i]+"\")'>"+tabs[i]+"</button>";}
+n.innerHTML=h;
+var a=$("app");var s="";
+for(var i=0;i<tabIds.length;i++){s+="<div class='tab' id='t-"+tabIds[i]+"'></div>";}
+a.innerHTML=s;
+fillAll();
+go("dt");
+}
+
+function go(id){
+cur=id;
+for(var i=0;i<tabIds.length;i++){
+var t=$("t-"+tabIds[i]);var b=$("b-"+tabIds[i]);
+if(tabIds[i]===id){t.className="tab vis";b.className="on";}
+else{t.className="tab";b.className="";}
+}
+}
+
+function tog(el){
+if(el.parentNode.className.indexOf("open")>=0)el.parentNode.className="cd";
+else el.parentNode.className="cd open";
+}
+
+function fillAll(){
+$("t-dt").innerHTML=mkDt();
+$("t-jp").innerHTML=mkJp();
+$("t-dg").innerHTML=mkDg();
+$("t-dr").innerHTML=mkDr();
+$("t-sc").innerHTML=mkSc();
+$("t-lg").innerHTML=mkLg();
+}
+
+/* ===== TAB 1: DECISION TREE ===== */
+var dtData={
+start:{q:"What do you want to use AI for?",opts:[
+{label:"Writing / Editing",next:"write1"},
+{label:"Research / Analysis",next:"research1"},
+{label:"Translation",next:"trans1"},
+{label:"Literature Search",next:"lit1"},
+{label:"Data Processing",next:"data1"},
+{label:"Teaching Prep",next:"teach1"}
+]},
+write1:{q:"What level of writing assistance?",opts:[
+{label:"Grammar / spell check",next:"r_green_grammar"},
+{label:"Sentence-level polishing",next:"write2"},
+{label:"Paragraph rewriting / restructuring",next:"write3"},
+{label:"Generating first drafts",next:"r_red_draft"},
+{label:"Generating arguments or analysis",next:"r_red_argument"}
+]},
+write2:{q:"Will you review every sentence and revise substantively?",opts:[
+{label:"Yes, I will revise thoroughly",next:"r_green_polish"},
+{label:"No, I will mostly keep what AI produces",next:"r_yellow_polish"}
+]},
+write3:{q:"Are the ideas and argument structure yours, with AI only reorganising?",opts:[
+{label:"Yes, ideas are mine, AI just restructures",next:"r_yellow_restructure"},
+{label:"Honestly, AI is shaping the argument too",next:"r_red_argument"}
+]},
+research1:{q:"What kind of research assistance?",opts:[
+{label:"Summarising papers I have already read",next:"r_green_summary"},
+{label:"Coding qualitative data",next:"research2"},
+{label:"Identifying patterns in quantitative data",next:"research3"},
+{label:"Generating research questions or hypotheses",next:"r_red_rq"}
+]},
+research2:{q:"Will you develop your own coding scheme and use AI only to assist with application?",opts:[
+{label:"Yes, my scheme, AI assists",next:"r_yellow_coding"},
+{label:"No, AI is generating the codes",next:"r_red_coding"}
+]},
+research3:{q:"Can you independently verify and explain every result AI produces?",opts:[
+{label:"Yes, I understand the methods fully",next:"r_yellow_quant"},
+{label:"No, I am relying on AI for analysis I cannot evaluate",next:"r_red_quant"}
+]},
+trans1:{q:"Are you translating primary sources for your own analysis?",opts:[
+{label:"Yes, for my own reading and analysis",next:"r_green_trans"},
+{label:"I am pasting translated text directly into my manuscript",next:"r_yellow_trans"}
+]},
+lit1:{q:"How are you using AI for literature search?",opts:[
+{label:"Discovering papers I then read myself",next:"r_green_lit"},
+{label:"Getting AI summaries instead of reading papers",next:"r_yellow_lit"},
+{label:"Asking AI to write my literature review",next:"r_red_draft"}
+]},
+data1:{q:"What kind of data processing?",opts:[
+{label:"Cleaning / formatting data",next:"r_green_data"},
+{label:"Transcription of interviews",next:"r_green_transcribe"},
+{label:"Generating synthetic data or simulations",next:"r_yellow_synthetic"}
+]},
+teach1:{q:"How are you using AI for teaching?",opts:[
+{label:"Generating discussion questions or rubrics",next:"r_green_teach"},
+{label:"Creating course materials I will review",next:"r_green_teach"},
+{label:"Grading student work",next:"r_red_grading"}
+]},
+r_green_grammar:{result:"green",title:"LOW RISK - Generally Acceptable",msg:"Grammar and spell-checking tools (including AI-powered ones like Grammarly) are widely accepted. Most journal policies do not require disclosure for basic grammar correction. However, check your specific institution's policy."},
+r_green_polish:{result:"green",title:"ACCEPTABLE WITH DISCLOSURE",msg:"Using AI to polish sentences is acceptable at most journals provided you disclose it and thoroughly review all output. The ideas and argument must be yours. Include a disclosure statement naming the tool and the task."},
+r_yellow_polish:{result:"yellow",title:"GREY AREA - CAUTION",msg:"If you are keeping AI-generated text largely unchanged, you are approaching ghostwriting territory. The value-added test: can you articulate what YOU contributed? Revise substantively so the final text reflects your thinking, not the AI's default output. Disclose."},
+r_yellow_restructure:{result:"yellow",title:"GREY AREA - DISCLOSE AND JUSTIFY",msg:"Having AI reorganise your existing ideas is a grey area. It is more defensible than having AI generate content, but you should disclose it and be prepared to explain that the intellectual structure is yours. Ask yourself: would I have arrived at this structure on my own?"},
+r_red_draft:{result:"red",title:"HIGH RISK - NOT RECOMMENDED",msg:"Having AI generate first drafts of scholarly text means the words, framing, and often the argument structure are not yours. This is problematic for academic integrity and for your development as a scholar. Most journal policies require disclosure, and reviewers increasingly recognise AI-generated prose. For PhD work specifically, this undermines the skill-building purpose of the degree."},
+r_red_argument:{result:"red",title:"NOT ACCEPTABLE",msg:"If AI is generating your theoretical argument, analytical framework, or conclusions, you cannot claim the intellectual contribution. This crosses the line from tool use to outsourcing the core work that a PhD certifies you can do. No amount of disclosure makes this acceptable for doctoral work."},
+r_green_summary:{result:"green",title:"LOW RISK - ACCEPTABLE",msg:"Using AI to summarise papers you have already read is a note-taking aid. It is acceptable provided you have actually read the sources and can discuss them in depth. Do not cite papers based solely on AI summaries - always verify against the original."},
+r_yellow_coding:{result:"yellow",title:"GREY AREA - DISCLOSE IN METHODS",msg:"Using AI to assist with applying your coding scheme is increasingly common but must be disclosed in your methodology section. Describe the tool, how it was used, and how you validated the coding. Your coding scheme and interpretive judgements must be your own."},
+r_red_coding:{result:"red",title:"HIGH RISK - NOT RECOMMENDED",msg:"Having AI generate your analytical categories means the interpretive framework is not yours. For interpretivist and critical research especially, the coding process IS the analysis - outsourcing it defeats the purpose. Develop your own codes through engagement with the data."},
+r_yellow_quant:{result:"yellow",title:"ACCEPTABLE IF AUDITABLE - DISCLOSE",msg:"AI-assisted quantitative analysis can be acceptable if you understand the methods, can explain every step, and the process is replicable. Disclose the tools used in your methods section. Ensure another researcher could reproduce your results."},
+r_red_quant:{result:"red",title:"NOT ACCEPTABLE",msg:"Using AI to perform analysis you cannot evaluate yourself violates the competence principle. If you cannot assess whether the output is correct, you cannot take responsibility for it. Learn the method first, then consider AI assistance."},
+r_green_trans:{result:"green",title:"ACCEPTABLE - DISCLOSE",msg:"Using AI to translate primary sources for your own analysis is a legitimate research aid, similar to using a dictionary. Note the use of AI translation in your methods section and verify accuracy against your own language knowledge where possible."},
+r_yellow_trans:{result:"yellow",title:"CAUTION - VERIFY AND DISCLOSE",msg:"If AI-translated text appears directly in your manuscript, you must verify the translation is accurate and disclose the use of AI translation. Machine translation can introduce subtle distortions of meaning that matter for interpretive analysis."},
+r_green_lit:{result:"green",title:"LOW RISK - ACCEPTABLE",msg:"Using AI to discover relevant literature is like using a sophisticated search engine. It is acceptable provided you actually read the papers it identifies. NEVER cite a paper based on an AI summary without reading the original. AI hallucinate citations."},
+r_yellow_lit:{result:"yellow",title:"GREY AREA - RISKY",msg:"Relying on AI summaries instead of reading papers is risky. AI summaries can misrepresent arguments, miss nuance, and fabricate claims. You cannot engage critically with literature you have not read. Use AI to find papers, then read them yourself."},
+r_green_data:{result:"green",title:"LOW RISK - ACCEPTABLE",msg:"Using AI for data cleaning and formatting is a technical task analogous to using any software tool. Describe your data processing pipeline in your methods section as you normally would."},
+r_green_transcribe:{result:"green",title:"ACCEPTABLE - VERIFY",msg:"AI transcription of interviews is widely accepted. Always verify the transcript against the audio, especially for key passages you will quote directly. Note the transcription tool in your methods."},
+r_yellow_synthetic:{result:"yellow",title:"DISCLOSE FULLY IN METHODS",msg:"Synthetic data or AI-assisted simulations must be fully disclosed and justified in your methods section. Explain why synthetic data is appropriate, how it was generated, and what validation you performed. This is a methodological choice with implications for your findings."},
+r_green_teach:{result:"green",title:"ACCEPTABLE",msg:"Using AI to help prepare teaching materials (discussion questions, rubric drafts, reading guides) is widely accepted. Review and adapt all output. You are responsible for the pedagogical quality of your materials."},
+r_red_grading:{result:"red",title:"NOT RECOMMENDED",msg:"Using AI to grade student work raises serious fairness, privacy, and pedagogical concerns. Students deserve human evaluation of their learning. AI cannot assess originality, effort, or development. If you use AI to assist (e.g., checking citations), the evaluative judgement must be yours."},
+r_red_rq:{result:"red",title:"NOT ACCEPTABLE FOR PHD WORK",msg:"Your research question must emerge from your own engagement with the literature and the empirical world. It is the single most important intellectual contribution of a dissertation. Having AI generate it means the foundational intellectual move is not yours."}
+};
+
+function mkDt(){
+var h="<div class='st'>AI Use Decision Tree</div>";
+h+="<div class='ib'>Select what you want to use AI for. The tool will walk you through questions to assess whether the use is appropriate, a grey area, or problematic - and give you specific guidance.</div>";
+h+="<div id='dt-area'></div>";
+h+="<div style='margin-top:12px'><button class='bt bt2' onclick='dtReset()'>Start Over</button></div>";
+return h;
+}
+
+function dtReset(){
+dtShow("start");
+}
+
+function dtShow(key){
+var d=dtData[key];
+var area=$("dt-area");
+if(!d){area.innerHTML="<p>Error: node not found.</p>";return;}
+if(d.result){
+var cls=d.result==="green"?"dt-green":(d.result==="yellow"?"dt-yellow":"dt-red");
+var icon=d.result==="green"?"ACCEPTABLE":(d.result==="yellow"?"GREY AREA":"HIGH RISK");
+area.innerHTML="<div class='dt-result "+cls+"'><b>"+d.title+"</b><br><br>"+d.msg+"</div>";
+return;
+}
+var h="<div class='dt-box'>";
+h+="<div class='dt-q'>"+d.q+"</div>";
+h+="<div class='dt-opts'>";
+for(var i=0;i<d.opts.length;i++){
+h+="<button onclick='dtShow(\""+d.opts[i].next+"\")'>"+d.opts[i].label+"</button>";
+}
+h+="</div></div>";
+area.innerHTML=h;
+}
+
+/* ===== TAB 2: JOURNAL POLICIES ===== */
+function mkJp(){
+var pubs=[
+{n:"Nature Portfolio",w:"Allowed + disclose",f:"Restricted, must disclose",d:"Methods or Acknowledgements",a:"No"},
+{n:"Elsevier",w:"Allowed + disclose",f:"Restricted + disclose",d:"Submission form AND manuscript",a:"No"},
+{n:"Wiley",w:"Allowed + disclose",f:"Restricted + disclose",d:"Acknowledgements or Methods",a:"No"},
+{n:"Cambridge UP",w:"Allowed + disclose",f:"Restricted",d:"Varies by journal",a:"No"},
+{n:"Oxford UP",w:"Allowed + disclose",f:"Restricted",d:"Varies by journal",a:"No"},
+{n:"Taylor and Francis",w:"Allowed + disclose",f:"Restricted",d:"Acknowledgements",a:"No"},
+{n:"Springer Nature",w:"Allowed + disclose",f:"Restricted",d:"Methods or Acknowledgements",a:"No"},
+{n:"SAGE",w:"Allowed + disclose",f:"Restricted",d:"Acknowledgements",a:"No"},
+{n:"IEEE",w:"Editing only",f:"Prohibited for originals",d:"Separate AI statement",a:"No"},
+{n:"PLOS",w:"Allowed + disclose",f:"Developing policy",d:"Methods section",a:"No"}
+];
+var h="<div class='st'>Journal AI Policies (2026)</div>";
+h+="<div class='ib'>Every major publisher now requires AI disclosure. Policies differ in where and how. Always check your specific target journal's author guidelines before submission - these are publisher-level summaries.</div>";
+h+="<input id='jp-search' type='text' placeholder='Search by publisher name...' oninput='filterJp()' style='width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px;margin-bottom:10px;font-size:.88em'>";
+h+="<div id='jp-table'></div>";
+h+="<div class='st' style='margin-top:16px'>Universal Rules Across All Publishers</div>";
+h+="<div class='gb'><b>1.</b> AI cannot be listed as an author (it cannot take responsibility for the work).</div>";
+h+="<div class='gb'><b>2.</b> Authors must disclose AI use transparently.</div>";
+h+="<div class='gb'><b>3.</b> Authors bear full responsibility for all content, including AI-assisted portions.</div>";
+h+="<div class='gb'><b>4.</b> Peer reviewers should not upload manuscripts to AI tools (confidentiality).</div>";
+h+="<div class='ref'>Sources: COPE guidelines (publicationethics.org); individual publisher policy pages verified April 2026. Always confirm current policy on your target journal.</div>";
+
+window._jpData=pubs;
+return h;
+}
+
+function filterJp(){
+var s=($("jp-search")?$("jp-search").value:"").toLowerCase();
+var pubs=window._jpData;
+var h="<div style='overflow-x:auto'><table><tr><th>Publisher</th><th>AI for Writing</th><th>AI for Figures</th><th>Where to Disclose</th><th>AI as Author</th></tr>";
+for(var i=0;i<pubs.length;i++){
+var p=pubs[i];
+if(s&&p.n.toLowerCase().indexOf(s)<0)continue;
+h+="<tr><td><b>"+p.n+"</b></td><td>"+p.w+"</td><td>"+p.f+"</td><td>"+p.d+"</td><td><span class='tg tg-r'>"+p.a+"</span></td></tr>";
+}
+h+="</table></div>";
+$("jp-table").innerHTML=h;
+}
+
+/* ===== TAB 3: DISCLOSURE GENERATOR ===== */
+function mkDg(){
+var h="<div class='st'>AI Disclosure Statement Generator</div>";
+h+="<div class='ib'>Fill in the details of your AI use and generate a formatted disclosure statement you can paste into your manuscript's Methods or Acknowledgements section.</div>";
+h+="<div class='fg'><label>Author name(s)</label><input id='dg-auth' placeholder='e.g., F. Kaymak'></div>";
+h+="<div class='fg'><label>AI tool used</label><select id='dg-tool'><option value=''>-- Select --</option><option>ChatGPT (OpenAI, GPT-4)</option><option>ChatGPT (OpenAI, GPT-4o)</option><option>Claude (Anthropic)</option><option>Gemini (Google)</option><option>Copilot (Microsoft)</option><option>Grammarly</option><option>DeepL Translator</option><option>Other (specify below)</option></select></div>";
+h+="<div class='fg'><label>If other, specify</label><input id='dg-other' placeholder='Tool name and version'></div>";
+h+="<div class='fg'><label>What task did AI perform?</label><select id='dg-task'><option value=''>-- Select --</option><option>Language editing and proofreading</option><option>Translation of primary sources</option><option>Literature search assistance</option><option>Summarising background material</option><option>Coding assistance for qualitative data</option><option>Data cleaning and formatting</option><option>Interview transcription</option><option>Drafting assistance for specific sections</option><option>Other (describe below)</option></select></div>";
+h+="<div class='fg'><label>Describe the specific use in your own words</label><textarea id='dg-desc' placeholder='e.g., Used to polish language in the Discussion section / Used to translate three Turkish-language archival documents / Used to assist with initial coding of 12 interview transcripts'></textarea></div>";
+h+="<div class='fg'><label>Which sections of the manuscript were affected?</label><input id='dg-sections' placeholder='e.g., Discussion section / Literature review / Methods'></div>";
+h+="<div class='fg'><label>What human review was performed?</label><select id='dg-review'><option value=''>-- Select --</option><option>All output was reviewed, verified, and revised by the author(s)</option><option>All output was reviewed and fact-checked against primary sources</option><option>All translations were verified against author knowledge of the source language</option><option>All coding was reviewed, revised, and validated by the author(s)</option><option>Custom (describe below)</option></select></div>";
+h+="<div class='fg'><label>Custom review description (if applicable)</label><textarea id='dg-custom' placeholder='Describe your review process'></textarea></div>";
+h+="<button class='bt bt1' onclick='genDisc()'>Generate Disclosure Statement</button> ";
+h+="<button class='bt bt2' onclick='clrDisc()'>Clear</button>";
+h+="<div id='dg-out' style='display:none'></div>";
+h+="<div id='dg-cp' style='display:none'><button class='bt bt3' onclick='cpTxt(\"dg-out\")'>Copy to Clipboard</button></div>";
+return h;
+}
+
+function genDisc(){
+var tool=$("dg-tool").value;
+var other=$("dg-other").value.replace(/^\s+|\s+$/g,"");
+var task=$("dg-task").value;
+var desc=$("dg-desc").value.replace(/^\s+|\s+$/g,"");
+var sections=$("dg-sections").value.replace(/^\s+|\s+$/g,"");
+var review=$("dg-review").value;
+var custom=$("dg-custom").value.replace(/^\s+|\s+$/g,"");
+var auth=$("dg-auth").value.replace(/^\s+|\s+$/g,"");
+
+if(!tool){alert("Please select the AI tool used.");return;}
+if(!task){alert("Please select the task AI performed.");return;}
+
+var toolName=tool;
+if(tool.indexOf("Other")>=0&&other)toolName=other;
+
+var reviewText=review;
+if(review.indexOf("Custom")>=0&&custom)reviewText=custom;
+
+var lines=[];
+lines.push("DISCLOSURE OF AI USE");
+lines.push("");
+if(desc){
+lines.push("The author"+(auth?"(s)":"")+" used "+toolName+" for the following purpose: "+desc+".");
+}else{
+lines.push("The author"+(auth?"(s)":"")+" used "+toolName+" for "+task.toLowerCase()+".");
+}
+if(sections){
+lines.push("This assistance was applied to the following section(s): "+sections+".");
+}
+if(reviewText){
+lines.push(reviewText+".");
+}
+lines.push("The author"+(auth?"(s)":"")+" take"+(auth?"":"s")+" full responsibility for the accuracy, originality, and integrity of the final manuscript.");
+lines.push("");
+lines.push("---");
+lines.push("Generated by AI in Academia Toolkit | INTL698");
+
+var o=$("dg-out");
+o.className="ob";
+o.style.display="block";
+o.textContent=lines.join("\n");
+$("dg-cp").style.display="block";
+}
+
+function clrDisc(){
+var ids=["dg-auth","dg-tool","dg-other","dg-task","dg-desc","dg-sections","dg-review","dg-custom"];
+for(var i=0;i<ids.length;i++){
+var e=$(ids[i]);
+if(e.tagName==="SELECT")e.selectedIndex=0;
+else e.value="";
+}
+$("dg-out").style.display="none";
+$("dg-cp").style.display="none";
+}
+
+/* ===== TAB 4: DETECTION REALITY ===== */
+function mkDr(){
+var h="<div class='st'>AI Detection: The Reality</div>";
+h+="<div class='ib'>Understanding how detection works - and why it fails - is essential for protecting yourself.</div>";
+
+h+="<div class='cd'><div class='cd-h' onclick='tog(this)'>How Detection Tools Work <span>+</span></div><div class='cd-b'>";
+h+="<p>AI detectors measure two properties of text:</p>";
+h+="<p><b>Perplexity:</b> How predictable is each word? AI chooses statistically likely words, making text \"smooth.\" Human writing is more unpredictable.</p>";
+h+="<p><b>Burstiness:</b> How much does sentence length vary? Humans mix short and long sentences erratically. AI text is more uniform.</p>";
+h+="<p>The detector produces a probability score. It is NOT a definitive identification. There is no digital watermark or fingerprint for AI text.</p></div></div>";
+
+h+="<div class='cd'><div class='cd-h' onclick='tog(this)'>False Positive Rates <span>+</span></div><div class='cd-b'>";
+h+="<p><b>Turnitin claims:</b> ~85% detection rate for unmodified AI text, false positive rate \"below 1%.\"</p>";
+h+="<p><b>Independent evidence:</b></p>";
+h+="<p>- A 2026 study found a mean false positive rate of 61.3% for non-native English writing samples</p>";
+h+="<p>- The Stanford HAI study (2023) found detectors unanimously misidentified 19% of TOEFL essays by non-native speakers as AI-generated</p>";
+h+="<p>- Some universities (e.g., Curtin University, Australia) have disabled Turnitin AI detection entirely from 2026</p>";
+h+="<p>- The University of Pittsburgh now recommends against using AI detectors, stating they are \"not accurate enough to prove\" violations</p>";
+h+="</div></div>";
+
+h+="<div class='cd'><div class='cd-h' onclick='tog(this)'>Bias Against Non-Native English Speakers <span>+</span></div><div class='cd-b'>";
+h+="<p>This is particularly relevant for students at EMU. AI detectors flag text that is \"too clean\" or follows predictable patterns. Non-native English speakers who produce careful, grammatically correct academic prose are disproportionately flagged.</p>";
+h+="<p>The Stanford HAI study found that GPT detectors \"have a bias against non-native English writers.\" Turnitin has disputed this with their own study, but the methodological debate is unresolved.</p>";
+h+="<p>The practical implication: if you are a non-native English speaker, you face a higher risk of false accusation regardless of whether you used AI.</p></div></div>";
+
+h+="<div class='cd'><div class='cd-h' onclick='tog(this)'>What Detection Cannot Do <span>+</span></div><div class='cd-b'>";
+h+="<p>- Cannot distinguish between AI-generated and AI-polished text</p>";
+h+="<p>- Cannot detect paraphrased or lightly edited AI output reliably</p>";
+h+="<p>- Cannot account for individual writing styles that happen to be \"smooth\"</p>";
+h+="<p>- Cannot prove authorship - only estimates probability</p>";
+h+="<p>- Cannot detect AI use in research design, data analysis, or non-textual work</p></div></div>";
+
+h+="<div class='st'>Protecting Yourself: Checklist</div>";
+var checks=[
+"Save every draft of your chapters (use Google Docs for automatic version history, or save dated copies)",
+"Keep handwritten notes, mind maps, and annotated PDFs that show your thinking process",
+"Use track changes when revising - save at least one version with changes visible",
+"If you use AI for any purpose, keep a log: date, tool, prompt, what you did with the output (use the AI Use Log tab)",
+"Keep browser history of sources you consulted during writing sessions",
+"Be prepared to walk someone through your argument, sources, and reasoning in a conversation",
+"For long documents (dissertation chapters), consider periodic check-ins with your supervisor showing work in progress"
+];
+for(var i=0;i<checks.length;i++){
+h+="<div class='gb'>"+checks[i]+"</div>";
+}
+h+="<div class='ref'>Sources: Stanford HAI (2023); Turnitin Guides (2026); University of Pittsburgh Teaching Resources; Curtin University AI Detection Update (2026).</div>";
+return h;
+}
+
+/* ===== TAB 5: SCENARIOS ===== */
+var scenarios=[
+{title:"Scenario 1: The Translation",
+desc:"You are writing a dissertation chapter on Turkish foreign policy. You have 15 archival documents in Ottoman Turkish that are relevant. You use ChatGPT to produce initial English translations, then correct them based on your own knowledge of Ottoman Turkish. You include translated excerpts in your dissertation.",
+opts:[
+{text:"A) Use the translations without disclosure - translation tools are just like dictionaries",fb:"Risky. While translation is widely accepted, AI translation can introduce subtle meaning distortions. Best practice is to disclose the tool in your methods section and note that translations were verified by the author. Treating AI translation as invisible normalises non-disclosure.",cls:"dt-yellow"},
+{text:"B) Disclose in methods: 'Initial translations produced using ChatGPT, verified and corrected by the author'",fb:"This is the correct approach. You are transparent about the tool, you describe the human verification step, and you take responsibility for accuracy. This is defensible to any supervisor, examiner, or journal editor.",cls:"dt-green"},
+{text:"C) Avoid AI entirely and translate everything manually to be safe",fb:"Legitimate but potentially unnecessary. AI translation is a widely accepted research aid when disclosed. The key is verification and transparency, not avoidance. However, if your language skills are strong enough for manual translation, that eliminates any concern.",cls:"dt-yellow"}
+]},
+{title:"Scenario 2: The Literature Gap",
+desc:"You paste your draft literature review into Claude and ask: 'What important scholars or works am I missing on the topic of security community formation?' It suggests four authors you had not considered. You read their work, find two relevant, and add them to your review.",
+opts:[
+{text:"A) No disclosure needed - this is just a sophisticated search engine",fb:"This is a reasonable position and many scholars would agree. Using AI to discover literature you then read and evaluate yourself is analogous to using Google Scholar recommendations. However, as norms evolve, brief disclosure is the safer practice.",cls:"dt-yellow"},
+{text:"B) Add a footnote: 'AI-assisted literature search was used to identify additional relevant works'",fb:"This is the safest approach. It costs you nothing, it is transparent, and it protects you if norms tighten. The intellectual work - reading, evaluating, and integrating the scholarship - is entirely yours.",cls:"dt-green"},
+{text:"C) This is clearly cheating - you should find all sources yourself",fb:"This is an overly strict position. Scholars have always used tools to discover relevant work - bibliographies, citation indexes, database alerts, colleagues' recommendations. AI is another discovery tool. The question is whether you engage with the sources yourself, which you did.",cls:"dt-yellow"}
+]},
+{title:"Scenario 3: The Coding Dilemma",
+desc:"You have 50 semi-structured interview transcripts for your dissertation. You develop a coding scheme based on your theoretical framework, then use ChatGPT to apply the codes to the transcripts as a first pass. You review every coded passage and revise about 30% of the AI's coding decisions.",
+opts:[
+{text:"A) Acceptable if disclosed in methods - the coding scheme is mine and I reviewed everything",fb:"This is defensible but requires very careful disclosure. You should describe exactly how AI was used, what percentage of codes you revised, and how you validated the final coding. For interpretivist work especially, be prepared for pushback - some scholars argue that the act of coding IS the interpretive analysis.",cls:"dt-yellow"},
+{text:"B) Not acceptable - coding is the analytical heart of qualitative research",fb:"This is a legitimate position, especially within interpretivist and critical traditions. The argument is that the process of reading, re-reading, and coding is where understanding develops. Outsourcing even the first pass means you are not fully immersed in the data. Many qualitative methodologists would agree with this view.",cls:"dt-yellow"},
+{text:"C) Only acceptable for a positivist content analysis, not for interpretive work",fb:"This is a nuanced and arguably correct distinction. For quantitative content analysis with predefined categories, AI-assisted coding is more defensible because the codes are meant to be applied mechanically. For interpretive work where meaning emerges through the coding process, AI assistance is more problematic. Good methodological thinking.",cls:"dt-green"}
+]},
+{title:"Scenario 4: The Clarity Edit",
+desc:"You have written a 3,000-word theoretical argument section. The ideas are yours but the writing is unclear. You paste the section into ChatGPT and ask it to 'improve clarity and flow while preserving the argument.' It returns a rewritten version that is noticeably better written. About 60% of the sentences are substantially different from your original.",
+opts:[
+{text:"A) Use the rewritten version with disclosure - the ideas are mine",fb:"This is a grey area leaning toward problematic. When 60% of sentences are substantially rewritten, the voice and expression are no longer yours. For a journal article, this might be acceptable with full disclosure. For a PhD dissertation, it undermines the evidence that you can write sustained scholarly prose - which is part of what the degree certifies.",cls:"dt-yellow"},
+{text:"B) Use the rewritten version as a guide but rewrite again in my own words",fb:"This is the best approach. You use AI output as feedback on where your writing was unclear, then rewrite in your own voice. The final text is yours. You still developed the skill of clear academic writing. Disclosure is optional since the final text is your own rewriting, but mentioning AI-assisted revision is good practice.",cls:"dt-green"},
+{text:"C) Don't use AI - go to the writing centre or ask a colleague for feedback instead",fb:"Also a good approach, and arguably better for your development. Human feedback on writing is more targeted, more contextual, and helps you learn patterns you can apply in future writing. The writing centre exists precisely for this purpose.",cls:"dt-green"}
+]},
+{title:"Scenario 5: The Conference Paper Rush",
+desc:"You have a conference paper due in 48 hours. You have your data, your argument, and an outline, but no time to write a full draft. You use AI to generate a first draft of each section based on your outline and notes, then spend the remaining time heavily editing and revising.",
+opts:[
+{text:"A) This is fine for a conference paper - it is not a publication",fb:"Conference papers are lower stakes than publications, but they are still your scholarly work and part of your professional reputation. Heavy AI use in drafting means the prose style, framing choices, and transitional logic are substantially not yours. If you present this paper, you need to be able to defend every claim in Q&A. Consider whether the time pressure justifies the trade-off.",cls:"dt-yellow"},
+{text:"B) Not acceptable even for a conference paper - the writing process matters",fb:"This is a principled position. However, the reality of academic life involves time pressures and pragmatic choices. The key question is whether your heavy editing made the final text genuinely yours. If you can defend every sentence and the argument is entirely your own, some would find this acceptable for a conference working paper (not a publication).",cls:"dt-yellow"},
+{text:"C) Present only the sections I actually wrote myself and cut the rest",fb:"This is the most defensible approach. Present what you can genuinely stand behind. A shorter, fully yours conference paper is better than a longer, partially AI-generated one. Conference presentations often benefit from brevity anyway.",cls:"dt-green"}
+]}
+];
+
+function mkSc(){
+var h="<div class='st'>Scenario Exercises</div>";
+h+="<div class='ib'>Read each scenario and choose the option closest to your view. The feedback explores the implications of each choice. There are no trick answers - these are genuine grey areas.</div>";
+for(var i=0;i<scenarios.length;i++){
+var s=scenarios[i];
+h+="<div class='sc-card'><h4>"+s.title+"</h4><p>"+s.desc+"</p>";
+h+="<div class='sc-opts'>";
+for(var j=0;j<s.opts.length;j++){
+h+="<button onclick='scFb(this,\""+s.opts[j].cls+"\",\""+escQ(s.opts[j].fb)+"\")'>"+s.opts[j].text+"</button>";
+}
+h+="</div>";
+h+="<div class='sc-fb' id='sc-fb-"+i+"'></div>";
+h+="</div>";
+}
+return h;
+}
+
+function escQ(s){return s.replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+
+function scFb(btn,cls,fb){
+var card=btn.parentNode.parentNode;
+var fbDiv=card.querySelector(".sc-fb");
+fbDiv.className="sc-fb "+cls;
+fbDiv.style.display="block";
+fbDiv.innerHTML="<b>Feedback:</b> "+fb.replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+}
+
+/* ===== TAB 6: AI USE LOG ===== */
+var logEntries=[];
+
+function mkLg(){
+var h="<div class='st'>AI Use Log</div>";
+h+="<div class='ib'>Document your AI use as you go. This creates a record you can reference for disclosure statements and defend against false accusations. Entries are stored in your browser session - copy the log before closing.</div>";
+h+="<div class='fg'><label>Date</label><input id='lg-date' type='date'></div>";
+h+="<div class='fg'><label>AI Tool Used</label><input id='lg-tool' placeholder='e.g., ChatGPT GPT-4, Claude, Grammarly'></div>";
+h+="<div class='fg'><label>Task / Purpose</label><input id='lg-task' placeholder='e.g., Language polishing of Chapter 3 discussion'></div>";
+h+="<div class='fg'><label>Prompt or Input (brief summary)</label><textarea id='lg-prompt' placeholder='e.g., Asked to improve clarity of paragraph on democratic peace theory'></textarea></div>";
+h+="<div class='fg'><label>What I Did With the Output</label><textarea id='lg-action' placeholder='e.g., Kept 2 sentence-level edits, rejected restructuring suggestion, rewrote concluding paragraph myself'></textarea></div>";
+h+="<button class='bt bt1' onclick='addLog()'>Add Entry</button> ";
+h+="<button class='bt bt3' onclick='copyLog()'>Copy Full Log</button> ";
+h+="<button class='bt bt4' onclick='clearLog()'>Clear All</button>";
+h+="<div class='st' style='margin-top:16px'>Log Entries</div>";
+h+="<div id='lg-list'><p style='color:#94a3b8;font-size:.9em'>No entries yet. Start documenting your AI use above.</p></div>";
+return h;
+}
+
+function addLog(){
+var date=$("lg-date").value;
+var tool=$("lg-tool").value.replace(/^\s+|\s+$/g,"");
+var task=$("lg-task").value.replace(/^\s+|\s+$/g,"");
+var prompt=$("lg-prompt").value.replace(/^\s+|\s+$/g,"");
+var action=$("lg-action").value.replace(/^\s+|\s+$/g,"");
+if(!tool||!task){alert("Please enter at least the tool and task.");return;}
+logEntries.push({date:date||"(no date)",tool:tool,task:task,prompt:prompt,action:action});
+renderLog();
+$("lg-date").value="";
+$("lg-tool").value="";
+$("lg-task").value="";
+$("lg-prompt").value="";
+$("lg-action").value="";
+}
+
+function renderLog(){
+var c=$("lg-list");
+if(logEntries.length===0){c.innerHTML="<p style='color:#94a3b8;font-size:.9em'>No entries yet.</p>";return;}
+var h="";
+for(var i=logEntries.length-1;i>=0;i--){
+var e=logEntries[i];
+h+="<div class='log-entry'>";
+h+="<button class='del' onclick='delLog("+i+")'>&times;</button>";
+h+="<b>"+e.date+"</b> | <b>"+e.tool+"</b><br>";
+h+="<b>Task:</b> "+e.task+"<br>";
+if(e.prompt)h+="<b>Prompt:</b> "+e.prompt+"<br>";
+if(e.action)h+="<b>Action taken:</b> "+e.action;
+h+="</div>";
+}
+c.innerHTML=h;
+}
+
+function delLog(i){
+logEntries.splice(i,1);
+renderLog();
+}
+
+function copyLog(){
+if(logEntries.length===0){alert("No entries to copy.");return;}
+var lines=["AI USE LOG","=========",""];
+for(var i=0;i<logEntries.length;i++){
+var e=logEntries[i];
+lines.push("Entry "+(i+1));
+lines.push("Date: "+e.date);
+lines.push("Tool: "+e.tool);
+lines.push("Task: "+e.task);
+if(e.prompt)lines.push("Prompt: "+e.prompt);
+if(e.action)lines.push("Action: "+e.action);
+lines.push("");
+}
+lines.push("Generated by AI in Academia Toolkit | INTL698");
+var t=lines.join("\n");
+if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert("Log copied to clipboard!");});}
+else{var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");document.body.removeChild(a);alert("Log copied!");}
+}
+
+function clearLog(){
+if(logEntries.length===0)return;
+if(confirm("Delete all log entries?")){logEntries=[];renderLog();}
+}
+
+function cpTxt(id){
+var t=$(id).textContent;
+if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert("Copied!");});}
+else{var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");document.body.removeChild(a);alert("Copied!");}
+}
+
+/* ===== INIT ===== */
+init();
+setTimeout(function(){dtShow("start");filterJp();},50);
+</script>
+</body>
+</html>
