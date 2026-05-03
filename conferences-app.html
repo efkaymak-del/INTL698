@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Professional Activities Companion – INTL698</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Georgia,"Times New Roman",serif;background:#f5f6fa;color:#1a1a2e;line-height:1.7;}
+header{background:linear-gradient(135deg,#1e3a5f 0%,#2d5a87 100%);color:#fff;padding:28px 20px;text-align:center;}
+header h1{font-size:1.7em;margin-bottom:4px;}
+header p{font-size:0.95em;opacity:0.88;}
+nav{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px;background:#fff;border-bottom:2px solid #ddd;justify-content:center;}
+nav button{padding:8px 14px;border:2px solid #1e3a5f;background:#fff;color:#1e3a5f;border-radius:6px;cursor:pointer;font-size:0.85em;font-family:inherit;transition:all .2s;}
+nav button:hover{background:#eef3fa;}
+nav button.active{background:#1e3a5f;color:#fff;}
+.container{max-width:960px;margin:0 auto;padding:20px 16px;}
+.card{background:#fff;border-radius:10px;padding:22px;margin-bottom:18px;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+.card h2{color:#1e3a5f;font-size:1.25em;margin-bottom:10px;border-bottom:2px solid #eee;padding-bottom:6px;}
+.card h3{color:#2d5a87;font-size:1.05em;margin:14px 0 6px;}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:0.9em;}
+th,td{border:1px solid #ddd;padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#1e3a5f;color:#fff;font-weight:600;}
+tr:nth-child(even){background:#f9fafc;}
+.tag{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.78em;margin:2px;font-weight:600;}
+.tag-green{background:#d4edda;color:#155724;}
+.tag-blue{background:#d1ecf1;color:#0c5460;}
+.tag-yellow{background:#fff3cd;color:#856404;}
+.tag-red{background:#f8d7da;color:#721c24;}
+.tag-purple{background:#e8daef;color:#4a235a;}
+.checklist-item{padding:8px 0;border-bottom:1px solid #eee;}
+.checklist-item label{cursor:pointer;display:flex;align-items:flex-start;gap:8px;}
+.checklist-item input[type="checkbox"]{margin-top:5px;width:16px;height:16px;}
+.btn{padding:10px 20px;background:#1e3a5f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.95em;font-family:inherit;margin:4px;}
+.btn:hover{background:#2d5a87;}
+.btn-secondary{background:#5a7d9a;}
+.btn-secondary:hover{background:#6b8fae;}
+select,input[type="text"],input[type="date"],textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:0.95em;font-family:inherit;margin:4px 0 12px;}
+textarea{min-height:80px;resize:vertical;}
+.result-box{background:#eef3fa;border-left:4px solid #1e3a5f;padding:16px;border-radius:0 6px 6px 0;margin:12px 0;white-space:pre-wrap;font-size:0.92em;}
+.score-bar{height:20px;border-radius:10px;margin:6px 0;}
+.tip-box{background:#fff3cd;border-left:4px solid #ffc107;padding:12px 16px;border-radius:0 6px 6px 0;margin:10px 0;font-size:0.9em;}
+.expandable-header{cursor:pointer;padding:10px 0;display:flex;justify-content:space-between;align-items:center;}
+.expandable-header:hover{color:#2d5a87;}
+.expandable-body{display:none;padding:8px 0;}
+.expandable-body.open{display:block;}
+.hidden{display:none;}
+a{color:#1e3a5f;}
+@media(max-width:600px){header h1{font-size:1.3em;}nav button{font-size:0.78em;padding:6px 10px;}.container{padding:12px 10px;}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Professional Activities Companion App</h1>
+<p>INTL698 Doctoral Seminar in International Relations – Eastern Mediterranean University</p>
+</header>
+
+<nav id="topnav"></nav>
+
+<div class="container" id="app"></div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+var TABS = [
+  {id:"conferences", label:"Conference Selector"},
+  {id:"funding", label:"Funding Tracker"},
+  {id:"networking", label:"Networking Toolkit"},
+  {id:"publishing", label:"Article Publishing Guide"},
+  {id:"grants", label:"Grant Writing Guide"},
+  {id:"abstract", label:"Abstract Builder"},
+  {id:"profile", label:"Profile Checklist"},
+  {id:"timeline", label:"PhD Timeline Planner"}
+];
+
+var CONFERENCES = [
+  {name:"ISA Annual Convention", org:"International Studies Association", freq:"Annual (Mar/Apr)", size:"6,000+", location:"Rotating (US/intl)", cost:"USD 300-500 registration", character:"Largest IR-specific meeting; broad coverage", virtual:"ISA Virtual held separately (Jul/Aug); ~USD 50-100", url:"https://www.isanet.org/Conferences", ecpr:false, tips:"Submit by Jun for following year. Section panels have higher acceptance rates. Join an ISA section early."},
+  {name:"ISA Virtual", org:"International Studies Association", freq:"Annual (Jul/Aug)", size:"1,000+", location:"Online", cost:"USD 50-100", character:"Affordable online alternative; same scholarly rigor", virtual:"Fully virtual", url:"https://www.isanet.org/Conferences/Virtual-2026", ecpr:false, tips:"Great first conference experience. No travel costs. Time-zone friendly panels available."},
+  {name:"ECPR General Conference", org:"European Consortium for Political Research", freq:"Annual (Aug/Sep)", size:"3,000+", location:"Rotating (Europe)", cost:"EUR 150-250 (member rate)", character:"Premier European political science conference; strong methods culture", virtual:"Limited virtual options in some years", url:"https://ecpr.eu/Events", ecpr:true, tips:"EMU is an ECPR member: you are eligible for travel/accommodation grants (up to GBP 500). Apply for funding early."},
+  {name:"ECPR Joint Sessions", org:"ECPR", freq:"Annual (Apr/May)", size:"500-800", location:"Rotating (Europe)", cost:"EUR 100-200 (member rate)", character:"Intensive workshop format; smaller, deeper engagement. Strong for works-in-progress.", virtual:"No", url:"https://ecpr.eu/Events", ecpr:true, tips:"Highly competitive but excellent for deep feedback on a single paper. Apply through workshop directors."},
+  {name:"EISA PEC", org:"European International Studies Association", freq:"Biennial", size:"2,000+", location:"Rotating (Europe)", cost:"EUR 150-300", character:"European flagship for IR specifically; theory-rich", virtual:"Varies", url:"https://eisa-net.org/pec-2026/", ecpr:false, tips:"Strong for critical and interpretivist IR. Next: Portugal 2026."},
+  {name:"EISA EWIS", org:"EISA", freq:"Annual (Jun/Jul)", size:"200-400", location:"Rotating (Europe)", cost:"EUR 100-200", character:"Small workshop format; intensive feedback on papers", virtual:"No", url:"https://eisa-net.org/ewis-2026/", ecpr:false, tips:"Excellent for PhD students; next held 1-3 Jul 2026 at Izmir University of Economics (close to EMU)."},
+  {name:"BISA Annual Conference", org:"British International Studies Association", freq:"Annual (Jun)", size:"800-1,200", location:"UK", cost:"GBP 100-200 (postgrad rate)", character:"Strong British School of IR; good for English School, critical security studies", virtual:"Some hybrid options", url:"https://www.bisaconference.org/", ecpr:false, tips:"Apply for postgraduate bursaries. Development day for ECRs usually precedes main conference."},
+  {name:"IPSA World Congress", org:"International Political Science Association", freq:"Biennial", size:"3,000+", location:"Rotating (global)", cost:"USD 200-400", character:"Broadest comparative politics coverage; global reach", virtual:"Some virtual participation options", url:"https://www.ipsa.org", ecpr:false, tips:"Next: Rome 2027 (24-28 Jul). Travel grants available for ECRs. Global networking."},
+  {name:"APSA Annual Meeting", org:"American Political Science Association", freq:"Annual (Aug/Sep)", size:"7,000+", location:"US cities", cost:"USD 100-200 (grad rate)", character:"Largest political science conference globally; US-centric but broad", virtual:"Virtual events held separately", url:"https://apsanet.org/events/", ecpr:false, tips:"Very large; can feel overwhelming. Focus on organized sections. APSA offers travel grants for international scholars."},
+  {name:"MPSA Annual Conference", org:"Midwest Political Science Association", freq:"Annual (Apr)", size:"4,000+", location:"Chicago", cost:"USD 80-150 (grad rate)", character:"High acceptance rate; good for first presentations; strong quantitative focus", virtual:"Political Science Research Exchange (online alternative)", url:"https://www.mpsanet.org/conference/", ecpr:false, tips:"Often recommended as a first conference for PhD students due to supportive atmosphere."}
+];
+
+var FUNDING_SOURCES = [
+  {name:"ECPR Event Participant Grants", amount:"Up to GBP 500", eligibility:"PhD students and ECRs at ECPR Full Member institutions", covers:"Registration, travel, accommodation", deadline:"Varies by event (check ecpr.eu/Funding)", url:"https://ecpr.eu/Funding/Funding", notes:"EMU is a Full Member. Apply as soon as call opens."},
+  {name:"ECPR Methods School Funding", amount:"Varies", eligibility:"Graduate students at ECPR member institutions", covers:"Course fees, travel", deadline:"Typically Feb/Mar", url:"https://ecpr.eu/MethodsSchool", notes:"Excellent for acquiring specific methods training (QCA, process tracing, stats)."},
+  {name:"ISA Travel Grants", amount:"Varies (USD 200-500)", eligibility:"ISA members, especially from developing countries", covers:"Travel, registration", deadline:"Typically Nov/Dec for following year convention", url:"https://www.isanet.org", notes:"Various ISA sections also offer their own travel grants."},
+  {name:"IPSA Travel Grants", amount:"Varies", eligibility:"Early-career scholars from underrepresented countries", covers:"Travel, registration", deadline:"Varies by congress cycle", url:"https://www.ipsa.org", notes:"IPSA also funds participation in summer schools."},
+  {name:"BISA Postgraduate Bursaries", amount:"GBP 100-300", eligibility:"Postgraduate BISA members", covers:"Conference registration and travel", deadline:"Typically Mar/Apr", url:"https://www.bisa.ac.uk", notes:"Small but helpful. Apply early."},
+  {name:"TUBITAK 2214-A (International Research Fellowship)", amount:"Up to USD 1,500/month + travel", eligibility:"PhD students enrolled in Turkey", covers:"Living expenses, travel, health insurance", deadline:"Periodic calls (check tubitak.gov.tr)", url:"https://tubitak.gov.tr/en/scholarships/postgraduate/research-scholarship-programs/2214-international-research-fellowship-programme-phd-students", notes:"For research visits abroad (3-12 months). Can support conference attendance if tied to research stay."},
+  {name:"TUBITAK 2211 (National PhD Scholarship)", amount:"Monthly stipend (varies by program)", eligibility:"PhD students in Turkey", covers:"Monthly living stipend", deadline:"Annual cycle", url:"https://tubitak.gov.tr/en/scholarships/postgraduate/research-scholarship-programs/2211-national-phd-scholarship-programs", notes:"General PhD funding; frees other funds for conference travel."},
+  {name:"TUBITAK 3005 (Social Sciences Research Projects)", amount:"Up to TRY 450,000", eligibility:"Researchers at Turkish universities", covers:"Research expenses, equipment, travel", deadline:"Periodic calls", url:"https://tubitak.gov.tr/en/funds/academic/national-support-programs/3005-innovative-solutions-research-projects-support-program-social-sciences-and-humanities", notes:"For supervisors/teams; can include conference travel as a budget item."},
+  {name:"NSF DDRIG (Doctoral Dissertation Research Improvement Grants)", amount:"Up to USD 20,000", eligibility:"US-based PhD students in political science", covers:"Data collection, fieldwork, travel", deadline:"Jan 15 and Aug 15 (rolling)", url:"https://www.nsf.gov/funding/opportunities/ps-political-science/5418/pd98-1371", notes:"US-specific but sets the model. If you collaborate with US-based scholars, they may include you."},
+  {name:"SSRC Fellowships", amount:"Varies by program", eligibility:"Varies; many open to international scholars", covers:"Research, writing, fieldwork", deadline:"Varies", url:"https://www.ssrc.org/how-we-work/fellowship-and-grants-administration/", notes:"Multiple fellowship programs; check annually for IR-relevant calls."},
+  {name:"CEPR PhD Research Grants", amount:"Up to GBP 15,000", eligibility:"PhD students (varies by program)", covers:"Research assistance, data, stipend", deadline:"Varies", url:"https://grp.cepr.org/steg/funding/small-phd-research-grants", notes:"Strong for political economy topics."},
+  {name:"EU Marie Sklodowska-Curie Actions", amount:"Varies (generous)", eligibility:"Researchers at all career stages", covers:"Salary, mobility, research, training", deadline:"Annual (typically Sep/Oct)", url:"https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/fellowships-and-individual-research-grants_en", notes:"Highly competitive but transformative. Plan 6+ months ahead."},
+  {name:"EMU Departmental Funds", amount:"Varies", eligibility:"Enrolled EMU PhD students", covers:"Conference registration, some travel", deadline:"Check with department", url:"", notes:"Always ask your supervisor and department about internal funds first."}
+];
+
+var JOURNALS = [
+  {name:"International Organization (IO)", tier:"Top", field:"IR/IPE", review:"6-12 months", accept:"5-8%", style:"Positivist-leaning, rigorous empirical", notes:"Flagship IR journal. High methodological bar."},
+  {name:"International Security", tier:"Top", field:"Security Studies", review:"3-6 months", accept:"5-10%", style:"Policy-relevant, qualitative and quantitative", notes:"Strong for security, strategy, conflict."},
+  {name:"World Politics", tier:"Top", field:"Comparative/IR", review:"4-8 months", accept:"5-8%", style:"Theoretically innovative, multi-method", notes:"Values theoretical contribution over method."},
+  {name:"American Political Science Review (APSR)", tier:"Top", field:"General PoliSci", review:"3-6 months", accept:"5-8%", style:"Pluralist, methodologically diverse", notes:"Broadest top journal; any IR topic if contribution is clear."},
+  {name:"Review of International Political Economy (RIPE)", tier:"Top", field:"IPE", review:"3-6 months", accept:"8-12%", style:"Critical IPE, heterodox approaches welcome", notes:"Strong for critical/constructivist IPE."},
+  {name:"European Journal of International Relations (EJIR)", tier:"Top/A", field:"IR Theory", review:"4-8 months", accept:"8-12%", style:"Theory-heavy, pluralist", notes:"ECPR journal. Excellent for theoretical contributions."},
+  {name:"Review of International Studies (RIS)", tier:"A", field:"IR", review:"3-6 months", accept:"10-15%", style:"British School, pluralist", notes:"BISA journal. Good for English School and critical approaches."},
+  {name:"Journal of Peace Research (JPR)", tier:"Top/A", field:"Peace/Conflict", review:"3-6 months", accept:"8-12%", style:"Quantitative-leaning, conflict data", notes:"Strong quantitative conflict research."},
+  {name:"Security Studies", tier:"A", field:"Security", review:"3-6 months", accept:"10-15%", style:"Realist and beyond; theoretical security", notes:"Good for grand strategy, deterrence, alliance theory."},
+  {name:"International Studies Quarterly (ISQ)", tier:"A", field:"IR", review:"3-6 months", accept:"10-12%", style:"Broad IR, multi-method", notes:"ISA flagship journal. Broad IR coverage."},
+  {name:"Cooperation and Conflict", tier:"A/B", field:"Nordic IR/European Security", review:"3-6 months", accept:"15-20%", style:"European security, Nordic tradition", notes:"Good for European and Nordic IR perspectives."},
+  {name:"Journal of International Relations and Development (JIRD)", tier:"B", field:"IR", review:"3-6 months", accept:"15-20%", style:"Development, non-Western IR", notes:"More accessible for first publications; values diverse perspectives."},
+  {name:"Cambridge Review of International Affairs", tier:"B", field:"IR/Policy", review:"2-4 months", accept:"15-25%", style:"Policy-oriented, accessible", notes:"Faster turnaround; good for policy-relevant work."},
+  {name:"Third World Quarterly", tier:"A/B", field:"Development/Global South", review:"3-6 months", accept:"10-15%", style:"Critical, Global South perspectives", notes:"Strong for postcolonial and development-focused IR."},
+  {name:"International Affairs", tier:"A", field:"IR/Policy", review:"3-6 months", accept:"10-15%", style:"Policy-relevant, accessible to practitioners", notes:"Chatham House journal. Values readability."},
+  {name:"PS: Political Science and Politics", tier:"B", field:"Profession/Teaching", review:"2-4 months", accept:"20-30%", style:"Shorter pieces, professional reflection", notes:"Good for methods/pedagogy pieces. Where Gary King published 'Publication, Publication.'"}
+];
+
+var METHODS_SCHOOLS = [
+  {name:"ECPR Methods School", when:"Jan-Feb (Winter) / Jul-Aug (Summer)", where:"Rotating European cities", cost:"EUR 200-600 (member rate)", focus:"Broad: QCA, process tracing, text analysis, statistics, R, Python, game theory", url:"https://ecpr.eu/MethodsSchool", notes:"EMU membership gives reduced fees. Funding available."},
+  {name:"Essex Summer School in Social Science Data Analysis", when:"Jul-Aug", where:"University of Essex, UK", cost:"GBP 400-800 per course", focus:"Statistics, econometrics, Bayesian analysis, causal inference, text-as-data", url:"https://essexsummerschool.com", notes:"Gold standard for quantitative methods training."},
+  {name:"IQMR (Institute for Qualitative and Multi-Method Research)", when:"Jun (two weeks)", where:"Syracuse University, USA", cost:"Varies; scholarships available", focus:"Process tracing, case studies, comparative methods, multi-method designs", url:"https://www.maxwell.syr.edu/research/moynihan-institute-of-global-affairs/iqmr", notes:"Essential for qualitative researchers. Competitive admission."},
+  {name:"ICPSR Summer Program", when:"Jun-Aug", where:"University of Michigan, USA", cost:"Varies; fellowships available", focus:"Quantitative methods, machine learning, network analysis, Bayesian stats", url:"https://www.icpsr.umich.edu/web/pages/sumprog/", notes:"Longest-running methods training program in social science."},
+  {name:"ECPR Summer School on Methods and Techniques", when:"Jul-Aug", where:"Rotating", cost:"EUR 200-500", focus:"Specialized topics (far-right research, concepts, mixed methods)", url:"https://ecpr.eu/Events", notes:"More specialized than the main Methods School; thematic focus varies annually."}
+];
+
+/* ============================================================
+   APP LOGIC
+   ============================================================ */
+
+var currentTab = "conferences";
+
+function el(id){ return document.getElementById(id); }
+
+function buildNav(){
+  var nav = el("topnav");
+  var html = "";
+  for(var i=0; i<TABS.length; i++){
+    var t = TABS[i];
+    html += '<button id="nav-' + t.id + '" onclick="showTab(\'' + t.id + '\')">' + t.label + '</button>';
+  }
+  nav.innerHTML = html;
+}
+
+function showTab(id){
+  currentTab = id;
+  var btns = document.querySelectorAll("nav button");
+  for(var i=0; i<btns.length; i++){
+    btns[i].className = btns[i].id === "nav-" + id ? "active" : "";
+  }
+  el("app").innerHTML = getTabContent(id);
+}
+
+function getTabContent(id){
+  if(id === "conferences") return buildConferences();
+  if(id === "funding") return buildFunding();
+  if(id === "networking") return buildNetworking();
+  if(id === "publishing") return buildPublishing();
+  if(id === "grants") return buildGrants();
+  if(id === "abstract") return buildAbstract();
+  if(id === "profile") return buildProfile();
+  if(id === "timeline") return buildTimeline();
+  return "";
+}
+
+/* ---------- TAB 1: CONFERENCE SELECTOR ---------- */
+function buildConferences(){
+  var h = '<div class="card"><h2>Conference Selector</h2>';
+  h += '<p>Use the filters below to find conferences that match your needs, budget, and research focus.</p>';
+  h += '<label><strong>Budget:</strong></label>';
+  h += '<select id="conf-budget" onchange="filterConfs()">';
+  h += '<option value="all">Any budget</option>';
+  h += '<option value="low">Low cost (under EUR/USD 200)</option>';
+  h += '<option value="mid">Moderate (EUR/USD 200-400)</option>';
+  h += '<option value="high">Major investment (EUR/USD 400+)</option>';
+  h += '</select>';
+  h += '<label><strong>Format preference:</strong></label>';
+  h += '<select id="conf-format" onchange="filterConfs()">';
+  h += '<option value="all">Any format</option>';
+  h += '<option value="virtual">Virtual/online only</option>';
+  h += '<option value="workshop">Small workshop format</option>';
+  h += '<option value="large">Large conference</option>';
+  h += '</select>';
+  h += '<label><strong>ECPR-funded (EMU member benefit):</strong></label>';
+  h += '<select id="conf-ecpr" onchange="filterConfs()">';
+  h += '<option value="all">Show all</option>';
+  h += '<option value="yes">ECPR-funded only</option>';
+  h += '</select>';
+  h += '<div id="conf-results"></div></div>';
+
+  h += '<div class="card"><h2>Virtual and Low-Cost Alternatives</h2>';
+  h += '<p>Not every career-building activity requires expensive travel. Consider these alternatives:</p>';
+  h += '<h3>Virtual Conferences</h3>';
+  h += '<p><strong>ISA Virtual (Jul/Aug each year)</strong> offers the same scholarly rigor as the annual convention at a fraction of the cost (USD 50-100, no travel). The MPSA Political Science Research Exchange is another online-only option.</p>';
+  h += '<h3>Workshops Over Conferences</h3>';
+  h += '<p>Workshops like <strong>EISA EWIS</strong> and <strong>ECPR Joint Sessions</strong> provide deeper engagement with fewer participants. You present a full paper and receive detailed written feedback. These are often more valuable for a work-in-progress than a 15-minute panel slot at a mega-conference.</p>';
+  h += '<h3>Think-Tank and Policy Events</h3>';
+  h += '<p>Organizations like <a href="https://www.chathamhouse.org/events" target="_blank">Chatham House</a>, <a href="https://www.csis.org/events" target="_blank">CSIS</a>, and regional think tanks host events (often free or low-cost, sometimes virtual) that connect academic research with policy communities.</p>';
+  h += '<h3>Graduate Symposia</h3>';
+  h += '<p>Many departments and regional associations organize graduate-only conferences with minimal fees. These are low-stakes environments to practice presenting and receive peer feedback (e.g., MPSA Graduate Symposium, Pi Sigma Alpha Student Research Conference).</p>';
+  h += '</div>';
+
+  h += '<div class="card"><h2>Methods Schools</h2>';
+  h += '<p>Dedicated methods training is a strategic investment that strengthens your dissertation and CV simultaneously.</p>';
+  h += '<table><tr><th>Program</th><th>When</th><th>Focus</th><th>Cost</th><th>Notes</th></tr>';
+  for(var i=0; i<METHODS_SCHOOLS.length; i++){
+    var m = METHODS_SCHOOLS[i];
+    h += '<tr><td><a href="' + m.url + '" target="_blank">' + m.name + '</a></td><td>' + m.when + '</td><td>' + m.focus + '</td><td>' + m.cost + '</td><td>' + m.notes + '</td></tr>';
+  }
+  h += '</table></div>';
+  return h;
+}
+
+function filterConfs(){
+  var budget = el("conf-budget").value;
+  var format = el("conf-format").value;
+  var ecpr = el("conf-ecpr").value;
+  var results = [];
+  for(var i=0; i<CONFERENCES.length; i++){
+    var c = CONFERENCES[i];
+    if(ecpr === "yes" && !c.ecpr) continue;
+    if(format === "virtual" && c.location !== "Online") continue;
+    if(format === "workshop" && c.size.replace(/[^0-9]/g,"") > 1000) continue;
+    if(format === "large" && c.size.replace(/[^0-9]/g,"") < 1000 && c.location !== "Online") continue;
+    var costNum = parseInt(c.cost.replace(/[^0-9]/g,""));
+    if(budget === "low" && costNum > 200) continue;
+    if(budget === "mid" && (costNum < 150 || costNum > 400)) continue;
+    if(budget === "high" && costNum < 300) continue;
+    results.push(c);
+  }
+  var h = "";
+  if(results.length === 0){
+    h = '<p style="margin-top:12px;color:#856404;">No conferences match your filters. Try broadening your criteria.</p>';
+  } else {
+    h = '<table style="margin-top:12px;"><tr><th>Conference</th><th>Frequency</th><th>Size</th><th>Cost</th><th>Character</th><th>Tips</th></tr>';
+    for(var j=0; j<results.length; j++){
+      var r = results[j];
+      var ecprTag = r.ecpr ? ' <span class="tag tag-green">ECPR Funded</span>' : '';
+      h += '<tr><td><a href="' + r.url + '" target="_blank">' + r.name + '</a>' + ecprTag + '</td><td>' + r.freq + '</td><td>' + r.size + '</td><td>' + r.cost + '</td><td>' + r.character + '</td><td>' + r.tips + '</td></tr>';
+    }
+    h += '</table>';
+  }
+  el("conf-results").innerHTML = h;
+}
+
+/* ---------- TAB 2: FUNDING TRACKER ---------- */
+function buildFunding(){
+  var h = '<div class="card"><h2>Funding Source Directory</h2>';
+  h += '<p>Search and filter available funding sources for conference travel, research, and professional development.</p>';
+  h += '<input type="text" id="fund-search" placeholder="Search by name, type, or keyword..." onkeyup="filterFunding()">';
+  h += '<div id="fund-results"></div></div>';
+
+  h += '<div class="card"><h2>Your Funding Applications Log</h2>';
+  h += '<p>Track your applications, deadlines, and outcomes.</p>';
+  h += '<label>Funding Source:</label><input type="text" id="fund-name-input" placeholder="e.g., ECPR Travel Grant">';
+  h += '<label>Amount Requested:</label><input type="text" id="fund-amount-input" placeholder="e.g., GBP 500">';
+  h += '<label>Deadline:</label><input type="date" id="fund-deadline-input">';
+  h += '<label>Status:</label><select id="fund-status-input"><option>Planning</option><option>Submitted</option><option>Awarded</option><option>Rejected</option><option>Pending</option></select>';
+  h += '<label>Notes:</label><textarea id="fund-notes-input" placeholder="Any details..."></textarea>';
+  h += '<button class="btn" onclick="addFundingEntry()">Add Entry</button>';
+  h += '<div id="fund-log"></div></div>';
+  return h;
+}
+
+var fundingLog = [];
+
+function filterFunding(){
+  var q = el("fund-search").value.toLowerCase();
+  var h = '<table><tr><th>Source</th><th>Amount</th><th>Eligibility</th><th>Covers</th><th>Deadline</th><th>Notes</th></tr>';
+  var count = 0;
+  for(var i=0; i<FUNDING_SOURCES.length; i++){
+    var f = FUNDING_SOURCES[i];
+    var searchStr = (f.name + " " + f.eligibility + " " + f.covers + " " + f.notes).toLowerCase();
+    if(q && searchStr.indexOf(q) === -1) continue;
+    var link = f.url ? '<a href="' + f.url + '" target="_blank">' + f.name + '</a>' : f.name;
+    h += '<tr><td>' + link + '</td><td>' + f.amount + '</td><td>' + f.eligibility + '</td><td>' + f.covers + '</td><td>' + f.deadline + '</td><td>' + f.notes + '</td></tr>';
+    count++;
+  }
+  h += '</table>';
+  if(count === 0) h = '<p>No matching funding sources found.</p>';
+  el("fund-results").innerHTML = h;
+}
+
+function addFundingEntry(){
+  var entry = {
+    name: el("fund-name-input").value,
+    amount: el("fund-amount-input").value,
+    deadline: el("fund-deadline-input").value,
+    status: el("fund-status-input").value,
+    notes: el("fund-notes-input").value
+  };
+  if(!entry.name){alert("Please enter a funding source name."); return;}
+  fundingLog.push(entry);
+  el("fund-name-input").value = "";
+  el("fund-amount-input").value = "";
+  el("fund-deadline-input").value = "";
+  el("fund-notes-input").value = "";
+  renderFundingLog();
+}
+
+function renderFundingLog(){
+  if(fundingLog.length === 0){el("fund-log").innerHTML = ""; return;}
+  var h = '<h3 style="margin-top:16px;">Your Applications</h3><table><tr><th>Source</th><th>Amount</th><th>Deadline</th><th>Status</th><th>Notes</th></tr>';
+  for(var i=0; i<fundingLog.length; i++){
+    var e = fundingLog[i];
+    var statusClass = "tag-blue";
+    if(e.status === "Awarded") statusClass = "tag-green";
+    if(e.status === "Rejected") statusClass = "tag-red";
+    if(e.status === "Submitted") statusClass = "tag-yellow";
+    h += '<tr><td>' + e.name + '</td><td>' + e.amount + '</td><td>' + e.deadline + '</td><td><span class="tag ' + statusClass + '">' + e.status + '</span></td><td>' + e.notes + '</td></tr>';
+  }
+  h += '</table>';
+  el("fund-log").innerHTML = h;
+}
+
+/* ---------- TAB 3: NETWORKING TOOLKIT ---------- */
+function buildNetworking(){
+  var h = '<div class="card"><h2>Networking Strategies for Introverts (and Everyone Else)</h2>';
+  h += '<p>Networking is often the most anxiety-inducing part of conferences, especially for PhD students. The key insight is that networking is not about self-promotion; it is about genuine intellectual exchange.</p>';
+
+  h += '<h3>Before the Conference</h3>';
+  h += '<p>Preparation eliminates most networking anxiety. Identify 5-8 scholars whose work connects to yours. Read at least one recent piece from each. Prepare a 30-second "research elevator pitch" using the template below. Check the program for their panels and plan to attend. Draft a brief, specific email to send afterward.</p>';
+
+  h += '<h3>The Research Elevator Pitch</h3>';
+  h += '<p>Fill in the template below to craft your pitch. Practice it until it feels natural, not rehearsed.</p>';
+  h += '<label>Your name and institution:</label><input type="text" id="net-name" placeholder="e.g., I am [Name], a PhD candidate at EMU">';
+  h += '<label>Your broad topic (one sentence):</label><input type="text" id="net-topic" placeholder="e.g., I study the domestic politics of alliance commitments in NATO">';
+  h += '<label>Your specific puzzle or question:</label><input type="text" id="net-puzzle" placeholder="e.g., I am trying to understand why some allies increase burden-sharing after threats while others free-ride">';
+  h += '<label>Your approach (one sentence):</label><input type="text" id="net-approach" placeholder="e.g., I use comparative case studies of three NATO members using process tracing">';
+  h += '<label>Why it matters:</label><input type="text" id="net-matters" placeholder="e.g., This speaks to debates about alliance credibility and the future of collective security">';
+  h += '<button class="btn" onclick="generatePitch()">Generate Pitch</button>';
+  h += '<div id="pitch-output"></div>';
+
+  h += '<h3>At the Conference</h3>';
+  h += '<p>Ask questions after panels (this is the single best way to make yourself visible). Approach speakers after their panel with a specific comment about their paper, not a generic compliment. Attend social events even briefly. Sit next to someone new at meals.</p>';
+
+  h += '<h3>After the Conference</h3>';
+  h += '<p>Send follow-up emails within one week. Be specific: reference their paper, your conversation, and any follow-up you discussed. Connect on Google Scholar or ORCID, not just social media. Share your paper if promised.</p>';
+
+  h += '<h3>Follow-Up Email Template</h3>';
+  h += '<label>Scholar name:</label><input type="text" id="followup-name">';
+  h += '<label>Conference name:</label><input type="text" id="followup-conf">';
+  h += '<label>Their paper/panel topic:</label><input type="text" id="followup-topic">';
+  h += '<label>Specific point you discussed:</label><textarea id="followup-point" placeholder="e.g., Your argument about normative diffusion in Southeast Asia connects to my work on..."></textarea>';
+  h += '<button class="btn" onclick="generateFollowup()">Generate Email</button>';
+  h += '<div id="followup-output"></div>';
+  h += '</div>';
+  return h;
+}
+
+function generatePitch(){
+  var name = el("net-name").value || "[Your name and institution]";
+  var topic = el("net-topic").value || "[Your broad topic]";
+  var puzzle = el("net-puzzle").value || "[Your specific question]";
+  var approach = el("net-approach").value || "[Your methodological approach]";
+  var matters = el("net-matters").value || "[Why it matters]";
+  var pitch = name + ". " + topic + ". Specifically, " + puzzle + ". " + approach + ". " + matters + ".";
+  el("pitch-output").innerHTML = '<div class="result-box"><strong>Your Elevator Pitch:</strong>\n\n' + pitch + '</div>';
+}
+
+function generateFollowup(){
+  var name = el("followup-name").value || "[Scholar Name]";
+  var conf = el("followup-conf").value || "[Conference]";
+  var topic = el("followup-topic").value || "[their topic]";
+  var point = el("followup-point").value || "[specific discussion point]";
+  var email = "Dear " + name + ",\n\nThank you for your engaging presentation on " + topic + " at " + conf + ". " + point + "\n\nI would welcome the opportunity to continue this conversation and would be happy to share my working paper if you are interested. Thank you again for your time and insights.\n\nBest regards,\n[Your Name]\n[Your Institution]\n[Your ORCID/Google Scholar link]";
+  el("followup-output").innerHTML = '<div class="result-box">' + email + '</div><button class="btn btn-secondary" onclick="copyText(\'followup-output\')">Copy to Clipboard</button>';
+}
+
+/* ---------- TAB 4: ARTICLE PUBLISHING GUIDE ---------- */
+function buildPublishing(){
+  var h = '<div class="card"><h2>Publishing Your First Article: A Strategic Guide</h2>';
+  h += '<p>Publishing during your PhD is increasingly expected in political science and IR. This guide walks you through the process from idea to publication, drawing on established advice from scholars like Gary King and the norms of the discipline.</p>';
+
+  h += '<h3>The Replication-to-Publication Path (Gary King)</h3>';
+  h += '<p>Gary King\'s influential article "Publication, Publication" (PS: Political Science and Politics, 2006) outlines a proven path: begin with the replication of a previously published article, then extend it. This approach works because it gives you real data, a clear research question, an established literature, and a baseline against which your contribution is measured. Key principles from King:</p>';
+  h += '<p>(1) Choose an article from a good journal so your extension has a chance at publication in that journal or one level below. (2) Focus your paper on what others will learn, not on how hard you worked. Start your abstract with "In this paper, we demonstrate that..." (3) Your section headings alone should convey the entire argument. (4) Before writing, ask: "Whose mind am I going to change about what?"</p>';
+
+  h += '<h3>The Peer Review Process</h3>';
+  h += '<p>Understanding what happens after you click "submit" reduces anxiety and helps you prepare better manuscripts.</p>';
+  h += '<table><tr><th>Stage</th><th>Duration</th><th>What Happens</th><th>Your Role</th></tr>';
+  h += '<tr><td>Desk Review</td><td>1-4 weeks</td><td>Editor assesses fit, quality, and scope. ~40-60% of submissions are desk-rejected.</td><td>Ensure your paper clearly matches the journal\'s scope. A strong abstract and introduction are critical.</td></tr>';
+  h += '<tr><td>Peer Review</td><td>2-6 months</td><td>2-3 anonymous reviewers evaluate originality, rigor, contribution. They recommend accept, revise, or reject.</td><td>Wait patiently. Do not contact the editor unless 4+ months pass without communication.</td></tr>';
+  h += '<tr><td>Decision</td><td>After review</td><td>Editor sends decision: accept (rare on first round), revise and resubmit (R&R, the goal), or reject.</td><td>Read all feedback carefully. An R&R is good news. A rejection with detailed reviews is still useful.</td></tr>';
+  h += '<tr><td>Revision</td><td>1-3 months (deadline varies)</td><td>You revise in response to all reviewer comments. Submit a point-by-point response letter.</td><td>Address every comment, even those you disagree with. Explain your reasoning respectfully.</td></tr>';
+  h += '<tr><td>Publication</td><td>2-6 months after acceptance</td><td>Copyediting, proofs, online-first, then print.</td><td>Review proofs carefully. Celebrate.</td></tr>';
+  h += '</table>';
+
+  h += '<h3>Journal Selection Tool</h3>';
+  h += '<p>Use the filters below to identify appropriate journals for your work.</p>';
+  h += '<label>Tier:</label><select id="j-tier" onchange="filterJournals()"><option value="all">Any tier</option><option value="Top">Top tier</option><option value="A">A tier</option><option value="B">B tier</option></select>';
+  h += '<label>Field:</label><select id="j-field" onchange="filterJournals()"><option value="all">Any field</option><option value="IR">IR</option><option value="Security">Security</option><option value="IPE">IPE</option><option value="Comparative">Comparative</option><option value="General">General PoliSci</option><option value="Development">Development</option><option value="Policy">Policy</option></select>';
+  h += '<label>Methodological style:</label><select id="j-style" onchange="filterJournals()"><option value="all">Any</option><option value="positivist">Positivist/quantitative</option><option value="pluralist">Pluralist/multi-method</option><option value="critical">Critical/interpretivist</option></select>';
+  h += '<div id="j-results"></div>';
+
+  h += '<h3>Common Mistakes to Avoid</h3>';
+  h += '<p>(1) Submitting to the wrong journal: if your paper is interpretivist, do not send it to a journal known for quantitative rigor. (2) Simultaneous submission: never submit the same paper to two journals at once; this is a serious ethical violation. (3) Ignoring reviewer feedback: even in a rejection, reviewers often identify real weaknesses. (4) Waiting until your dissertation is "perfect" before extracting an article: start converting chapters early. (5) Not reading the journal: always read 5-10 recent articles from any journal you target to understand its style and expectations.</p>';
+
+  h += '<h3>Writing Tips for First-Time Authors</h3>';
+  h += '<p>Write the introduction last (after you know what your paper actually argues). Make your contribution explicit in the first two paragraphs. Use signposting ("This article argues that... It proceeds in four sections..."). Keep literature reviews analytical, not encyclopedic: organize by argument, not by author. Every paragraph should make exactly one point.</p>';
+  h += '</div>';
+
+  h += '<div class="card"><h2>Key IR Journals: Quick Reference</h2>';
+  h += '<div id="journal-table"></div></div>';
+  return h;
+}
+
+function filterJournals(){
+  var tier = el("j-tier").value;
+  var field = el("j-field").value;
+  var style = el("j-style").value;
+  var h = '<table><tr><th>Journal</th><th>Tier</th><th>Field</th><th>Review Time</th><th>Accept Rate</th><th>Style</th><th>Notes</th></tr>';
+  var count = 0;
+  for(var i=0; i<JOURNALS.length; i++){
+    var j = JOURNALS[i];
+    if(tier !== "all" && j.tier.indexOf(tier) === -1) continue;
+    if(field !== "all" && j.field.indexOf(field) === -1) continue;
+    if(style !== "all"){
+      var jstyle = j.style.toLowerCase();
+      if(style === "positivist" && jstyle.indexOf("positivist") === -1 && jstyle.indexOf("quantitative") === -1) continue;
+      if(style === "pluralist" && jstyle.indexOf("pluralist") === -1 && jstyle.indexOf("multi") === -1 && jstyle.indexOf("diverse") === -1) continue;
+      if(style === "critical" && jstyle.indexOf("critical") === -1 && jstyle.indexOf("heterodox") === -1 && jstyle.indexOf("interpretivist") === -1 && jstyle.indexOf("british") === -1 && jstyle.indexOf("global south") === -1) continue;
+    }
+    h += '<tr><td>' + j.name + '</td><td><span class="tag ' + (j.tier === "Top" ? "tag-green" : j.tier === "A" || j.tier === "Top/A" || j.tier === "A/B" ? "tag-blue" : "tag-yellow") + '">' + j.tier + '</span></td><td>' + j.field + '</td><td>' + j.review + '</td><td>' + j.accept + '</td><td>' + j.style + '</td><td>' + j.notes + '</td></tr>';
+    count++;
+  }
+  h += '</table>';
+  if(count === 0) h = '<p>No journals match your filters. Try broadening your criteria.</p>';
+  el("j-results").innerHTML = h;
+}
+
+/* ---------- TAB 5: GRANT WRITING GUIDE ---------- */
+function buildGrants(){
+  var h = '<div class="card"><h2>Grant Writing for PhD Students</h2>';
+  h += '<p>Writing grants is a skill you will use throughout your academic career. Starting during your PhD, even for small amounts, builds your capacity and CV simultaneously. The principles below apply whether you are applying for GBP 500 in conference travel or EUR 100,000 in research funding.</p>';
+
+  h += '<h3>Why Write Grants as a PhD Student?</h3>';
+  h += '<p>Grant writing forces you to articulate your research clearly, justify your methods, and think about feasibility. Even unsuccessful applications sharpen your thinking. Funded grants signal to hiring committees that external bodies have validated your research. In many European and Turkish systems, a track record of funding is essential for career progression.</p>';
+
+  h += '<h3>Anatomy of a Strong Proposal</h3>';
+  h += '<table><tr><th>Section</th><th>Purpose</th><th>Common Mistakes</th><th>Tips</th></tr>';
+  h += '<tr><td>Title and Abstract</td><td>First impression; determines whether reviewers engage seriously</td><td>Too vague, too long, jargon-heavy</td><td>Be specific and compelling. "Explaining Alliance Burden-Sharing Variation in NATO After 2014" is better than "A Study of International Security."</td></tr>';
+  h += '<tr><td>Problem Statement / Research Question</td><td>Establishes the puzzle and why it matters</td><td>Describing a topic rather than a question; no clear gap</td><td>State the question explicitly. Explain what we do not yet know and why that gap matters for scholarship or policy.</td></tr>';
+  h += '<tr><td>Literature Review / State of the Art</td><td>Shows you know the field and identifies the gap your project fills</td><td>Encyclopedic listing; not connecting the gap to your contribution</td><td>Organize by argument, not chronologically. End with a clear statement of what your project adds.</td></tr>';
+  h += '<tr><td>Theoretical Framework</td><td>Presents the concepts and logic guiding your analysis</td><td>Choosing a theory without justifying why; misalignment with epistemology</td><td>Be explicit about your ontological and epistemological commitments if the funder values this (common in European grants).</td></tr>';
+  h += '<tr><td>Research Design and Methods</td><td>Explains how you will answer the question</td><td>Methods not justified; no discussion of case selection logic; no feasibility</td><td>Explain why your method fits your question. If qualitative, justify case selection (see KKV, George and Bennett). If quantitative, discuss data sources and techniques.</td></tr>';
+  h += '<tr><td>Timeline and Work Plan</td><td>Demonstrates feasibility</td><td>Unrealistic timelines; no milestones</td><td>Be honest about what is achievable. Include specific milestones and deliverables.</td></tr>';
+  h += '<tr><td>Budget</td><td>Justifies costs</td><td>Padding the budget; unexplained line items; forgetting indirect costs</td><td>Every line item should connect to a research activity. Explain why each cost is necessary.</td></tr>';
+  h += '<tr><td>Impact / Broader Significance</td><td>Explains who benefits and how</td><td>Vague claims about "contributing to knowledge"</td><td>Be specific: publications, policy briefs, datasets, training outcomes.</td></tr>';
+  h += '</table>';
+
+  h += '<h3>Grant Opportunities for IR PhD Students</h3>';
+  h += '<p>The Funding Tracker tab has a full directory. Key opportunities include:</p>';
+  h += '<p><strong>ECPR Grants (up to GBP 500):</strong> Event participation. As an EMU student, you are eligible. Apply early each cycle via ecpr.eu/Funding.</p>';
+  h += '<p><strong>TUBITAK 2214-A:</strong> International research fellowship for PhD students enrolled in Turkey. Covers living expenses, travel, and insurance for 3-12 months abroad. Excellent for fieldwork or archival research.</p>';
+  h += '<p><strong>TUBITAK 2211:</strong> National PhD scholarship providing a monthly stipend. This frees other funds for conference travel and research costs.</p>';
+  h += '<p><strong>TUBITAK 3005:</strong> Research project funding for social sciences and humanities (up to TRY 450,000). Typically for supervisors/teams but can include PhD student support.</p>';
+  h += '<p><strong>NSF DDRIG:</strong> US-specific but the model for dissertation research grants globally. Understand its structure even if you cannot apply directly.</p>';
+  h += '<p><strong>EU Marie Sklodowska-Curie Actions:</strong> Postdoctoral fellowships with generous funding. Plan for this after your PhD, but understand the system now.</p>';
+
+  h += '<h3>Grant Proposal Outline Generator</h3>';
+  h += '<p>Fill in the fields below to generate a structured outline for your next grant application.</p>';
+  h += '<label>Grant/funder name:</label><input type="text" id="grant-funder" placeholder="e.g., ECPR Event Participant Grant">';
+  h += '<label>Project title:</label><input type="text" id="grant-title" placeholder="e.g., Explaining Alliance Burden-Sharing in NATO">';
+  h += '<label>Research question:</label><textarea id="grant-question" placeholder="State your question clearly"></textarea>';
+  h += '<label>Why does this matter? (1-2 sentences):</label><textarea id="grant-significance" placeholder="Scholarly and/or policy significance"></textarea>';
+  h += '<label>Proposed method:</label><input type="text" id="grant-method" placeholder="e.g., Comparative case study with process tracing">';
+  h += '<label>Amount requested:</label><input type="text" id="grant-amount" placeholder="e.g., GBP 500">';
+  h += '<label>What the funds cover:</label><input type="text" id="grant-covers" placeholder="e.g., Conference registration, return flight, 3 nights accommodation">';
+  h += '<label>Timeline:</label><input type="text" id="grant-timeline" placeholder="e.g., September 2026">';
+  h += '<button class="btn" onclick="generateGrant()">Generate Outline</button>';
+  h += '<div id="grant-output"></div>';
+  h += '</div>';
+
+  h += '<div class="card"><h2>Writing a Grant: Style and Strategy</h2>';
+  h += '<p><strong>Write for a busy, intelligent non-specialist.</strong> Grant reviewers may not be in your exact subfield. Avoid unexplained jargon. Define key terms. Make your argument self-contained.</p>';
+  h += '<p><strong>Front-load your contribution.</strong> In the first paragraph, state what you will do, why it matters, and what the expected outcome is. Do not make reviewers read three pages before understanding your project.</p>';
+  h += '<p><strong>Be specific about everything.</strong> "I will conduct interviews" is weak. "I will conduct 15-20 semi-structured interviews with current and former NATO officials in Brussels and Ankara between January and March 2027" is strong.</p>';
+  h += '<p><strong>Align your epistemology, theory, and methods.</strong> This is where the Research Design Toolkit (your other app) directly supports grant writing. A grant that claims to use constructivist theory but proposes regression analysis will confuse reviewers.</p>';
+  h += '<p><strong>Get feedback before submitting.</strong> Ask your supervisor, a colleague, and ideally someone outside your subfield to read your proposal. If they cannot summarize your project in two sentences after reading it, rewrite your introduction.</p>';
+  h += '</div>';
+  return h;
+}
+
+function generateGrant(){
+  var funder = el("grant-funder").value || "[Funder]";
+  var title = el("grant-title").value || "[Project Title]";
+  var question = el("grant-question").value || "[Research Question]";
+  var significance = el("grant-significance").value || "[Significance]";
+  var method = el("grant-method").value || "[Method]";
+  var amount = el("grant-amount").value || "[Amount]";
+  var covers = el("grant-covers").value || "[Budget items]";
+  var timeline = el("grant-timeline").value || "[Timeline]";
+  var outline = "GRANT PROPOSAL OUTLINE\n";
+  outline += "======================\n\n";
+  outline += "Funder: " + funder + "\n";
+  outline += "Project Title: " + title + "\n\n";
+  outline += "1. RESEARCH QUESTION\n" + question + "\n\n";
+  outline += "2. SIGNIFICANCE\n" + significance + "\n\n";
+  outline += "3. STATE OF THE ART\n[Summarize 3-5 key works that frame your contribution. Identify the gap your project fills.]\n\n";
+  outline += "4. THEORETICAL FRAMEWORK\n[State the theoretical lens you will use and why it is appropriate for your question.]\n\n";
+  outline += "5. RESEARCH DESIGN AND METHODS\nProposed method: " + method + "\n[Justify why this method fits your question. Discuss case selection if applicable. Address potential limitations.]\n\n";
+  outline += "6. WORK PLAN AND TIMELINE\n" + timeline + "\n[Break into phases with specific milestones and deliverables.]\n\n";
+  outline += "7. BUDGET JUSTIFICATION\nAmount requested: " + amount + "\nItems: " + covers + "\n[Explain why each cost is necessary for the research.]\n\n";
+  outline += "8. EXPECTED OUTCOMES\n[Specify: conference paper, journal article, dissertation chapter, dataset, policy brief, etc.]\n\n";
+  outline += "9. BROADER IMPACT\n[Who benefits beyond you? Scholarly community, policy world, students?]\n";
+  el("grant-output").innerHTML = '<div class="result-box">' + outline + '</div><button class="btn btn-secondary" onclick="copyText(\'grant-output\')">Copy to Clipboard</button>';
+}
+
+/* ---------- TAB 6: ABSTRACT BUILDER ---------- */
+function buildAbstract(){
+  var h = '<div class="card"><h2>Conference Abstract Builder</h2>';
+  h += '<p>A strong abstract is the single most important factor in getting your paper accepted to a conference. Most IR conferences require 200-300 word abstracts. Use the structured approach below.</p>';
+
+  h += '<h3>The Four-Sentence Abstract (for conference submissions)</h3>';
+  h += '<p>Following the logic of King\'s "Publication, Publication" and standard disciplinary practice, a strong abstract answers four questions in order:</p>';
+
+  h += '<label><strong>1. What is the puzzle or question?</strong> (The gap or debate your paper addresses)</label>';
+  h += '<textarea id="abs-puzzle" placeholder="e.g., Despite decades of alliance theory, we lack a compelling explanation for why some NATO allies increased defense spending after the 2014 Ukraine crisis while others did not."></textarea>';
+
+  h += '<label><strong>2. What does this paper argue?</strong> (Your thesis or contribution)</label>';
+  h += '<textarea id="abs-argument" placeholder="e.g., This paper argues that domestic partisan composition, not threat perception, best explains variation in post-2014 burden-sharing behavior."></textarea>';
+
+  h += '<label><strong>3. How do you demonstrate this?</strong> (Your method and evidence)</label>';
+  h += '<textarea id="abs-method" placeholder="e.g., Using comparative case studies of Germany, Poland, and Turkey with process tracing and original interview data, I test competing explanations drawn from realist, liberal, and constructivist theory."></textarea>';
+
+  h += '<label><strong>4. What do we learn?</strong> (Implications and significance)</label>';
+  h += '<textarea id="abs-implications" placeholder="e.g., The findings challenge purely structural accounts of alliance behavior and suggest that understanding domestic coalition politics is essential for predicting future NATO cohesion."></textarea>';
+
+  h += '<button class="btn" onclick="generateAbstract()">Generate Abstract</button>';
+  h += '<div id="abs-output"></div>';
+
+  h += '<h3>Abstract Checklist</h3>';
+  var checks = [
+    "Does it state a clear question or puzzle (not just a topic)?",
+    "Does it make an argument (not just promise to 'explore' or 'examine')?",
+    "Does it specify the method and evidence?",
+    "Does it state the contribution or implications?",
+    "Is it under 300 words (or whatever the conference requires)?",
+    "Does it avoid jargon that a generalist IR scholar would not understand?",
+    "Does it avoid first-person language where the conference norms prefer third-person?",
+    "Would a reader know exactly what the paper argues after reading only the abstract?"
+  ];
+  for(var i=0; i<checks.length; i++){
+    h += '<div class="checklist-item"><label><input type="checkbox"> ' + checks[i] + '</label></div>';
+  }
+  h += '</div>';
+
+  h += '<div class="card"><h2>Article Abstract Builder</h2>';
+  h += '<p>Journal abstracts follow the same logic but are often more precise. Many journals require structured abstracts with specific headings. Use the form above for a general abstract or modify it to include: Background, Objective, Methods, Findings, Conclusions.</p></div>';
+  return h;
+}
+
+function generateAbstract(){
+  var puzzle = el("abs-puzzle").value || "[State your puzzle]";
+  var argument = el("abs-argument").value || "[State your argument]";
+  var method = el("abs-method").value || "[Describe your method]";
+  var implications = el("abs-implications").value || "[State implications]";
+  var abstract = puzzle + " " + argument + " " + method + " " + implications;
+  var words = abstract.split(/\s+/).length;
+  var wordWarning = "";
+  if(words > 300) wordWarning = "\n\n[WARNING: " + words + " words. Most conferences require 200-300 words. Consider trimming.]";
+  if(words < 100) wordWarning = "\n\n[NOTE: " + words + " words. Your abstract may be too short. Consider expanding.]";
+  el("abs-output").innerHTML = '<div class="result-box">' + abstract + wordWarning + '\n\nWord count: ' + words + '</div><button class="btn btn-secondary" onclick="copyText(\'abs-output\')">Copy to Clipboard</button>';
+}
+
+/* ---------- TAB 7: PROFILE CHECKLIST ---------- */
+function buildProfile(){
+  var h = '<div class="card"><h2>Academic Profile Building Checklist</h2>';
+  h += '<p>Your online presence is increasingly how scholars discover your work. Build these profiles early and keep them updated.</p>';
+
+  var profiles = [
+    {name:"Google Scholar Profile", why:"Tracks citations, makes your work discoverable, signals scholarly activity. Automatically indexes your publications.", action:"Create at scholar.google.com. Add a professional photo, your affiliation (Eastern Mediterranean University), and keywords (e.g., international relations, security studies, NATO).", priority:"Essential"},
+    {name:"ORCID iD", why:"Persistent digital identifier that links you to all your publications across systems. Required by many journals and funders.", action:"Register at orcid.org. Add your education, employment, and works. Link to your Google Scholar and institutional page.", priority:"Essential"},
+    {name:"Institutional Profile Page", why:"Your department page is often the first result when someone searches your name. Ensure it is accurate.", action:"Contact your department to update your profile with current research interests, publications, and contact information.", priority:"Essential"},
+    {name:"Personal Academic Website (via GitHub Pages)", why:"Full control over your presentation. Can host your CV, working papers, blog, teaching materials.", action:"Create a GitHub repository, use a simple template or Jekyll, and publish. You are already learning this with the INTL698 site.", priority:"Highly Recommended"},
+    {name:"ResearchGate", why:"Social network for academics. Good for sharing papers and tracking reads/citations. Some scholars use it actively.", action:"Create a profile. Upload preprints and published papers (check copyright). Follow scholars in your field.", priority:"Recommended"},
+    {name:"Academia.edu", why:"Similar to ResearchGate but with a larger humanities/social science user base.", action:"Create a profile. Same as ResearchGate. Note: some features require paid subscription.", priority:"Optional"},
+    {name:"Twitter/X (Academic Twitter)", why:"Real-time scholarly conversation, conference live-tweeting, sharing new publications. Increasingly important but also increasingly chaotic.", action:"If you use it, keep it professional. Share your work, engage with others' research, follow key scholars and journals in your field.", priority:"Optional"},
+    {name:"Departmental and University Newsletters", why:"Internal visibility matters too. Your colleagues and administration should know about your achievements.", action:"Send your supervisor and department a brief note when you publish, present, or receive funding.", priority:"Recommended"}
+  ];
+
+  for(var i=0; i<profiles.length; i++){
+    var p = profiles[i];
+    var prClass = p.priority === "Essential" ? "tag-green" : p.priority === "Highly Recommended" ? "tag-blue" : p.priority === "Recommended" ? "tag-yellow" : "tag-purple";
+    h += '<div class="checklist-item"><label><input type="checkbox" id="prof-' + i + '"> <strong>' + p.name + '</strong> <span class="tag ' + prClass + '">' + p.priority + '</span></label>';
+    h += '<p style="margin:4px 0 4px 28px;font-size:0.9em;"><em>Why:</em> ' + p.why + '</p>';
+    h += '<p style="margin:0 0 0 28px;font-size:0.9em;"><em>Action:</em> ' + p.action + '</p></div>';
+  }
+
+  h += '<div style="margin-top:16px;"><button class="btn" onclick="checkProfileProgress()">Check My Progress</button></div>';
+  h += '<div id="profile-progress"></div>';
+  h += '</div>';
+  return h;
+}
+
+function checkProfileProgress(){
+  var total = 8;
+  var done = 0;
+  for(var i=0; i<total; i++){
+    if(el("prof-" + i) && el("prof-" + i).checked) done++;
+  }
+  var pct = Math.round((done/total)*100);
+  var color = pct < 40 ? "#dc3545" : pct < 70 ? "#ffc107" : "#28a745";
+  var h = '<div style="margin-top:12px;"><strong>Profile Completeness: ' + pct + '% (' + done + '/' + total + ')</strong>';
+  h += '<div style="background:#eee;border-radius:10px;height:20px;margin-top:6px;"><div class="score-bar" style="width:' + pct + '%;background:' + color + ';"></div></div>';
+  if(pct < 40) h += '<p style="color:#dc3545;margin-top:8px;">You have significant gaps in your online academic presence. Prioritize the Essential items this week.</p>';
+  else if(pct < 70) h += '<p style="color:#856404;margin-top:8px;">Good progress. Complete the Essential and Highly Recommended items before your next conference.</p>';
+  else h += '<p style="color:#155724;margin-top:8px;">Strong academic profile. Keep everything updated, especially after new publications or presentations.</p>';
+  h += '</div>';
+  el("profile-progress").innerHTML = h;
+}
+
+/* ---------- TAB 8: PHD TIMELINE PLANNER ---------- */
+function buildTimeline(){
+  var h = '<div class="card"><h2>PhD Professional Activity Timeline</h2>';
+  h += '<p>A strategic approach to professional activities across your PhD ensures steady progress without overwhelming any single year. This timeline assumes a 4-year doctoral program.</p>';
+
+  h += '<h3>Year 1: Foundations</h3>';
+  h += '<table><tr><th>Activity</th><th>Purpose</th><th>Concrete Steps</th></tr>';
+  h += '<tr><td>Set up academic profiles</td><td>Establish online presence</td><td>Create Google Scholar, ORCID, institutional page. Build personal website on GitHub Pages.</td></tr>';
+  h += '<tr><td>Attend 1 virtual conference</td><td>Learn the format; low risk</td><td>ISA Virtual (Jul/Aug) is ideal. Submit a paper from your coursework or a research note.</td></tr>';
+  h += '<tr><td>Attend 1 methods school</td><td>Build methodological skills</td><td>ECPR Methods School (EMU member rates). Choose a method relevant to your dissertation.</td></tr>';
+  h += '<tr><td>Begin reading top journals systematically</td><td>Understand the field and identify your niche</td><td>Read current issues of IO, ISQ, EJIR, and one subfield journal. Note methodological patterns.</td></tr>';
+  h += '<tr><td>Draft your research design</td><td>Foundation for everything else</td><td>Use the IR Research Design Toolkit app to align your epistemology, theory, and methods.</td></tr>';
+  h += '</table>';
+
+  h += '<h3>Year 2: Engagement</h3>';
+  h += '<table><tr><th>Activity</th><th>Purpose</th><th>Concrete Steps</th></tr>';
+  h += '<tr><td>Present at 1-2 conferences</td><td>Get feedback on dissertation chapter(s)</td><td>One regional/workshop (EISA EWIS, ECPR Joint Sessions) and one larger (ISA, ECPR General).</td></tr>';
+  h += '<tr><td>Apply for funding</td><td>Build grant-writing skills; offset costs</td><td>Apply for ECPR grant, TUBITAK 2214-A if planning fieldwork, and any departmental funds.</td></tr>';
+  h += '<tr><td>Begin converting a chapter to an article</td><td>Start the publication process early</td><td>Identify your strongest chapter. Read 5-10 articles in your target journal. Draft and circulate.</td></tr>';
+  h += '<tr><td>Volunteer as a journal reviewer</td><td>Understand the review process from the inside</td><td>Tell your supervisor you are willing to review. Some journals accept graduate student reviewers.</td></tr>';
+  h += '<tr><td>Expand your network</td><td>Build relationships beyond your department</td><td>Follow up with scholars you met at conferences. Attend online seminars and webinars in your subfield.</td></tr>';
+  h += '</table>';
+
+  h += '<h3>Year 3: Production</h3>';
+  h += '<table><tr><th>Activity</th><th>Purpose</th><th>Concrete Steps</th></tr>';
+  h += '<tr><td>Submit 1-2 articles to journals</td><td>Begin building your publication record</td><td>Submit your strongest piece. Prepare a second. Use the Abstract Builder and journal selection tool.</td></tr>';
+  h += '<tr><td>Present at 2 conferences (at least 1 major)</td><td>Visibility and feedback on near-final work</td><td>Target ISA, ECPR General, EISA PEC, or IPSA World Congress depending on the cycle.</td></tr>';
+  h += '<tr><td>Apply for research grants</td><td>Fund fieldwork; demonstrate competitiveness</td><td>TUBITAK 2214-A for international research; TUBITAK 3005 with your supervisor; consider SSRC or CEPR.</td></tr>';
+  h += '<tr><td>Write a policy brief or public-facing piece</td><td>Demonstrate impact beyond academia</td><td>The Loop (ECPR), The Conversation, or a policy institute in your area.</td></tr>';
+  h += '<tr><td>Attend a workshop or summer school</td><td>Deepen a specific skill</td><td>IQMR (qualitative), Essex (quantitative), or a specialized ECPR summer school.</td></tr>';
+  h += '</table>';
+
+  h += '<h3>Year 4: Consolidation and Job Market</h3>';
+  h += '<table><tr><th>Activity</th><th>Purpose</th><th>Concrete Steps</th></tr>';
+  h += '<tr><td>Finalize and defend dissertation</td><td>The main goal</td><td>Protect writing time. Minimize new commitments.</td></tr>';
+  h += '<tr><td>Revise and resubmit articles</td><td>Turn R&Rs into publications before job applications</td><td>Respond promptly and thoroughly to reviewer comments.</td></tr>';
+  h += '<tr><td>Present at 1 major conference</td><td>Signal that you are on the market; meet potential colleagues</td><td>Target the conference most relevant to your job market (ISA for US/global, ECPR/EISA for Europe).</td></tr>';
+  h += '<tr><td>Prepare job market materials</td><td>Be ready when postings appear</td><td>CV, cover letter template, research statement, teaching statement, writing sample, reference list.</td></tr>';
+  h += '<tr><td>Apply for postdoctoral fellowships</td><td>Bridge to permanent position</td><td>EU Marie Curie, national research councils, university-specific postdocs. Apply widely.</td></tr>';
+  h += '</table>';
+
+  h += '<h3>Your Personal Planner</h3>';
+  h += '<p>Record your plans for each year. These entries are saved in your browser for this session.</p>';
+  h += '<label>Current PhD Year:</label><select id="plan-year"><option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option></select>';
+  h += '<label>Planned conferences:</label><textarea id="plan-confs" placeholder="e.g., ISA Virtual Jul 2026, ECPR General Sep 2026"></textarea>';
+  h += '<label>Planned funding applications:</label><textarea id="plan-funds" placeholder="e.g., ECPR travel grant (apply May), TUBITAK 2214-A (apply Sep)"></textarea>';
+  h += '<label>Publishing goals:</label><textarea id="plan-pubs" placeholder="e.g., Submit Chapter 2 as article to EJIR by December"></textarea>';
+  h += '<label>Skills to develop:</label><textarea id="plan-skills" placeholder="e.g., Process tracing at ECPR Methods School, R programming"></textarea>';
+  h += '<label>Other goals:</label><textarea id="plan-other" placeholder="e.g., Build personal website, start reviewing for a journal"></textarea>';
+  h += '<button class="btn" onclick="savePlan()">Save Plan</button><button class="btn btn-secondary" onclick="exportPlan()">Export as Text</button>';
+  h += '<div id="plan-output"></div>';
+  h += '</div>';
+  return h;
+}
+
+function savePlan(){
+  el("plan-output").innerHTML = '<div class="tip-box">Plan saved for this session. Use "Export as Text" to copy and keep a permanent record.</div>';
+}
+
+function exportPlan(){
+  var year = el("plan-year").value;
+  var text = "PHD PROFESSIONAL DEVELOPMENT PLAN\n";
+  text += "==================================\n\n";
+  text += "Current Stage: " + year + "\n\n";
+  text += "CONFERENCES:\n" + (el("plan-confs").value || "[None entered]") + "\n\n";
+  text += "FUNDING APPLICATIONS:\n" + (el("plan-funds").value || "[None entered]") + "\n\n";
+  text += "PUBLISHING GOALS:\n" + (el("plan-pubs").value || "[None entered]") + "\n\n";
+  text += "SKILLS DEVELOPMENT:\n" + (el("plan-skills").value || "[None entered]") + "\n\n";
+  text += "OTHER GOALS:\n" + (el("plan-other").value || "[None entered]") + "\n";
+  el("plan-output").innerHTML = '<div class="result-box">' + text + '</div><button class="btn btn-secondary" onclick="copyText(\'plan-output\')">Copy to Clipboard</button>';
+}
+
+/* ---------- UTILITY ---------- */
+function copyText(containerId){
+  var box = el(containerId);
+  if(!box) return;
+  var resultDiv = box.querySelector(".result-box");
+  if(!resultDiv) return;
+  var text = resultDiv.innerText || resultDiv.textContent;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      alert("Copied to clipboard.");
+    });
+  } else {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    alert("Copied to clipboard.");
+  }
+}
+
+function toggleExpand(id){
+  var body = el(id);
+  if(!body) return;
+  if(body.className.indexOf("open") > -1){
+    body.className = "expandable-body";
+  } else {
+    body.className = "expandable-body open";
+  }
+}
+
+/* ---------- INIT ---------- */
+function init(){
+  buildNav();
+  showTab("conferences");
+  // auto-populate funding table
+  setTimeout(function(){
+    if(el("fund-search")) filterFunding();
+    if(el("j-results")) filterJournals();
+    if(el("conf-results")) filterConfs();
+  }, 100);
+}
+
+init();
+</script>
+
+</body>
+</html>
