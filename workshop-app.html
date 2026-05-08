@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Paper Workshop App – INTL698</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Georgia,"Times New Roman",serif;background:#f5f6fa;color:#1a1a2e;line-height:1.7;}
+header{background:linear-gradient(135deg,#1e3a5f 0%,#2d5a87 100%);color:#fff;padding:24px 20px;text-align:center;}
+header h1{font-size:1.6em;margin-bottom:4px;}
+header p{font-size:0.9em;opacity:0.85;}
+nav{display:flex;flex-wrap:wrap;gap:5px;padding:10px 14px;background:#fff;border-bottom:2px solid #ddd;justify-content:center;}
+nav button{padding:7px 12px;border:2px solid #1e3a5f;background:#fff;color:#1e3a5f;border-radius:6px;cursor:pointer;font-size:0.82em;font-family:inherit;transition:all .2s;}
+nav button:hover{background:#eef3fa;}
+nav button.active{background:#1e3a5f;color:#fff;}
+.container{max-width:960px;margin:0 auto;padding:18px 14px;}
+.card{background:#fff;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+.card h2{color:#1e3a5f;font-size:1.2em;margin-bottom:10px;border-bottom:2px solid #eee;padding-bottom:6px;}
+.card h3{color:#2d5a87;font-size:1.02em;margin:14px 0 6px;}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:0.88em;}
+th,td{border:1px solid #ddd;padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#1e3a5f;color:#fff;font-weight:600;}
+tr:nth-child(even){background:#f9fafc;}
+.tag{display:inline-block;padding:3px 9px;border-radius:12px;font-size:0.76em;margin:2px;font-weight:600;}
+.tag-green{background:#d4edda;color:#155724;}
+.tag-blue{background:#d1ecf1;color:#0c5460;}
+.tag-yellow{background:#fff3cd;color:#856404;}
+.tag-red{background:#f8d7da;color:#721c24;}
+select,input[type="text"],input[type="date"],input[type="number"],textarea{width:100%;padding:9px;border:1px solid #ccc;border-radius:6px;font-size:0.92em;font-family:inherit;margin:3px 0 10px;}
+textarea{min-height:70px;resize:vertical;}
+.btn{padding:9px 18px;background:#1e3a5f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.92em;font-family:inherit;margin:3px;}
+.btn:hover{background:#2d5a87;}
+.btn-sec{background:#5a7d9a;}
+.btn-sec:hover{background:#6b8fae;}
+.btn-warn{background:#c0392b;}
+.btn-warn:hover{background:#e74c3c;}
+.result-box{background:#eef3fa;border-left:4px solid #1e3a5f;padding:14px;border-radius:0 6px 6px 0;margin:10px 0;white-space:pre-wrap;font-size:0.9em;}
+.score-bar{height:18px;border-radius:9px;margin:4px 0;transition:width 0.3s;}
+.tip{background:#fff3cd;border-left:4px solid #ffc107;padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:0.88em;}
+.radio-group{margin:4px 0 10px;}
+.radio-group label{display:block;padding:3px 0;cursor:pointer;font-size:0.9em;}
+.hidden{display:none;}
+a{color:#1e3a5f;}
+@media(max-width:600px){header h1{font-size:1.25em;}nav button{font-size:0.75em;padding:5px 8px;}.container{padding:10px 8px;}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Paper Workshop Companion</h1>
+<p>INTL698 – Abstract Building, Peer Review, and Submission Strategy</p>
+</header>
+
+<nav id="topnav"></nav>
+<div class="container" id="app"></div>
+
+<script>
+var TABS = [
+  {id:"abstract", label:"Abstract Builder"},
+  {id:"review", label:"Peer Review Form"},
+  {id:"feedback", label:"Feedback Received"},
+  {id:"submission", label:"Submission Planner"},
+  {id:"grant", label:"Grant Proposal Builder"},
+  {id:"checklist", label:"Pre-Submission Checklist"},
+  {id:"revlog", label:"Revision Log"}
+];
+
+var currentTab = "abstract";
+
+function el(id){ return document.getElementById(id); }
+
+function buildNav(){
+  var nav = el("topnav");
+  var h = "";
+  for(var i = 0; i < TABS.length; i++){
+    var t = TABS[i];
+    h += '<button id="nav-' + t.id + '" onclick="showTab(\'' + t.id + '\')">' + t.label + '</button>';
+  }
+  nav.innerHTML = h;
+}
+
+function showTab(id){
+  currentTab = id;
+  var btns = document.querySelectorAll("nav button");
+  for(var i = 0; i < btns.length; i++){
+    btns[i].className = btns[i].id === "nav-" + id ? "active" : "";
+  }
+  el("app").innerHTML = getTab(id);
+}
+
+function getTab(id){
+  if(id === "abstract") return tabAbstract();
+  if(id === "review") return tabReview();
+  if(id === "feedback") return tabFeedback();
+  if(id === "submission") return tabSubmission();
+  if(id === "grant") return tabGrant();
+  if(id === "checklist") return tabChecklist();
+  if(id === "revlog") return tabRevlog();
+  return "";
+}
+
+/* ===== TAB 1: ABSTRACT BUILDER ===== */
+function tabAbstract(){
+  var h = '<div class="card"><h2>Conference Abstract Builder</h2>';
+  h += '<p>Build your abstract using the four-sentence structure. Each field maps to what conference reviewers look for.</p>';
+  h += '<div class="tip">Target: under 200 words for ISA, under 300 words for ECPR. Your abstract must contain a question, argument, method, and contribution.</div>';
+
+  h += '<label><strong>Your Name:</strong></label><input type="text" id="ab-name" placeholder="Full name">';
+  h += '<label><strong>Paper Title:</strong></label><input type="text" id="ab-title" placeholder="A specific, descriptive title (under 50 words for ISA)">';
+  h += '<label><strong>Target Conference:</strong></label><select id="ab-conf"><option>ISA Annual Convention</option><option>ISA Virtual</option><option>ECPR General Conference</option><option>ECPR Joint Sessions</option><option>EISA PEC</option><option>EISA EWIS</option><option>BISA</option><option>IPSA World Congress</option><option>APSA</option><option>MPSA</option><option>Other</option></select>';
+
+  h += '<h3>Sentence 1: The Puzzle / Gap</h3>';
+  h += '<p style="font-size:0.88em;color:#666;">What do we not know? What is the debate or gap? Start with: "Despite..." or "While scholars have shown X, we lack..."</p>';
+  h += '<textarea id="ab-puzzle" placeholder="e.g., Despite decades of alliance theory, we lack a compelling explanation for why some NATO allies increased defense spending after the 2014 Ukraine crisis while others did not."></textarea>';
+
+  h += '<h3>Sentence 2: The Argument</h3>';
+  h += '<p style="font-size:0.88em;color:#666;">What does your paper argue? Start with: "This paper argues that..." Never use "explores" or "examines."</p>';
+  h += '<textarea id="ab-argument" placeholder="e.g., This paper argues that domestic partisan composition, rather than threat perception alone, best explains variation in post-2014 burden-sharing behavior among NATO allies."></textarea>';
+
+  h += '<h3>Sentence 3: The Method and Evidence</h3>';
+  h += '<p style="font-size:0.88em;color:#666;">How do you demonstrate your argument? Name the method, data, and cases.</p>';
+  h += '<textarea id="ab-method" placeholder="e.g., Using comparative case studies of Germany, Poland, and Turkey with process tracing and original interview data, I test competing explanations drawn from realist, liberal, and constructivist theory."></textarea>';
+
+  h += '<h3>Sentence 4: The Contribution</h3>';
+  h += '<p style="font-size:0.88em;color:#666;">What do we learn? Why does it matter? "The findings challenge/extend/refine..."</p>';
+  h += '<textarea id="ab-contribution" placeholder="e.g., The findings challenge purely structural accounts of alliance behavior and suggest that understanding domestic coalition politics is essential for predicting future NATO cohesion."></textarea>';
+
+  h += '<label><strong>Keywords (3, comma-separated):</strong></label><input type="text" id="ab-keywords" placeholder="e.g., NATO, burden-sharing, alliance politics">';
+
+  h += '<button class="btn" onclick="buildAbstract()">Generate Abstract</button>';
+  h += '<button class="btn btn-sec" onclick="clearAbstract()">Clear</button>';
+  h += '<div id="ab-output"></div>';
+  h += '</div>';
+
+  h += '<div class="card"><h2>Abstract Quality Self-Check</h2>';
+  h += '<p>Before submitting your abstract to a peer reviewer, verify:</p>';
+  var checks = [
+    "Contains a clear, specific research QUESTION (not just a topic)",
+    "Makes an explicit ARGUMENT or states expected findings",
+    "Names a specific METHOD and data/evidence source",
+    "Identifies CASES or units of analysis",
+    "States the CONTRIBUTION (what changes in our understanding)",
+    "Under word limit (200 for ISA, 300 for ECPR)",
+    "Free of unexplained jargon",
+    "A non-specialist could summarize the paper after reading the abstract",
+    "Title is descriptive and under 50 words"
+  ];
+  for(var i = 0; i < checks.length; i++){
+    h += '<div style="padding:4px 0;"><label style="cursor:pointer;display:flex;align-items:flex-start;gap:8px;"><input type="checkbox" id="sc-' + i + '" style="margin-top:4px;width:16px;height:16px;" onchange="selfCheckScore()"> ' + checks[i] + '</label></div>';
+  }
+  h += '<div id="sc-result"></div>';
+  h += '</div>';
+  return h;
+}
+
+function buildAbstract(){
+  var title = el("ab-title").value || "[Paper Title]";
+  var conf = el("ab-conf").value;
+  var puzzle = el("ab-puzzle").value || "[Puzzle/gap sentence]";
+  var argument = el("ab-argument").value || "[Argument sentence]";
+  var method = el("ab-method").value || "[Method sentence]";
+  var contribution = el("ab-contribution").value || "[Contribution sentence]";
+  var keywords = el("ab-keywords").value || "[keywords]";
+  var name = el("ab-name").value || "[Author]";
+
+  var abstract = puzzle + " " + argument + " " + method + " " + contribution;
+  var words = abstract.split(/\s+/).filter(function(w){return w.length > 0;}).length;
+  var limit = (conf.indexOf("ISA") > -1) ? 200 : 300;
+  var warning = "";
+  if(words > limit) warning = "\n\nWARNING: " + words + " words exceeds the " + limit + "-word limit for " + conf + ". Trim by " + (words - limit) + " words.";
+  else if(words < 80) warning = "\n\nNOTE: " + words + " words may be too short. Consider expanding your method or contribution sentences.";
+
+  var out = "TITLE: " + title + "\n";
+  out += "Author: " + name + "\n";
+  out += "Target: " + conf + "\n";
+  out += "Keywords: " + keywords + "\n";
+  out += "---\n\n";
+  out += abstract;
+  out += "\n\n---\nWord count: " + words + " / " + limit + " limit" + warning;
+
+  el("ab-output").innerHTML = '<div class="result-box">' + out + '</div><button class="btn btn-sec" onclick="copyEl(\'ab-output\')">Copy to Clipboard</button>';
+}
+
+function clearAbstract(){
+  var ids = ["ab-name","ab-title","ab-puzzle","ab-argument","ab-method","ab-contribution","ab-keywords"];
+  for(var i = 0; i < ids.length; i++) el(ids[i]).value = "";
+  el("ab-output").innerHTML = "";
+}
+
+function selfCheckScore(){
+  var total = 9;
+  var done = 0;
+  for(var i = 0; i < total; i++){
+    if(el("sc-" + i) && el("sc-" + i).checked) done++;
+  }
+  var pct = Math.round((done / total) * 100);
+  var color = pct < 50 ? "#dc3545" : pct < 80 ? "#ffc107" : "#28a745";
+  var msg = "";
+  if(pct < 50) msg = "Your abstract needs significant revision before peer review.";
+  else if(pct < 80) msg = "Getting there. Address the unchecked items before the peer review round.";
+  else if(pct < 100) msg = "Nearly ready. Fix the remaining items.";
+  else msg = "Your abstract meets all structural requirements. Ready for peer review.";
+  var h = '<div style="margin-top:10px;"><strong>Readiness: ' + pct + '% (' + done + '/' + total + ')</strong>';
+  h += '<div style="background:#eee;border-radius:9px;height:18px;margin-top:4px;"><div class="score-bar" style="width:' + pct + '%;background:' + color + ';"></div></div>';
+  h += '<p style="color:' + color + ';margin-top:6px;">' + msg + '</p></div>';
+  el("sc-result").innerHTML = h;
+}
+
+/* ===== TAB 2: PEER REVIEW FORM ===== */
+function tabReview(){
+  var h = '<div class="card"><h2>Peer Review Form</h2>';
+  h += '<p>Use this form to review a colleague\'s abstract and research design summary. Complete one form per abstract you review.</p>';
+  h += '<div class="tip">Remember the three-reading method: (1) Overview — can you state the question and argument? (2) Content — does the logic hold? (3) Craft — is it clear and concise?</div>';
+
+  h += '<label><strong>Your Name (Reviewer):</strong></label><input type="text" id="rv-reviewer">';
+  h += '<label><strong>Author Name:</strong></label><input type="text" id="rv-author">';
+  h += '<label><strong>Paper Title:</strong></label><input type="text" id="rv-title">';
+
+  var criteria = [
+    {id:"rq", label:"Research Question", desc:"Is there a clear, specific, answerable question?"},
+    {id:"arg", label:"Argument / Thesis", desc:"Is there an explicit argument or expected finding (not just 'explores')?"},
+    {id:"meth", label:"Method", desc:"Is a specific method named? Are cases/data identified?"},
+    {id:"theory", label:"Theoretical Framework", desc:"Is a theory or framework named and justified?"},
+    {id:"align", label:"Epistemological Alignment", desc:"Do the epistemology, theory, and method cohere?"},
+    {id:"contrib", label:"Contribution", desc:"Is the contribution specific (not just 'adds to the literature')?"},
+    {id:"clarity", label:"Clarity and Concision", desc:"Is it under the word limit? Free of jargon? Clear to a generalist?"}
+  ];
+
+  h += '<h3>Scoring (1 = Needs Work, 3 = Adequate, 5 = Excellent)</h3>';
+  for(var i = 0; i < criteria.length; i++){
+    var c = criteria[i];
+    h += '<div style="padding:8px 0;border-bottom:1px solid #eee;">';
+    h += '<label><strong>' + c.label + '</strong> — ' + c.desc + '</label>';
+    h += '<div class="radio-group">';
+    for(var s = 1; s <= 5; s++){
+      h += '<label style="display:inline-block;margin-right:14px;"><input type="radio" name="rv-' + c.id + '" value="' + s + '"> ' + s + '</label>';
+    }
+    h += '</div></div>';
+  }
+
+  h += '<h3>Written Feedback</h3>';
+  h += '<label><strong>Overall Assessment (one paragraph):</strong></label>';
+  h += '<textarea id="rv-overall" placeholder="Summarize the abstract in your own words, then state your overall impression. What is the strongest element? What is the main weakness?"></textarea>';
+
+  h += '<label><strong>Major Suggestions (2-3):</strong></label>';
+  h += '<textarea id="rv-major" placeholder="These are substantive issues: unclear question, misaligned method, missing theory, etc. Be specific and offer alternatives."></textarea>';
+
+  h += '<label><strong>Minor Suggestions (1-2):</strong></label>';
+  h += '<textarea id="rv-minor" placeholder="Word choice, formatting, slight jargon, etc."></textarea>';
+
+  h += '<label><strong>Strengths to Preserve:</strong></label>';
+  h += '<textarea id="rv-strengths" placeholder="What works well? What should the author keep?"></textarea>';
+
+  h += '<button class="btn" onclick="generateReview()">Generate Review Summary</button>';
+  h += '<button class="btn btn-sec" onclick="clearReview()">Clear Form</button>';
+  h += '<div id="rv-output"></div>';
+  h += '</div>';
+  return h;
+}
+
+function generateReview(){
+  var reviewer = el("rv-reviewer").value || "[Reviewer]";
+  var author = el("rv-author").value || "[Author]";
+  var title = el("rv-title").value || "[Paper Title]";
+  var overall = el("rv-overall").value || "[No overall assessment provided]";
+  var major = el("rv-major").value || "[No major suggestions]";
+  var minor = el("rv-minor").value || "[No minor suggestions]";
+  var strengths = el("rv-strengths").value || "[No strengths noted]";
+
+  var criteria = ["rq","arg","meth","theory","align","contrib","clarity"];
+  var labels = ["Research Question","Argument","Method","Theory","Alignment","Contribution","Clarity"];
+  var totalScore = 0;
+  var scoreCount = 0;
+  var scoreLines = "";
+  for(var i = 0; i < criteria.length; i++){
+    var radios = document.querySelectorAll('input[name="rv-' + criteria[i] + '"]');
+    var val = 0;
+    for(var j = 0; j < radios.length; j++){
+      if(radios[j].checked) val = parseInt(radios[j].value);
+    }
+    if(val > 0){totalScore += val; scoreCount++;}
+    scoreLines += "  " + labels[i] + ": " + (val > 0 ? val + "/5" : "not scored") + "\n";
+  }
+  var avg = scoreCount > 0 ? (totalScore / scoreCount).toFixed(1) : "N/A";
+
+  var out = "PEER REVIEW\n";
+  out += "===========\n\n";
+  out += "Reviewer: " + reviewer + "\n";
+  out += "Author: " + author + "\n";
+  out += "Title: " + title + "\n\n";
+  out += "SCORES:\n" + scoreLines;
+  out += "  Average: " + avg + "/5\n\n";
+  out += "OVERALL ASSESSMENT:\n" + overall + "\n\n";
+  out += "MAJOR SUGGESTIONS:\n" + major + "\n\n";
+  out += "MINOR SUGGESTIONS:\n" + minor + "\n\n";
+  out += "STRENGTHS TO PRESERVE:\n" + strengths + "\n";
+
+  el("rv-output").innerHTML = '<div class="result-box">' + out + '</div><button class="btn btn-sec" onclick="copyEl(\'rv-output\')">Copy to Clipboard</button>';
+}
+
+function clearReview(){
+  var ids = ["rv-reviewer","rv-author","rv-title","rv-overall","rv-major","rv-minor","rv-strengths"];
+  for(var i = 0; i < ids.length; i++) el(ids[i]).value = "";
+  var radios = document.querySelectorAll('.card input[type="radio"]');
+  for(var j = 0; j < radios.length; j++) radios[j].checked = false;
+  el("rv-output").innerHTML = "";
+}
+
+/* ===== TAB 3: FEEDBACK RECEIVED ===== */
+function tabFeedback(){
+  var h = '<div class="card"><h2>Record Feedback Received</h2>';
+  h += '<p>After the peer review round, record the feedback you received here. This creates a structured record you can reference when revising.</p>';
+
+  h += '<label><strong>Reviewer Name:</strong></label><input type="text" id="fb-reviewer">';
+  h += '<label><strong>Overall Assessment:</strong></label><textarea id="fb-overall" placeholder="Paste or type the reviewer\'s overall assessment"></textarea>';
+  h += '<label><strong>Major Suggestions:</strong></label><textarea id="fb-major" placeholder="List the major suggestions"></textarea>';
+  h += '<label><strong>Minor Suggestions:</strong></label><textarea id="fb-minor" placeholder="List the minor suggestions"></textarea>';
+  h += '<label><strong>Strengths Noted:</strong></label><textarea id="fb-strengths" placeholder="What did the reviewer say works well?"></textarea>';
+  h += '<label><strong>Your Response Plan:</strong></label><textarea id="fb-plan" placeholder="For each major suggestion, note whether you will incorporate it, partially incorporate it, or disagree (with reason)."></textarea>';
+  h += '<button class="btn" onclick="saveFeedback()">Save Feedback</button>';
+  h += '<div id="fb-log"></div>';
+  h += '</div>';
+
+  h += '<div class="card"><h2>Instructor Feedback</h2>';
+  h += '<label><strong>Instructor Comments:</strong></label><textarea id="fb-instructor" placeholder="Record feedback from the instructor during the plenary session"></textarea>';
+  h += '<label><strong>Key Action Items:</strong></label><textarea id="fb-actions" placeholder="List specific actions to take based on instructor feedback"></textarea>';
+  h += '<button class="btn" onclick="saveInstructor()">Save</button>';
+  h += '<div id="fb-inst-out"></div>';
+  h += '</div>';
+  return h;
+}
+
+var feedbackLog = [];
+
+function saveFeedback(){
+  var entry = {
+    reviewer: el("fb-reviewer").value,
+    overall: el("fb-overall").value,
+    major: el("fb-major").value,
+    minor: el("fb-minor").value,
+    strengths: el("fb-strengths").value,
+    plan: el("fb-plan").value
+  };
+  if(!entry.reviewer){alert("Enter the reviewer name."); return;}
+  feedbackLog.push(entry);
+  el("fb-reviewer").value = "";
+  el("fb-overall").value = "";
+  el("fb-major").value = "";
+  el("fb-minor").value = "";
+  el("fb-strengths").value = "";
+  el("fb-plan").value = "";
+  renderFeedbackLog();
+}
+
+function renderFeedbackLog(){
+  if(feedbackLog.length === 0){el("fb-log").innerHTML = ""; return;}
+  var h = '<h3 style="margin-top:14px;">Saved Feedback (' + feedbackLog.length + ' reviews)</h3>';
+  for(var i = 0; i < feedbackLog.length; i++){
+    var f = feedbackLog[i];
+    h += '<div class="result-box"><strong>From: ' + f.reviewer + '</strong>\n\nOverall: ' + f.overall + '\n\nMajor Suggestions: ' + f.major + '\n\nMinor: ' + f.minor + '\n\nStrengths: ' + f.strengths + '\n\nMy Response Plan: ' + f.plan + '</div>';
+  }
+  h += '<button class="btn btn-sec" onclick="exportFeedback()">Export All Feedback</button>';
+  el("fb-log").innerHTML = h;
+}
+
+function exportFeedback(){
+  var text = "PEER REVIEW FEEDBACK RECEIVED\n=============================\n\n";
+  for(var i = 0; i < feedbackLog.length; i++){
+    var f = feedbackLog[i];
+    text += "--- Review " + (i+1) + " (from " + f.reviewer + ") ---\n";
+    text += "Overall: " + f.overall + "\nMajor: " + f.major + "\nMinor: " + f.minor + "\nStrengths: " + f.strengths + "\nMy Plan: " + f.plan + "\n\n";
+  }
+  copyToClip(text);
+}
+
+function saveInstructor(){
+  var comments = el("fb-instructor").value;
+  var actions = el("fb-actions").value;
+  if(!comments && !actions){alert("Enter some feedback first."); return;}
+  el("fb-inst-out").innerHTML = '<div class="result-box">INSTRUCTOR FEEDBACK SAVED\n\nComments: ' + comments + '\n\nAction Items: ' + actions + '</div>';
+}
+
+/* ===== TAB 4: SUBMISSION PLANNER ===== */
+function tabSubmission(){
+  var h = '<div class="card"><h2>Conference Submission Planner</h2>';
+  h += '<p>Map out your submission strategy. Identify your target, prepare your timeline, and track progress.</p>';
+
+  h += '<h3>Your Submission Plan</h3>';
+  h += '<label><strong>Target Conference:</strong></label>';
+  h += '<select id="sp-conf"><option>ISA Annual Convention 2027</option><option>ISA Virtual 2026</option><option>ECPR General Conference 2027</option><option>ECPR Joint Sessions 2027</option><option>EISA PEC 2026</option><option>EISA EWIS 2026</option><option>BISA 2027</option><option>IPSA World Congress 2027</option><option>APSA 2027</option><option>MPSA 2027</option><option>Other (specify below)</option></select>';
+  h += '<label>If other:</label><input type="text" id="sp-other" placeholder="Conference name">';
+  h += '<label><strong>Abstract Submission Deadline:</strong></label><input type="date" id="sp-abs-deadline">';
+  h += '<label><strong>Full Paper Deadline:</strong></label><input type="date" id="sp-paper-deadline">';
+  h += '<label><strong>Conference Dates:</strong></label><input type="text" id="sp-dates" placeholder="e.g., 15-18 March 2027">';
+  h += '<label><strong>Estimated Cost (travel + registration + accommodation):</strong></label><input type="text" id="sp-cost" placeholder="e.g., EUR 1,200">';
+  h += '<label><strong>Funding Source(s) to Apply For:</strong></label><textarea id="sp-funding" placeholder="e.g., ECPR travel grant (up to GBP 500), EMU departmental fund"></textarea>';
+  h += '<label><strong>Funding Application Deadline:</strong></label><input type="date" id="sp-fund-deadline">';
+
+  h += '<h3>Work-Back Timeline</h3>';
+  h += '<p>Fill in your abstract deadline above, then click Generate Timeline to get a structured work-back schedule.</p>';
+  h += '<button class="btn" onclick="genTimeline()">Generate Timeline</button>';
+  h += '<div id="sp-timeline"></div>';
+  h += '</div>';
+
+  h += '<div class="card"><h2>Simultaneous Grant Application</h2>';
+  h += '<p>For most PhD-level funding (ECPR grants, TUBITAK), you apply <strong>after</strong> your conference abstract has been accepted. The pipeline is:</p>';
+  h += '<p>1. Submit abstract to conference (now). 2. Receive acceptance (weeks-months later). 3. Apply for travel/participation grant with acceptance letter. 4. Write and present your paper. 5. Revise paper using conference feedback. 6. Submit to journal.</p>';
+  h += '<p>For larger research grants (TUBITAK 2214-A, SSRC), the application is independent of any single conference but your conference activity strengthens it.</p>';
+  h += '</div>';
+  return h;
+}
+
+function genTimeline(){
+  var deadlineStr = el("sp-abs-deadline").value;
+  if(!deadlineStr){alert("Enter your abstract submission deadline first."); return;}
+  var deadline = new Date(deadlineStr);
+  var today = new Date();
+
+  var daysLeft = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+  var conf = el("sp-conf").value;
+  var other = el("sp-other").value;
+  var confName = conf.indexOf("Other") > -1 ? (other || "Your Conference") : conf;
+
+  function addDays(d, n){var r = new Date(d); r.setDate(r.getDate() + n); return r;}
+  function fmt(d){var m = d.getMonth() + 1; var day = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (day < 10 ? "0" : "") + day;}
+
+  var steps = [];
+  if(daysLeft > 28){
+    steps.push({date:fmt(today), task:"Begin abstract revision using workshop feedback"});
+    steps.push({date:fmt(addDays(today, 3)), task:"Circulate revised abstract to supervisor for feedback"});
+    steps.push({date:fmt(addDays(today, 7)), task:"Incorporate supervisor feedback; finalize abstract"});
+    steps.push({date:fmt(addDays(today, 10)), task:"Prepare conference portal account; review submission guidelines"});
+    steps.push({date:fmt(addDays(deadline, -7)), task:"Final proofread of abstract; confirm all co-author details"});
+    steps.push({date:fmt(addDays(deadline, -3)), task:"Submit abstract (do not wait until the last day)"});
+    steps.push({date:fmt(deadline), task:"DEADLINE: Abstract submission closes for " + confName});
+    steps.push({date:fmt(addDays(deadline, 1)), task:"Begin identifying funding sources to apply for after acceptance"});
+  } else if(daysLeft > 7){
+    steps.push({date:fmt(today), task:"Finalize abstract immediately using workshop feedback"});
+    steps.push({date:fmt(addDays(today, 2)), task:"Get supervisor sign-off"});
+    steps.push({date:fmt(addDays(deadline, -2)), task:"Submit abstract"});
+    steps.push({date:fmt(deadline), task:"DEADLINE: " + confName});
+  } else if(daysLeft > 0){
+    steps.push({date:fmt(today), task:"URGENT: Finalize and submit abstract within " + daysLeft + " days"});
+    steps.push({date:fmt(deadline), task:"DEADLINE: " + confName});
+  } else {
+    steps.push({date:fmt(deadline), task:"This deadline has passed. Identify the next available conference."});
+  }
+
+  var h = '<h3 style="margin-top:12px;">Your Work-Back Timeline (' + daysLeft + ' days until deadline)</h3>';
+  h += '<table><tr><th>Date</th><th>Task</th><th>Done?</th></tr>';
+  for(var i = 0; i < steps.length; i++){
+    h += '<tr><td>' + steps[i].date + '</td><td>' + steps[i].task + '</td><td><input type="checkbox"></td></tr>';
+  }
+  h += '</table>';
+
+  var paperDeadline = el("sp-paper-deadline").value;
+  if(paperDeadline){
+    var pd = new Date(paperDeadline);
+    var paperDays = Math.ceil((pd - today) / (1000 * 60 * 60 * 24));
+    h += '<h3>Full Paper Timeline (' + paperDays + ' days)</h3>';
+    h += '<table><tr><th>Date</th><th>Task</th><th>Done?</th></tr>';
+    if(paperDays > 90){
+      h += '<tr><td>' + fmt(addDays(pd, -90)) + '</td><td>Complete literature review and theoretical framework</td><td><input type="checkbox"></td></tr>';
+      h += '<tr><td>' + fmt(addDays(pd, -60)) + '</td><td>Complete empirical/analytical section draft</td><td><input type="checkbox"></td></tr>';
+      h += '<tr><td>' + fmt(addDays(pd, -30)) + '</td><td>Complete full draft; circulate to supervisor</td><td><input type="checkbox"></td></tr>';
+      h += '<tr><td>' + fmt(addDays(pd, -14)) + '</td><td>Revise based on feedback</td><td><input type="checkbox"></td></tr>';
+      h += '<tr><td>' + fmt(addDays(pd, -3)) + '</td><td>Final proofread and formatting</td><td><input type="checkbox"></td></tr>';
+    }
+    h += '<tr><td>' + paperDeadline + '</td><td>DEADLINE: Full paper due</td><td><input type="checkbox"></td></tr>';
+    h += '</table>';
+  }
+
+  el("sp-timeline").innerHTML = h;
+}
+
+/* ===== TAB 5: GRANT PROPOSAL BUILDER ===== */
+function tabGrant(){
+  var h = '<div class="card"><h2>Grant Proposal Builder</h2>';
+  h += '<p>Generate a structured grant proposal outline that aligns with your conference abstract. The core question, argument, and method are the same; the grant adds budget, timeline, and feasibility.</p>';
+
+  h += '<label><strong>Funder / Grant Name:</strong></label>';
+  h += '<select id="gr-funder"><option>ECPR Event Participant Grant</option><option>TUBITAK 2214-A (International Research Fellowship)</option><option>TUBITAK 2211 (National PhD Scholarship)</option><option>TUBITAK 3005 (Social Sciences Research Projects)</option><option>ISA Travel Grant</option><option>IPSA Travel Grant</option><option>BISA Postgraduate Bursary</option><option>EMU Departmental Fund</option><option>EU Marie Curie (Postdoc)</option><option>Other</option></select>';
+  h += '<label>If other:</label><input type="text" id="gr-other-funder" placeholder="Funder name">';
+
+  h += '<label><strong>Project Title:</strong></label><input type="text" id="gr-title" placeholder="Same as or close to your conference paper title">';
+  h += '<label><strong>Research Question:</strong></label><textarea id="gr-question" placeholder="Copy from your abstract builder or write fresh"></textarea>';
+  h += '<label><strong>Significance (2-3 sentences):</strong></label><textarea id="gr-significance" placeholder="Why does this research matter? Scholarly and/or policy significance."></textarea>';
+  h += '<label><strong>Method and Cases:</strong></label><textarea id="gr-method" placeholder="What method? What cases? What data? Where?"></textarea>';
+  h += '<label><strong>Timeline:</strong></label><textarea id="gr-timeline" placeholder="e.g., Phase 1 (Sep-Dec 2026): Literature review and archival research. Phase 2 (Jan-Mar 2027): Fieldwork and interviews. Phase 3 (Apr-Jun 2027): Writing and presentation."></textarea>';
+  h += '<label><strong>Amount Requested:</strong></label><input type="text" id="gr-amount" placeholder="e.g., GBP 500 / EUR 1,200 / TRY 450,000">';
+
+  h += '<h3>Budget Line Items</h3>';
+  h += '<div id="gr-budget-items">';
+  h += '<div class="budget-row" style="display:flex;gap:8px;margin-bottom:6px;"><input type="text" placeholder="Item (e.g., return flight)" style="flex:2;"><input type="text" placeholder="Cost (e.g., EUR 250)" style="flex:1;"><input type="text" placeholder="Justification" style="flex:2;"></div>';
+  h += '<div class="budget-row" style="display:flex;gap:8px;margin-bottom:6px;"><input type="text" placeholder="Item" style="flex:2;"><input type="text" placeholder="Cost" style="flex:1;"><input type="text" placeholder="Justification" style="flex:2;"></div>';
+  h += '<div class="budget-row" style="display:flex;gap:8px;margin-bottom:6px;"><input type="text" placeholder="Item" style="flex:2;"><input type="text" placeholder="Cost" style="flex:1;"><input type="text" placeholder="Justification" style="flex:2;"></div>';
+  h += '</div>';
+  h += '<button class="btn btn-sec" onclick="addBudgetRow()">+ Add Row</button>';
+
+  h += '<label style="margin-top:12px;"><strong>Expected Outcomes:</strong></label><textarea id="gr-outcomes" placeholder="e.g., Conference presentation at ISA 2027; working paper; journal submission to EJIR by June 2027; dataset to be deposited at Harvard Dataverse."></textarea>';
+
+  h += '<button class="btn" style="margin-top:12px;" onclick="generateGrantProposal()">Generate Proposal Outline</button>';
+  h += '<div id="gr-output"></div>';
+  h += '</div>';
+  return h;
+}
+
+function addBudgetRow(){
+  var container = el("gr-budget-items");
+  var div = document.createElement("div");
+  div.className = "budget-row";
+  div.style.cssText = "display:flex;gap:8px;margin-bottom:6px;";
+  div.innerHTML = '<input type="text" placeholder="Item" style="flex:2;"><input type="text" placeholder="Cost" style="flex:1;"><input type="text" placeholder="Justification" style="flex:2;">';
+  container.appendChild(div);
+}
+
+function generateGrantProposal(){
+  var funder = el("gr-funder").value;
+  if(funder === "Other") funder = el("gr-other-funder").value || "[Funder]";
+  var title = el("gr-title").value || "[Project Title]";
+  var question = el("gr-question").value || "[Research Question]";
+  var significance = el("gr-significance").value || "[Significance]";
+  var method = el("gr-method").value || "[Method]";
+  var timeline = el("gr-timeline").value || "[Timeline]";
+  var amount = el("gr-amount").value || "[Amount]";
+  var outcomes = el("gr-outcomes").value || "[Outcomes]";
+
+  var rows = document.querySelectorAll(".budget-row");
+  var budgetText = "";
+  for(var i = 0; i < rows.length; i++){
+    var inputs = rows[i].querySelectorAll("input");
+    if(inputs[0].value){
+      budgetText += "  - " + inputs[0].value + ": " + (inputs[1].value || "TBD") + " (" + (inputs[2].value || "no justification") + ")\n";
+    }
+  }
+
+  var out = "GRANT PROPOSAL OUTLINE\n";
+  out += "======================\n\n";
+  out += "Funder: " + funder + "\n";
+  out += "Amount Requested: " + amount + "\n";
+  out += "Project Title: " + title + "\n\n";
+  out += "1. RESEARCH QUESTION\n" + question + "\n\n";
+  out += "2. SIGNIFICANCE AND RATIONALE\n" + significance + "\n\n";
+  out += "3. STATE OF THE ART\n[Summarize 3-5 key works that frame your contribution. Identify the specific gap your project fills. Cite KKV, George and Bennett, or relevant methodological authorities to justify your approach.]\n\n";
+  out += "4. THEORETICAL FRAMEWORK\n[Name your theory. Explain why it is appropriate for your question. If the funder values epistemological clarity, state your ontological and epistemological commitments explicitly.]\n\n";
+  out += "5. RESEARCH DESIGN AND METHODS\n" + method + "\n\n";
+  out += "6. WORK PLAN AND TIMELINE\n" + timeline + "\n\n";
+  out += "7. BUDGET\nTotal: " + amount + "\n" + (budgetText || "  [Add budget items above]\n") + "\n";
+  out += "8. EXPECTED OUTCOMES\n" + outcomes + "\n\n";
+  out += "9. BROADER IMPACT\n[Who benefits? Scholarly community, policy world, students, the discipline?]\n";
+
+  el("gr-output").innerHTML = '<div class="result-box">' + out + '</div><button class="btn btn-sec" onclick="copyEl(\'gr-output\')">Copy to Clipboard</button>';
+}
+
+/* ===== TAB 6: PRE-SUBMISSION CHECKLIST ===== */
+function tabChecklist(){
+  var h = '<div class="card"><h2>Pre-Submission Checklist</h2>';
+  h += '<p>Run through this checklist before submitting your abstract to any conference. Check each item as you confirm it.</p>';
+
+  var sections = [
+    {title:"Abstract Quality", items:[
+      "Research question is clear, specific, and answerable",
+      "An explicit argument or expected finding is stated",
+      "Method is named and specific (not just 'qualitative' or 'quantitative')",
+      "Cases or data sources are identified",
+      "Contribution is stated concretely",
+      "Word count is within the conference limit",
+      "No unexplained jargon or acronyms",
+      "A generalist could summarize the paper from the abstract alone"
+    ]},
+    {title:"Conference Requirements", items:[
+      "Title is under 50 words (ISA requirement; good practice for all)",
+      "Correct number of keywords/tags provided",
+      "Correct submission type selected (paper, panel, roundtable)",
+      "All co-author details are correct",
+      "Conference portal account is created and verified",
+      "Submission guidelines have been read in full"
+    ]},
+    {title:"Strategic Considerations", items:[
+      "Targeted a specific section or panel (not just the general pool)",
+      "Checked whether supervisor or colleagues have a panel to join",
+      "Identified the relevant section chair or panel organizer",
+      "Confirmed no simultaneous submission of the same paper elsewhere",
+      "Considered whether a panel proposal (5 papers) is stronger than an individual submission"
+    ]},
+    {title:"Funding Preparation", items:[
+      "Identified funding source(s) to apply for after acceptance",
+      "Noted funding application deadline(s)",
+      "Prepared a preliminary budget estimate",
+      "Confirmed eligibility (ECPR membership, enrollment status, etc.)"
+    ]},
+    {title:"After Submission", items:[
+      "Saved confirmation email and submission ID",
+      "Noted expected notification date",
+      "Begun drafting the full paper (do not wait for acceptance)"
+    ]}
+  ];
+
+  var totalItems = 0;
+  var checkIdx = 0;
+  for(var s = 0; s < sections.length; s++){
+    h += '<h3>' + sections[s].title + '</h3>';
+    for(var i = 0; i < sections[s].items.length; i++){
+      h += '<div style="padding:4px 0;"><label style="cursor:pointer;display:flex;align-items:flex-start;gap:8px;"><input type="checkbox" id="cl-' + checkIdx + '" style="margin-top:4px;width:16px;height:16px;" onchange="checklistScore()"> ' + sections[s].items[i] + '</label></div>';
+      checkIdx++;
+      totalItems++;
+    }
+  }
+
+  h += '<div id="cl-score" style="margin-top:14px;"></div>';
+  h += '<input type="hidden" id="cl-total" value="' + totalItems + '">';
+  h += '</div>';
+  return h;
+}
+
+function checklistScore(){
+  var total = parseInt(el("cl-total").value);
+  var done = 0;
+  for(var i = 0; i < total; i++){
+    if(el("cl-" + i) && el("cl-" + i).checked) done++;
+  }
+  var pct = Math.round((done / total) * 100);
+  var color = pct < 50 ? "#dc3545" : pct < 80 ? "#ffc107" : pct < 100 ? "#17a2b8" : "#28a745";
+  var msg = "";
+  if(pct < 50) msg = "Significant gaps remain. Do not submit yet.";
+  else if(pct < 80) msg = "Getting close. Address the remaining items before clicking submit.";
+  else if(pct < 100) msg = "Almost ready. Review the unchecked items.";
+  else msg = "All checks passed. You are ready to submit.";
+  var h = '<strong>Readiness: ' + pct + '% (' + done + '/' + total + ')</strong>';
+  h += '<div style="background:#eee;border-radius:9px;height:18px;margin-top:4px;"><div class="score-bar" style="width:' + pct + '%;background:' + color + ';"></div></div>';
+  h += '<p style="color:' + color + ';margin-top:6px;font-weight:600;">' + msg + '</p>';
+  el("cl-score").innerHTML = h;
+}
+
+/* ===== TAB 7: REVISION LOG ===== */
+function tabRevlog(){
+  var h = '<div class="card"><h2>Revision Log</h2>';
+  h += '<p>Track every revision you make to your abstract and paper. This creates a version history and documents how you incorporated feedback. It is also useful evidence if you are ever questioned about your writing process.</p>';
+
+  h += '<label><strong>Date:</strong></label><input type="date" id="rl-date">';
+  h += '<label><strong>What did you change?</strong></label><textarea id="rl-change" placeholder="e.g., Rewrote research question to be more specific per Reviewer 1 suggestion. Changed from \'What is the role of identity?\' to \'How do partisan identity shifts explain variation in NATO burden-sharing after 2014?\'"></textarea>';
+  h += '<label><strong>Why?</strong></label><textarea id="rl-why" placeholder="e.g., Both reviewers noted the question was too vague. Instructor agreed. New question is testable and specific."></textarea>';
+  h += '<label><strong>Source of feedback:</strong></label><select id="rl-source"><option>Peer Reviewer 1</option><option>Peer Reviewer 2</option><option>Instructor</option><option>Supervisor</option><option>Self-identified</option><option>Conference reviewer feedback</option><option>Journal reviewer feedback</option></select>';
+  h += '<button class="btn" onclick="addRevision()">Add Revision</button>';
+  h += '<div id="rl-log"></div>';
+  h += '</div>';
+  return h;
+}
+
+var revisionLog = [];
+
+function addRevision(){
+  var entry = {
+    date: el("rl-date").value || new Date().toISOString().slice(0,10),
+    change: el("rl-change").value,
+    why: el("rl-why").value,
+    source: el("rl-source").value
+  };
+  if(!entry.change){alert("Describe what you changed."); return;}
+  revisionLog.push(entry);
+  el("rl-change").value = "";
+  el("rl-why").value = "";
+  renderRevLog();
+}
+
+function renderRevLog(){
+  if(revisionLog.length === 0){el("rl-log").innerHTML = ""; return;}
+  var h = '<h3 style="margin-top:14px;">Revision History (' + revisionLog.length + ' entries)</h3>';
+  h += '<table><tr><th>#</th><th>Date</th><th>Change</th><th>Reason</th><th>Source</th></tr>';
+  for(var i = revisionLog.length - 1; i >= 0; i--){
+    var r = revisionLog[i];
+    h += '<tr><td>' + (i+1) + '</td><td>' + r.date + '</td><td>' + r.change + '</td><td>' + r.why + '</td><td>' + r.source + '</td></tr>';
+  }
+  h += '</table>';
+  h += '<button class="btn btn-sec" onclick="exportRevLog()">Export Revision Log</button>';
+  el("rl-log").innerHTML = h;
+}
+
+function exportRevLog(){
+  var text = "REVISION LOG\n============\n\n";
+  for(var i = 0; i < revisionLog.length; i++){
+    var r = revisionLog[i];
+    text += "Revision " + (i+1) + " (" + r.date + ")\n";
+    text += "Source: " + r.source + "\n";
+    text += "Change: " + r.change + "\n";
+    text += "Reason: " + r.why + "\n\n";
+  }
+  copyToClip(text);
+}
+
+/* ===== UTILITY ===== */
+function copyEl(containerId){
+  var box = el(containerId);
+  if(!box) return;
+  var rd = box.querySelector(".result-box");
+  if(!rd) return;
+  copyToClip(rd.innerText || rd.textContent);
+}
+
+function copyToClip(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){alert("Copied to clipboard.");});
+  } else {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    alert("Copied to clipboard.");
+  }
+}
+
+/* ===== INIT ===== */
+buildNav();
+showTab("abstract");
+</script>
+</body>
+</html>
