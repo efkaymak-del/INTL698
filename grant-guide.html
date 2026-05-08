@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Grant Application Guide – INTL698</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Georgia,"Times New Roman",serif;background:#f5f6fa;color:#1a1a2e;line-height:1.7;}
+header{background:linear-gradient(135deg,#1e3a5f 0%,#2d5a87 100%);color:#fff;padding:24px 20px;text-align:center;}
+header h1{font-size:1.55em;margin-bottom:4px;}
+header p{font-size:0.88em;opacity:0.85;}
+nav{display:flex;flex-wrap:wrap;gap:5px;padding:10px 14px;background:#fff;border-bottom:2px solid #ddd;justify-content:center;}
+nav button{padding:7px 12px;border:2px solid #1e3a5f;background:#fff;color:#1e3a5f;border-radius:6px;cursor:pointer;font-size:0.82em;font-family:inherit;transition:all .2s;}
+nav button:hover{background:#eef3fa;}
+nav button.active{background:#1e3a5f;color:#fff;}
+.wrap{max-width:960px;margin:0 auto;padding:18px 14px;}
+.card{background:#fff;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+.card h2{color:#1e3a5f;font-size:1.2em;margin-bottom:10px;border-bottom:2px solid #eee;padding-bottom:6px;}
+.card h3{color:#2d5a87;font-size:1.02em;margin:14px 0 6px;}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:0.88em;}
+th,td{border:1px solid #ddd;padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#1e3a5f;color:#fff;font-weight:600;}
+tr:nth-child(even){background:#f9fafc;}
+.tag{display:inline-block;padding:3px 9px;border-radius:12px;font-size:0.76em;margin:2px;font-weight:600;}
+.tg{background:#d4edda;color:#155724;}.tb{background:#d1ecf1;color:#0c5460;}.ty{background:#fff3cd;color:#856404;}.tr{background:#f8d7da;color:#721c24;}.tp{background:#e8daef;color:#4a235a;}
+select,input[type="text"],input[type="date"],input[type="number"],textarea{width:100%;padding:9px;border:1px solid #ccc;border-radius:6px;font-size:0.92em;font-family:inherit;margin:3px 0 10px;}
+textarea{min-height:70px;resize:vertical;}
+.btn{padding:9px 18px;background:#1e3a5f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.92em;font-family:inherit;margin:3px;}
+.btn:hover{background:#2d5a87;}
+.btn2{background:#5a7d9a;}.btn2:hover{background:#6b8fae;}
+.result{background:#eef3fa;border-left:4px solid #1e3a5f;padding:14px;border-radius:0 6px 6px 0;margin:10px 0;white-space:pre-wrap;font-size:0.9em;}
+.alert{background:#fff3cd;border-left:4px solid #ffc107;padding:12px 16px;border-radius:0 6px 6px 0;margin:10px 0;font-size:0.9em;}
+.alert-red{background:#f8d7da;border-left-color:#dc3545;}
+.alert-green{background:#d4edda;border-left-color:#28a745;}
+.ck{padding:6px 0;border-bottom:1px solid #eee;}
+.ck label{cursor:pointer;display:flex;align-items:flex-start;gap:8px;font-size:0.92em;}
+.ck input[type="checkbox"]{margin-top:4px;width:16px;height:16px;flex-shrink:0;}
+.bar{height:18px;border-radius:9px;transition:width 0.3s;}
+.wc{font-size:0.82em;color:#666;margin-top:2px;}
+a{color:#1e3a5f;}
+@media(max-width:600px){header h1{font-size:1.25em;}nav button{font-size:0.75em;padding:5px 8px;}.wrap{padding:10px 8px;}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Grant Application Guide</h1>
+<p>INTL698 Doctoral Seminar – Step-by-Step Funding for IR PhD Students at EMU</p>
+</header>
+
+<nav id="topnav"></nav>
+<div class="wrap" id="app"></div>
+
+<script>
+var TABS=[
+  {id:"overview",label:"Which Grant?"},
+  {id:"ecpr",label:"ECPR Grant"},
+  {id:"t2214",label:"TUBITAK 2214-A"},
+  {id:"t2211",label:"TUBITAK 2211"},
+  {id:"t3005",label:"TUBITAK 3005"},
+  {id:"other",label:"Other Funding"},
+  {id:"tracker",label:"My Applications"}
+];
+var cur="overview";
+function el(id){return document.getElementById(id);}
+function buildNav(){
+  var n=el("topnav"),h="";
+  for(var i=0;i<TABS.length;i++){
+    var t=TABS[i];
+    h+='<button id="n-'+t.id+'" onclick="go(\''+t.id+'\')">'+t.label+'</button>';
+  }
+  n.innerHTML=h;
+}
+function go(id){
+  cur=id;
+  var bs=document.querySelectorAll("nav button");
+  for(var i=0;i<bs.length;i++) bs[i].className=bs[i].id==="n-"+id?"active":"";
+  el("app").innerHTML=render(id);
+}
+function render(id){
+  if(id==="overview") return pgOverview();
+  if(id==="ecpr") return pgECPR();
+  if(id==="t2214") return pgT2214();
+  if(id==="t2211") return pgT2211();
+  if(id==="t3005") return pgT3005();
+  if(id==="other") return pgOther();
+  if(id==="tracker") return pgTracker();
+  return "";
+}
+
+/* ========== OVERVIEW ========== */
+function pgOverview(){
+  var h='<div class="card"><h2>Find the Right Grant for You</h2>';
+  h+='<p>Answer the questions below and this tool will tell you which grants you should apply for, in what order, and what you need to prepare.</p>';
+
+  h+='<label><strong>1. Are you a Turkish citizen?</strong></label>';
+  h+='<select id="ov-citizen"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select>';
+
+  h+='<label><strong>2. Have you passed your PhD qualifying exam and had your thesis proposal accepted?</strong></label>';
+  h+='<select id="ov-qual"><option value="">Select...</option><option value="yes">Yes</option><option value="no">Not yet</option></select>';
+
+  h+='<label><strong>3. How long since you registered for your PhD?</strong></label>';
+  h+='<select id="ov-years"><option value="">Select...</option><option value="1">Less than 2 years</option><option value="2">2-3 years</option><option value="3">3-4 years</option><option value="4">More than 4 years</option></select>';
+
+  h+='<label><strong>4. What do you need funding for?</strong> (select all that apply)</label>';
+  h+='<div class="ck"><label><input type="checkbox" id="ov-conf"> Conference travel and registration</label></div>';
+  h+='<div class="ck"><label><input type="checkbox" id="ov-field"> Fieldwork or research visit abroad (1-12 months)</label></div>';
+  h+='<div class="ck"><label><input type="checkbox" id="ov-methods"> Methods school or training course</label></div>';
+  h+='<div class="ck"><label><input type="checkbox" id="ov-stipend"> Monthly stipend during PhD</label></div>';
+  h+='<div class="ck"><label><input type="checkbox" id="ov-project"> Research project funding (data, equipment, assistants)</label></div>';
+
+  h+='<label><strong>5. Do you have an accepted paper at a conference already?</strong></label>';
+  h+='<select id="ov-accepted"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No, but I plan to submit</option></select>';
+
+  h+='<button class="btn" style="margin-top:12px;" onclick="recommend()">Show My Options</button>';
+  h+='<div id="ov-results"></div>';
+  h+='</div>';
+
+  h+='<div class="card"><h2>Quick Comparison</h2>';
+  h+='<table><tr><th>Grant</th><th>Amount</th><th>For What</th><th>Key Requirement</th><th>Deadline Pattern</th></tr>';
+  h+='<tr><td><strong>ECPR Event Participant Grant</strong></td><td>Up to full travel + accommodation + fee waiver</td><td>ECPR events (General Conference, Joint Sessions, Methods School)</td><td>Must be at ECPR Full Member institution (EMU qualifies)</td><td>Per event; current: <strong>13 May 2026</strong> for Methods School at GC Krakow</td></tr>';
+  h+='<tr><td><strong>TUBITAK 2214-A</strong></td><td>EUR 1,700/month (Europe) + travel for fellow and spouse</td><td>Research visit abroad during PhD (3-12 months)</td><td>Turkish citizen; passed qualifying exam; thesis proposal accepted; under 4 years since PhD registration</td><td>Annual calls; 2025 call deadline was Jan 2026</td></tr>';
+  h+='<tr><td><strong>TUBITAK 2211</strong></td><td>Monthly stipend (varies by sub-program)</td><td>Living costs during PhD in Turkey</td><td>Enrolled in PhD at Turkish university</td><td>Annual calls (2026/1 closed Mar 2026; watch for 2026/2)</td></tr>';
+  h+='<tr><td><strong>TUBITAK 3005</strong></td><td>Up to TRY 450,000</td><td>Social sciences research projects</td><td>PI must be faculty; can include PhD student costs</td><td>Periodic calls; check tubitak.gov.tr</td></tr>';
+  h+='</table></div>';
+  return h;
+}
+
+function recommend(){
+  var citizen=el("ov-citizen").value;
+  var qual=el("ov-qual").value;
+  var years=el("ov-years").value;
+  var conf=el("ov-conf").checked;
+  var field=el("ov-field").checked;
+  var methods=el("ov-methods").checked;
+  var stipend=el("ov-stipend").checked;
+  var project=el("ov-project").checked;
+  var accepted=el("ov-accepted").value;
+
+  if(!citizen||!qual||!years){
+    el("ov-results").innerHTML='<div class="alert">Please answer all questions before generating recommendations.</div>';
+    return;
+  }
+
+  var recs=[];
+  // ECPR - everyone at EMU qualifies
+  if(conf||methods){
+    recs.push({name:"ECPR Event Participant Grant",priority:"HIGH",reason:"You are at an ECPR Full Member institution. This is the easiest grant to apply for: 500-word statement, no research proposal required. Covers travel, accommodation, and registration fee waiver.",action:"Go to the ECPR Grant tab and draft your 500-word statement now.",tab:"ecpr",urgent:true});
+  }
+  // 2214-A
+  if(citizen==="yes"&&qual==="yes"&&(years==="1"||years==="2"||years==="3")&&field){
+    recs.push({name:"TUBITAK 2214-A",priority:"HIGH",reason:"You meet all eligibility criteria: Turkish citizen, passed qualifying exam, thesis proposal accepted, and under 4 years. This funds up to 12 months abroad at EUR 1,700/month plus travel.",action:"Go to the TUBITAK 2214-A tab. Start preparing your research proposal and securing an invitation letter from a host institution.",tab:"t2214",urgent:false});
+  }
+  if(citizen==="yes"&&qual==="no"&&field){
+    recs.push({name:"TUBITAK 2214-A",priority:"FUTURE",reason:"You will be eligible once you pass your qualifying exam and have your thesis proposal accepted. Start preparing now: identify a potential host institution and supervisor abroad.",action:"Begin exploring host institutions. You cannot apply until after your qualifying exam.",tab:"t2214",urgent:false});
+  }
+  if(citizen==="yes"&&years==="4"&&field){
+    recs.push({name:"TUBITAK 2214-A",priority:"CHECK",reason:"You may be ineligible if more than 4 years have passed since your PhD registration. Verify your exact registration date and check whether the 4-year rule has been updated in the latest call text.",action:"Contact bideb2214@tubitak.gov.tr to confirm eligibility.",tab:"t2214",urgent:false});
+  }
+  if(citizen==="no"&&field){
+    recs.push({name:"TUBITAK 2214-A",priority:"NOT ELIGIBLE",reason:"TUBITAK 2214-A requires Turkish citizenship. See the Other Funding tab for alternatives.",action:"Check alternative fieldwork funding options.",tab:"other",urgent:false});
+  }
+  // 2211
+  if(citizen==="yes"&&stipend){
+    recs.push({name:"TUBITAK 2211",priority:"HIGH",reason:"Monthly PhD stipend. The 2026/1 call closed in March 2026; watch for the 2026/2 call.",action:"Go to the TUBITAK 2211 tab and prepare your application materials for the next call.",tab:"t2211",urgent:false});
+  }
+  if(citizen==="no"&&stipend){
+    recs.push({name:"TUBITAK 2211",priority:"NOT ELIGIBLE",reason:"TUBITAK 2211 is for Turkish citizens enrolled in Turkish universities. See Other Funding for alternatives.",action:"Check departmental and external scholarship options.",tab:"other",urgent:false});
+  }
+  // 3005
+  if(project){
+    recs.push({name:"TUBITAK 3005",priority:"MEDIUM",reason:"This is a research project grant (up to TRY 450,000). The PI must be a faculty member, but the budget can include your costs (travel, data, equipment). Discuss with your supervisor.",action:"Go to the TUBITAK 3005 tab. Discuss with your supervisor whether a joint application makes sense.",tab:"t3005",urgent:false});
+  }
+  // General conference travel without ECPR
+  if(conf&&!methods){
+    recs.push({name:"Conference-specific travel grants (ISA, IPSA, BISA)",priority:"MEDIUM",reason:"Most major conferences offer their own travel grants. These are usually smaller (USD 200-500) but worth applying for.",action:"Check the Other Funding tab and the conferences-app.html for details.",tab:"other",urgent:false});
+  }
+  // Methods school
+  if(methods){
+    recs.push({name:"ECPR Methods School Funding",priority:"HIGH",reason:"The ECPR Methods School at the General Conference in Krakow (8-11 Sep 2026) has an Event Participant Grant with deadline 13 May 2026. This covers course fee, travel, and accommodation.",action:"This is URGENT. Apply via the ECPR Grant tab immediately.",tab:"ecpr",urgent:true});
+  }
+
+  if(recs.length===0){
+    el("ov-results").innerHTML='<div class="alert">Based on your answers, no specific grants match right now. Check the Other Funding tab for general options, or adjust your answers above.</div>';
+    return;
+  }
+
+  var h='<h3 style="margin-top:16px;">Your Recommended Grants</h3>';
+  for(var i=0;i<recs.length;i++){
+    var r=recs[i];
+    var cls="alert";
+    if(r.priority==="HIGH") cls="alert-green";
+    if(r.priority==="NOT ELIGIBLE") cls="alert alert-red";
+    if(r.urgent) cls="alert-green";
+    var urgentTag=r.urgent?'<span class="tag tr">URGENT DEADLINE</span> ':"";
+    var prTag='<span class="tag '+(r.priority==="HIGH"?"tg":r.priority==="NOT ELIGIBLE"?"tr":r.priority==="CHECK"?"ty":"tb")+'">'+r.priority+'</span>';
+    h+='<div class="'+cls+'" style="margin-bottom:10px;">'+urgentTag+prTag+' <strong>'+r.name+'</strong>';
+    h+='<p style="margin:6px 0;">'+r.reason+'</p>';
+    h+='<p><strong>Next step:</strong> '+r.action+'</p>';
+    h+='<button class="btn" style="margin-top:4px;" onclick="go(\''+r.tab+'\')">Go to '+r.name+' Guide</button>';
+    h+='</div>';
+  }
+  el("ov-results").innerHTML=h;
+}
+
+/* ========== ECPR EVENT PARTICIPANT GRANT ========== */
+function pgECPR(){
+  var h='<div class="card"><h2>ECPR Event Participant Grant</h2>';
+  h+='<div class="alert-green"><strong>CURRENT DEADLINE:</strong> Methods School at General Conference, Krakow, 8-11 September 2026. Grant application deadline: <strong>13 May 2026</strong>. Apply at <a href="https://ecpr.eu/Funding/Funding" target="_blank">ecpr.eu/Funding</a>.</div>';
+
+  h+='<h3>What This Grant Covers</h3>';
+  h+='<p>The ECPR Event Participant Grant aims to cover <strong>full travel and accommodation expenses</strong> of the participant. Successful applicants also have their <strong>event registration / course fee waived</strong>. Each ECPR Full Member institution can receive up to <strong>two grants per event per year</strong>.</p>';
+
+  h+='<h3>Eligibility (EMU Students)</h3>';
+  h+='<p>Eastern Mediterranean University is an <strong>ECPR Full Member</strong>. You are eligible if you are:</p>';
+  h+='<p>(1) Affiliated with EMU (enrolled PhD student or early career scholar). (2) Applying to participate in an ECPR event (General Conference, Joint Sessions, Methods School). That is it. No citizenship requirement. No qualifying exam requirement. If you are a PhD student at EMU, you can apply.</p>';
+
+  h+='<h3>What You Submit</h3>';
+  h+='<p>The application is submitted through the ECPR online system. The core requirement is a <strong>500-word statement</strong> that must address:</p>';
+  h+='<table><tr><th>#</th><th>Question You Must Answer</th><th>What Reviewers Want to See</th></tr>';
+  h+='<tr><td>1</td><td><strong>Why do you wish to attend the event?</strong></td><td>Connect the event to your research. Name specific panels, sections, or courses. Show you have looked at the program. Do not write generic statements about "broadening your horizons."</td></tr>';
+  h+='<tr><td>2</td><td><strong>Which course/event do you wish to receive funding for, and why does it benefit your research?</strong></td><td>Name the specific course or conference component. Explain how it addresses a gap in your skills or how presenting/attending will advance your dissertation. Be concrete: "I am using process tracing in my dissertation and the Methods School course on PT will strengthen my analytical framework."</td></tr>';
+  h+='<tr><td>3</td><td><strong>Your financial circumstances and why you need support.</strong></td><td>Be honest and direct. State that your institution/department does not have dedicated travel funding, that you are a self-funded or stipend-funded student, and that without the grant you cannot attend. Do not be embarrassed by this; the grant exists precisely for this situation.</td></tr>';
+  h+='</table>';
+
+  h+='<div class="alert">Your application is reviewed by members of the ECPR Executive Committee. The statement is the only thing they read. Make every word count. 500 words is about one page — treat it as a professional document.</div>';
+
+  h+='<h3>Draft Your 500-Word Statement</h3>';
+  h+='<p>Fill in each section below. The tool will assemble them into a single statement and count your words.</p>';
+
+  h+='<label><strong>Your name:</strong></label><input type="text" id="ec-name" placeholder="Full name">';
+  h+='<label><strong>Target event:</strong></label>';
+  h+='<select id="ec-event"><option>Methods School at General Conference, Krakow, 8-11 Sep 2026</option><option>ECPR General Conference 2027</option><option>ECPR Joint Sessions 2027</option><option>Other ECPR event</option></select>';
+
+  h+='<label><strong>Part 1: Why do you wish to attend?</strong> (approx. 150 words)</label>';
+  h+='<textarea id="ec-why" rows="6" placeholder="Start with your research topic and question. Then explain what this specific event offers that is relevant. Name specific panels, sections, courses, or scholars you want to engage with. Example: I am a doctoral candidate researching the domestic politics of NATO burden-sharing at Eastern Mediterranean University. The ECPR General Conference in Krakow offers a unique opportunity to present my work-in-progress and receive feedback from leading scholars in security studies and alliance politics. I am particularly interested in Section [X] on [topic], which directly addresses the theoretical debates at the heart of my dissertation..."></textarea>';
+  h+='<div class="wc" id="ec-why-wc"></div>';
+
+  h+='<label><strong>Part 2: How does this benefit your research?</strong> (approx. 200 words)</label>';
+  h+='<textarea id="ec-benefit" rows="6" placeholder="Be specific. If applying for Methods School, name the course and explain why you need it. If attending the conference, explain how presenting and receiving feedback will strengthen your dissertation. Connect to your research design. Example: My dissertation employs process tracing to analyze three NATO cases. The Methods School course on \'Advanced Process Tracing\' would directly strengthen my capacity to conduct rigorous within-case analysis. Specifically, I need guidance on formulating Bayesian priors for my causal mechanism tests, which I have not been able to access through coursework at EMU..."></textarea>';
+  h+='<div class="wc" id="ec-benefit-wc"></div>';
+
+  h+='<label><strong>Part 3: Financial circumstances and need.</strong> (approx. 100 words)</label>';
+  h+='<textarea id="ec-financial" rows="4" placeholder="Be direct and honest. Example: As a PhD student at Eastern Mediterranean University in North Cyprus, I have limited access to travel funding. My department does not have a dedicated conference travel budget for doctoral students. The estimated cost of attending the General Conference in Krakow — including flights from Ercan via Istanbul, four nights of accommodation, and registration — would total approximately EUR [X], which I cannot cover from my personal resources. Without the ECPR Event Participant Grant, I will be unable to attend."></textarea>';
+  h+='<div class="wc" id="ec-financial-wc"></div>';
+
+  h+='<button class="btn" onclick="buildECPR()">Generate Statement</button>';
+  h+='<button class="btn btn2" onclick="clearECPR()">Clear</button>';
+  h+='<div id="ec-output"></div>';
+  h+='</div>';
+
+  h+='<div class="card"><h2>ECPR Application Checklist</h2>';
+  var ecCks=[
+    "My ECPR profile is created at ecpr.eu (or I will create one now)",
+    "I have confirmed EMU is listed as a Full Member at ecpr.eu/Membership/CurrentMembers",
+    "I have identified the specific event/course I am applying for",
+    "I have reviewed the event programme and can name specific panels, sections, or courses",
+    "My 500-word statement addresses all three required questions",
+    "My statement is under 500 words",
+    "My statement names specific research benefits, not vague generalities",
+    "My financial need is stated clearly and honestly",
+    "I have checked the deadline (current: 13 May 2026 for Methods School at GC)",
+    "I have asked my supervisor if they can provide a supporting reference (if required)",
+    "I understand that a maximum of 2 grants per event per EMU — quality of statement matters"
+  ];
+  for(var i=0;i<ecCks.length;i++){
+    h+='<div class="ck"><label><input type="checkbox" id="ec-ck-'+i+'" onchange="ecScore()"> '+ecCks[i]+'</label></div>';
+  }
+  h+='<div id="ec-score"></div>';
+  h+='</div>';
+  return h;
+}
+
+function countWords(text){
+  if(!text) return 0;
+  return text.trim().split(/\s+/).filter(function(w){return w.length>0;}).length;
+}
+
+// Live word count
+function setupWC(){
+  var fields=[
+    {input:"ec-why",display:"ec-why-wc",target:150},
+    {input:"ec-benefit",display:"ec-benefit-wc",target:200},
+    {input:"ec-financial",display:"ec-financial-wc",target:100}
+  ];
+  for(var i=0;i<fields.length;i++){
+    (function(f){
+      var inp=el(f.input);
+      if(inp){
+        inp.addEventListener("input",function(){
+          var wc=countWords(inp.value);
+          var d=el(f.display);
+          if(d) d.textContent=wc+" words (target: ~"+f.target+")";
+        });
+      }
+    })(fields[i]);
+  }
+}
+
+function buildECPR(){
+  var name=el("ec-name").value||"[Your Name]";
+  var event=el("ec-event").value;
+  var why=el("ec-why").value||"[Part 1: Why you wish to attend]";
+  var benefit=el("ec-benefit").value||"[Part 2: How it benefits your research]";
+  var financial=el("ec-financial").value||"[Part 3: Financial circumstances]";
+  var full=why+"\n\n"+benefit+"\n\n"+financial;
+  var wc=countWords(full);
+  var warn="";
+  if(wc>500) warn="\n\nWARNING: "+wc+" words. You are "+(wc-500)+" words over the 500-word limit. You MUST cut to 500 or below.";
+  else if(wc>480) warn="\n\nGood: "+wc+" words. Close to the limit. Review for any cuts.";
+  else if(wc<350) warn="\n\nNOTE: "+wc+" words. You have room to expand. Consider adding more specifics about panels, courses, or research connections.";
+
+  var out="ECPR EVENT PARTICIPANT GRANT - FUNDING STATEMENT\n";
+  out+="=================================================\n\n";
+  out+="Applicant: "+name+"\n";
+  out+="Event: "+event+"\n\n";
+  out+="---\n\n";
+  out+=full;
+  out+="\n\n---\n";
+  out+="Word count: "+wc+" / 500 maximum"+warn;
+
+  el("ec-output").innerHTML='<div class="result">'+out+'</div><button class="btn btn2" onclick="copyR(\'ec-output\')">Copy to Clipboard</button>';
+}
+
+function clearECPR(){
+  var ids=["ec-name","ec-why","ec-benefit","ec-financial"];
+  for(var i=0;i<ids.length;i++) el(ids[i]).value="";
+  el("ec-output").innerHTML="";
+  var wcs=["ec-why-wc","ec-benefit-wc","ec-financial-wc"];
+  for(var j=0;j<wcs.length;j++) if(el(wcs[j])) el(wcs[j]).textContent="";
+}
+
+function ecScore(){
+  var total=11,done=0;
+  for(var i=0;i<total;i++) if(el("ec-ck-"+i)&&el("ec-ck-"+i).checked) done++;
+  var pct=Math.round((done/total)*100);
+  var color=pct<50?"#dc3545":pct<80?"#ffc107":pct<100?"#17a2b8":"#28a745";
+  var msg=pct<50?"Not ready to submit yet.":pct<80?"Getting close. Complete the remaining items.":pct<100?"Almost there.":"Ready to submit. Go to ecpr.eu/Funding.";
+  el("ec-score").innerHTML='<div style="margin-top:10px;"><strong>'+pct+'% ('+done+'/'+total+')</strong><div style="background:#eee;border-radius:9px;height:18px;margin:4px 0;"><div class="bar" style="width:'+pct+'%;background:'+color+';"></div></div><p style="color:'+color+';font-weight:600;">'+msg+'</p></div>';
+}
+
+/* ========== TUBITAK 2214-A ========== */
+function pgT2214(){
+  var h='<div class="card"><h2>TUBITAK 2214-A: International Research Fellowship for PhD Students</h2>';
+  h+='<div class="alert">This is the most valuable grant available to you as a PhD student. It funds 3-12 months of research abroad with a generous monthly stipend plus travel.</div>';
+
+  h+='<h3>What You Get</h3>';
+  h+='<table><tr><th>Item</th><th>Amount</th></tr>';
+  h+='<tr><td>Monthly stipend (European countries)</td><td><strong>EUR 1,700</strong></td></tr>';
+  h+='<tr><td>Monthly stipend (UK)</td><td><strong>GBP 1,500</strong></td></tr>';
+  h+='<tr><td>Monthly stipend (other countries)</td><td><strong>USD 1,900</strong></td></tr>';
+  h+='<tr><td>Travel (round-trip for fellow)</td><td>Covered</td></tr>';
+  h+='<tr><td>Travel (round-trip for spouse)</td><td>Covered</td></tr>';
+  h+='<tr><td>Maximum duration</td><td>12 months</td></tr>';
+  h+='</table>';
+
+  h+='<h3>Eligibility Requirements</h3>';
+  h+='<table><tr><th>Requirement</th><th>Details</th><th>Your Status</th></tr>';
+  h+='<tr><td>Citizenship</td><td>Must be a <strong>Turkish citizen</strong></td><td><select id="t2-cit"><option>Select...</option><option value="yes">I am a Turkish citizen</option><option value="no">I am not a Turkish citizen</option><option value="dual">I have dual citizenship including Turkish</option></select></td></tr>';
+  h+='<tr><td>PhD enrollment</td><td>Must be enrolled in a PhD at a Turkish university</td><td><select id="t2-enr"><option>Select...</option><option value="yes">Yes, enrolled at EMU</option><option value="other">Yes, at another Turkish university</option><option value="no">No</option></select></td></tr>';
+  h+='<tr><td>Qualifying exam</td><td>Must have <strong>passed qualifying exam</strong></td><td><select id="t2-qual"><option>Select...</option><option value="yes">Passed</option><option value="no">Not yet</option></select></td></tr>';
+  h+='<tr><td>Thesis proposal</td><td>Must have thesis proposal <strong>accepted</strong></td><td><select id="t2-thesis"><option>Select...</option><option value="yes">Accepted</option><option value="no">Not yet</option></select></td></tr>';
+  h+='<tr><td>Time since registration</td><td>Must <strong>not exceed 4 years</strong> between PhD registration date and application start date</td><td><select id="t2-time"><option>Select...</option><option value="ok">Under 4 years</option><option value="close">Close to 4 years</option><option value="over">Over 4 years</option></select></td></tr>';
+  h+='<tr><td>Previous use</td><td>Must not have benefited from 2214-A before</td><td><select id="t2-prev"><option>Select...</option><option value="no">Never used</option><option value="yes">Used before</option></select></td></tr>';
+  h+='<tr><td>Language proficiency</td><td>Must provide language proficiency documentation</td><td><select id="t2-lang"><option>Select...</option><option value="yes">I have documentation (TOEFL/IELTS/YDS or equivalent)</option><option value="no">I need to obtain this</option></select></td></tr>';
+  h+='<tr><td>Invitation letter</td><td>Must have an <strong>invitation letter from the host institution</strong></td><td><select id="t2-invite"><option>Select...</option><option value="yes">I have one</option><option value="progress">Working on it</option><option value="no">Not yet</option></select></td></tr>';
+  h+='</table>';
+  h+='<button class="btn" onclick="check2214()">Check My Eligibility</button>';
+  h+='<div id="t2-elig"></div>';
+
+  h+='<h3>Documents Required</h3>';
+  h+='<p>You submit via the <strong>TYBS online system</strong> (tybs.tubitak.gov.tr). The documents you need:</p>';
+  var docs=[
+    {doc:"2214-A Research Proposal Form",note:"Download from tubitak.gov.tr. Arial 11pt, single-spaced. This is your main document. It must include: project title, research question, literature review, theoretical framework, methodology, work plan, expected outcomes, and an ethics table.",action:"Draft using the Research Proposal Builder below."},
+    {doc:"Invitation letter from host institution",note:"Official letter from the host university/institute confirming they will host you. Must be signed by someone with authority (department head, dean, or equivalent).",action:"Identify your target host institution. Email a potential supervisor there with your research proposal and a request for a letter. Start this 3-6 months before the deadline."},
+    {doc:"Language proficiency certificate",note:"TOEFL, IELTS, YDS, or equivalent. Must demonstrate ability to work in the language of the host country.",action:"If you do not have a valid score, schedule a test immediately."},
+    {doc:"PhD enrollment certificate",note:"Document from EMU confirming your current enrollment.",action:"Request from the EMU Registrar's Office."},
+    {doc:"Transcript",note:"Your PhD transcript showing courses completed and qualifying exam passed.",action:"Request from EMU Registrar's Office."},
+    {doc:"Thesis proposal acceptance document",note:"Official document showing your thesis proposal has been approved by the relevant committee.",action:"Request from your department or graduate school."},
+    {doc:"Supervisor's letter of support",note:"Letter from your PhD supervisor at EMU supporting your application and confirming the research visit aligns with your dissertation.",action:"Ask your supervisor. Give them at least 2-3 weeks."},
+    {doc:"CV",note:"Academic curriculum vitae.",action:"Update your CV. Include publications, presentations, awards, language skills, and research experience."}
+  ];
+
+  for(var i=0;i<docs.length;i++){
+    var d=docs[i];
+    h+='<div class="ck"><label><input type="checkbox" id="t2-doc-'+i+'"> <strong>'+d.doc+'</strong></label>';
+    h+='<p style="margin:2px 0 2px 28px;font-size:0.85em;color:#555;">'+d.note+'</p>';
+    h+='<p style="margin:0 0 4px 28px;font-size:0.85em;"><strong>Action:</strong> '+d.action+'</p></div>';
+  }
+  h+='<button class="btn" style="margin-top:8px;" onclick="docScore2214()">Check Document Readiness</button>';
+  h+='<div id="t2-docscore"></div>';
+
+  h+='<h3>Research Proposal Outline Builder</h3>';
+  h+='<p>The 2214-A Research Proposal Form is the heart of your application. Use the fields below to draft an outline.</p>';
+  h+='<label><strong>Project title:</strong></label><input type="text" id="t2-title" placeholder="Same as or derived from your dissertation title">';
+  h+='<label><strong>Research question:</strong></label><textarea id="t2-rq" placeholder="Your dissertation research question, clearly stated"></textarea>';
+  h+='<label><strong>Why must this research be conducted abroad?</strong></label><textarea id="t2-why" placeholder="This is critical. TUBITAK funds research that CANNOT be performed within Turkish infrastructure. Explain: specific archives, libraries, fieldwork sites, interview subjects, datasets, or expertise available only at the host institution."></textarea>';
+  h+='<label><strong>Host institution and supervisor:</strong></label><textarea id="t2-host" placeholder="Name of university, department, and the scholar who will host you. Explain why this person/institution is uniquely suited to support your research."></textarea>';
+  h+='<label><strong>Methodology:</strong></label><textarea id="t2-method" placeholder="What methods will you use during the research visit? How does the visit enable these methods?"></textarea>';
+  h+='<label><strong>Work plan (month by month):</strong></label><textarea id="t2-plan" placeholder="e.g., Months 1-2: Archival research at [institution]. Month 3: Semi-structured interviews with [subjects]. Months 4-5: Data analysis and writing. Month 6: Presentation of findings at host institution seminar."></textarea>';
+  h+='<label><strong>Expected outcomes:</strong></label><textarea id="t2-outcomes" placeholder="e.g., Dissertation chapter(s); conference paper; journal article submission; dataset"></textarea>';
+  h+='<label><strong>Duration requested (months):</strong></label><input type="number" id="t2-duration" min="3" max="12" placeholder="3-12">';
+  h+='<button class="btn" style="margin-top:8px;" onclick="build2214()">Generate Proposal Outline</button>';
+  h+='<div id="t2-output"></div>';
+  h+='</div>';
+
+  h+='<div class="card"><h2>TRNC Students and TUBITAK</h2>';
+  h+='<p>In 2019-2020, TUBITAK and the TRNC Ministry of National Education signed a protocol opening a significant portion of TUBITAK research support programs to academics and researchers in the TRNC. TUBITAK President Prof. Dr. Hasan Mandal visited TRNC universities and met with rectors and YODAK to develop implementation.</p>';
+  h+='<p>However, the <strong>2214-A fellowship specifically requires Turkish citizenship</strong>. Many students in the TRNC hold Turkish citizenship or dual citizenship, in which case they are eligible. If you are a TRNC citizen without Turkish citizenship, your eligibility is uncertain and you should verify directly with TUBITAK.</p>';
+  h+='<p><strong>Contact:</strong> <a href="mailto:bideb2214@tubitak.gov.tr">bideb2214@tubitak.gov.tr</a> | Tel: 444 66 90</p>';
+  h+='</div>';
+  return h;
+}
+
+function check2214(){
+  var cit=el("t2-cit").value;
+  var enr=el("t2-enr").value;
+  var qual=el("t2-qual").value;
+  var thesis=el("t2-thesis").value;
+  var time=el("t2-time").value;
+  var prev=el("t2-prev").value;
+  var lang=el("t2-lang").value;
+  var invite=el("t2-invite").value;
+  var issues=[];
+  var blockers=[];
+
+  if(cit==="no") blockers.push("Turkish citizenship is required. You are not eligible for 2214-A.");
+  if(enr==="no") blockers.push("You must be enrolled in a PhD at a Turkish university.");
+  if(prev==="yes") blockers.push("You cannot use 2214-A more than once.");
+  if(time==="over") blockers.push("You may have exceeded the 4-year limit since PhD registration. Verify with TUBITAK.");
+  if(qual==="no") issues.push("You must pass your qualifying exam before you can apply. Plan your application timeline accordingly.");
+  if(thesis==="no") issues.push("Your thesis proposal must be accepted before you can apply.");
+  if(lang==="no") issues.push("You need language proficiency documentation. Schedule a test (TOEFL/IELTS/YDS) soon.");
+  if(invite==="no") issues.push("You need an invitation letter from a host institution. Start reaching out to potential hosts now — this typically takes 2-4 months.");
+  if(invite==="progress") issues.push("Good — keep working on the invitation letter. Follow up if you have not heard back in 2-3 weeks.");
+  if(time==="close") issues.push("You are close to the 4-year limit. Apply at the next call. Do not delay.");
+
+  var h="";
+  if(blockers.length>0){
+    h='<div class="alert alert-red"><strong>Eligibility Blockers:</strong>';
+    for(var i=0;i<blockers.length;i++) h+='<p>'+blockers[i]+'</p>';
+    h+='</div>';
+  } else if(issues.length>0){
+    h='<div class="alert"><strong>Conditionally eligible — resolve these issues:</strong>';
+    for(var j=0;j<issues.length;j++) h+='<p>'+issues[j]+'</p>';
+    h+='</div>';
+  } else if(cit&&enr&&qual&&thesis&&time&&prev&&lang&&invite){
+    h='<div class="alert-green"><strong>You appear to meet all eligibility criteria.</strong> Prepare your documents and apply at the next call. Watch tubitak.gov.tr for the 2026 call announcement.</div>';
+  } else {
+    h='<div class="alert">Please answer all eligibility questions above.</div>';
+  }
+  el("t2-elig").innerHTML=h;
+}
+
+function docScore2214(){
+  var total=8,done=0;
+  for(var i=0;i<total;i++) if(el("t2-doc-"+i)&&el("t2-doc-"+i).checked) done++;
+  var pct=Math.round((done/total)*100);
+  var color=pct<40?"#dc3545":pct<75?"#ffc107":pct<100?"#17a2b8":"#28a745";
+  var msg=pct<40?"Significant preparation needed. Start with the invitation letter and research proposal.":pct<75?"Making progress. Focus on the unchecked items.":pct<100?"Almost ready. Complete the remaining documents.":"All documents ready. Submit when the call opens.";
+  el("t2-docscore").innerHTML='<div style="margin-top:10px;"><strong>Document readiness: '+pct+'% ('+done+'/'+total+')</strong><div style="background:#eee;border-radius:9px;height:18px;margin:4px 0;"><div class="bar" style="width:'+pct+'%;background:'+color+';"></div></div><p style="color:'+color+';">'+msg+'</p></div>';
+}
+
+function build2214(){
+  var title=el("t2-title").value||"[Project Title]";
+  var rq=el("t2-rq").value||"[Research Question]";
+  var why=el("t2-why").value||"[Why abroad]";
+  var host=el("t2-host").value||"[Host institution]";
+  var method=el("t2-method").value||"[Methodology]";
+  var plan=el("t2-plan").value||"[Work plan]";
+  var outcomes=el("t2-outcomes").value||"[Expected outcomes]";
+  var dur=el("t2-duration").value||"[Duration]";
+
+  var out="TUBITAK 2214-A RESEARCH PROPOSAL OUTLINE\n";
+  out+="=========================================\n\n";
+  out+="Project Title: "+title+"\n";
+  out+="Requested Duration: "+dur+" months\n\n";
+  out+="1. RESEARCH QUESTION\n"+rq+"\n\n";
+  out+="2. RATIONALE FOR CONDUCTING RESEARCH ABROAD\n"+why+"\n\n";
+  out+="3. HOST INSTITUTION AND SUPERVISOR\n"+host+"\n\n";
+  out+="4. LITERATURE REVIEW AND THEORETICAL FRAMEWORK\n[Expand here: summarize key scholarship, identify the gap, state your theoretical approach. Align with your dissertation proposal.]\n\n";
+  out+="5. METHODOLOGY\n"+method+"\n\n";
+  out+="6. WORK PLAN\n"+plan+"\n\n";
+  out+="7. EXPECTED OUTCOMES\n"+outcomes+"\n\n";
+  out+="8. ETHICAL CONSIDERATIONS\n[Address any ethical issues: human subjects, interview consent, data protection. Complete the ethics table in the official form.]\n\n";
+  out+="9. REFERENCES\n[List key references from your dissertation bibliography.]\n";
+
+  el("t2-output").innerHTML='<div class="result">'+out+'</div><button class="btn btn2" onclick="copyR(\'t2-output\')">Copy to Clipboard</button>';
+}
+
+/* ========== TUBITAK 2211 ========== */
+function pgT2211(){
+  var h='<div class="card"><h2>TUBITAK 2211: National PhD Scholarship Programs</h2>';
+  h+='<div class="alert">The 2026/1 call closed on 24 March 2026. Watch for the 2026/2 call at <a href="https://tubitak.gov.tr" target="_blank">tubitak.gov.tr</a>.</div>';
+
+  h+='<h3>What This Is</h3>';
+  h+='<p>TUBITAK 2211 provides a <strong>monthly stipend</strong> to PhD students in Turkey across all disciplines, including social sciences and humanities. The stipend supports your living costs during your doctorate, freeing other resources for conference travel, fieldwork, and research materials.</p>';
+
+  h+='<h3>Sub-Programs</h3>';
+  h+='<table><tr><th>Program</th><th>Who</th><th>Notes</th></tr>';
+  h+='<tr><td><strong>2211-A</strong></td><td>All PhD students in Turkey, all disciplines</td><td>Broadest eligibility. If you are unsure which to apply for, start here.</td></tr>';
+  h+='<tr><td><strong>2211-C</strong></td><td>PhD students in TUBITAK priority fields in science and technology</td><td>Check whether your specific IR/political science topic falls under a priority field. Usually more oriented to STEM but some social science topics qualify.</td></tr>';
+  h+='<tr><td><strong>2211-E</strong></td><td>Former TUBITAK undergraduate or MSc/MA scholarship holders</td><td>If you received TUBITAK support during your undergraduate or masters, this is your track.</td></tr>';
+  h+='</table>';
+
+  h+='<h3>Eligibility</h3>';
+  h+='<p>Enrolled in a PhD program at a university in Turkey. Application is online via <a href="https://ebideb.tubitak.gov.tr" target="_blank">BİDEB Application and Monitoring System</a>.</p>';
+
+  h+='<h3>What to Prepare</h3>';
+  var items=[
+    "Valid enrollment in a PhD program at a Turkish university",
+    "Academic transcripts (undergraduate through current)",
+    "Research statement / thesis topic summary",
+    "CV with academic achievements",
+    "ALES score (if required by the specific sub-program)",
+    "Language proficiency score (if required)"
+  ];
+  for(var i=0;i<items.length;i++){
+    h+='<div class="ck"><label><input type="checkbox"> '+items[i]+'</label></div>';
+  }
+
+  h+='<h3>Strategic Value</h3>';
+  h+='<p>Even if the stipend amount is modest, having TUBITAK 2211 on your CV signals that a national funding body has evaluated and supported your doctoral work. This strengthens future applications for larger grants (2214-A, 3005, EU Marie Curie, etc.).</p>';
+
+  h+='<p><strong>Contact:</strong> <a href="mailto:bideb2211@tubitak.gov.tr">bideb2211@tubitak.gov.tr</a></p>';
+  h+='</div>';
+  return h;
+}
+
+/* ========== TUBITAK 3005 ========== */
+function pgT3005(){
+  var h='<div class="card"><h2>TUBITAK 3005: Innovative Solutions in Social Sciences and Humanities</h2>';
+  h+='<div class="alert">This is a research project grant, not a personal fellowship. The <strong>Principal Investigator must be a faculty member</strong>. As a PhD student, you participate as a team member, and the project budget can include your costs.</div>';
+
+  h+='<h3>What This Is</h3>';
+  h+='<p>TUBITAK 3005 funds research projects in social sciences and humanities that aim to provide social and public benefit in Turkey. Budget can reach <strong>up to TRY 450,000</strong>. Projects can include: researcher salaries, travel (domestic and international), data collection costs, equipment, software, and publication fees.</p>';
+
+  h+='<h3>Why It Matters for PhD Students</h3>';
+  h+='<p>If your dissertation research aligns with a project your supervisor wants to pursue, a 3005 proposal can fund your conference travel, fieldwork, data acquisition, and other research costs as line items in the project budget. This is how most PhD students in Turkey fund substantial research: through their supervisor\'s project grants.</p>';
+
+  h+='<h3>Application Requirements</h3>';
+  h+='<table><tr><th>Document</th><th>Details</th></tr>';
+  h+='<tr><td>Application Form</td><td>Arial 9 font, maximum 22 pages (excluding annexes). <a href="https://tubitak.gov.tr/sites/default/files/2024-05/3005_application_form_en.docx" target="_blank">Download template</a></td></tr>';
+  h+='<tr><td>Annex-1: References</td><td><a href="https://tubitak.gov.tr/sites/default/files/2024-05/3005_application_form_annex_1_references.doc" target="_blank">Download template</a></td></tr>';
+  h+='<tr><td>Annex-2: Budget and Budget Justification</td><td><a href="https://tubitak.gov.tr/sites/default/files/2024-05/3005_application_form_annex_2_budget_and_budget_justification.docx" target="_blank">Download template</a></td></tr>';
+  h+='<tr><td>Annex-3: Other Projects and Publications</td><td>Auto-generated from online system</td></tr>';
+  h+='<tr><td>Project Proposal Video (optional)</td><td>Up to 5 minutes, max 100 MB</td></tr>';
+  h+='<tr><td>Data Management Plan</td><td>Required; uploaded to system</td></tr>';
+  h+='<tr><td>Collaboration Form (Annex-4)</td><td>If there are collaborating institutions. <a href="https://tubitak.gov.tr/sites/default/files/2024-05/3005_collaboration_form_en.doc" target="_blank">Download template</a></td></tr>';
+  h+='<tr><td>Ethics Committee Approval</td><td>Required if project involves human subjects (interviews, surveys, etc.)</td></tr>';
+  h+='</table>';
+
+  h+='<h3>What You Should Do</h3>';
+  var steps=[
+    "Talk to your supervisor about whether a 3005 project aligning with your dissertation research is feasible",
+    "If yes, offer to help draft the application form (this is valuable experience)",
+    "Ensure your research costs (conference travel, fieldwork, transcription, data) are included as budget items",
+    "Download and review the application form template to understand the structure",
+    "Check tubitak.gov.tr periodically for the next 3005 call"
+  ];
+  for(var i=0;i<steps.length;i++){
+    h+='<div class="ck"><label><input type="checkbox"> '+steps[i]+'</label></div>';
+  }
+
+  h+='<div class="alert" style="margin-top:12px;">Even if your supervisor ultimately writes the proposal, understanding the 3005 application structure teaches you how large research grants work. This knowledge transfers directly to postdoctoral grant applications (EU Marie Curie, ERC Starting Grants, national research council funding) later in your career.</div>';
+  h+='</div>';
+  return h;
+}
+
+/* ========== OTHER FUNDING ========== */
+function pgOther(){
+  var h='<div class="card"><h2>Other Funding Sources</h2>';
+  h+='<p>Beyond ECPR and TUBITAK, here are additional sources worth exploring.</p>';
+
+  var sources=[
+    {name:"ISA Travel Grants",what:"Various ISA sections offer travel grants for conference participation. Amounts vary (USD 200-500).",how:"Check individual ISA section websites after your paper is accepted. Apply through the ISA system.",url:"https://www.isanet.org",who:"ISA members attending the Annual Convention or regional conferences"},
+    {name:"IPSA Travel Grants",what:"IPSA provides support for early-career scholars from underrepresented countries to attend the World Congress.",how:"Check ipsa.org when the World Congress call opens (next: Rome 2027).",url:"https://www.ipsa.org",who:"Early-career scholars, especially from developing countries"},
+    {name:"BISA Postgraduate Bursaries",what:"GBP 100-300 for postgraduate BISA members attending the annual conference.",how:"Apply through BISA after paper acceptance. Typically Mar/Apr.",url:"https://www.bisa.ac.uk",who:"Postgraduate BISA members"},
+    {name:"EISA Support",what:"EISA occasionally offers fee waivers or reduced rates for early-career scholars.",how:"Check eisa-net.org for specific event details.",url:"https://eisa-net.org",who:"Early-career IR scholars"},
+    {name:"EMU Departmental Funds",what:"Your department or faculty may have limited funds for conference travel. Always ask.",how:"Speak to your supervisor and department chair. Some faculties have annual allocation per student.",url:"",who:"Enrolled EMU students"},
+    {name:"EU Marie Sklodowska-Curie Actions (Postdoctoral)",what:"Generous postdoctoral fellowships funding salary, mobility, research, and training for 1-2 years.",how:"Apply after completing your PhD. Annual deadline typically Sep/Oct. Plan 6+ months in advance.",url:"https://marie-sklodowska-curie-actions.ec.europa.eu/",who:"Postdoctoral researchers (plan for this now, apply later)"},
+    {name:"SSRC Fellowships",what:"Multiple fellowship programs for social science researchers. Some open to international scholars.",how:"Check ssrc.org annually for relevant calls.",url:"https://www.ssrc.org",who:"Varies by program"},
+    {name:"CEPR PhD Research Grants",what:"Up to GBP 15,000 for PhD research (data, RA, fieldwork).",how:"Check grp.cepr.org for open calls.",url:"https://grp.cepr.org",who:"PhD students, particularly in political economy topics"},
+    {name:"Erasmus+ Staff and Student Mobility",what:"Funds short-term mobility between partner institutions. EMU may have Erasmus agreements.",how:"Check with EMU International Office.",url:"",who:"Students and staff at participating institutions"},
+    {name:"Open Society Foundations",what:"Various fellowship and grant programs for scholars working on open society issues.",how:"Check opensocietyfoundations.org for current programs.",url:"https://www.opensocietyfoundations.org",who:"Scholars working on governance, rights, justice themes"}
+  ];
+
+  h+='<table><tr><th>Source</th><th>What</th><th>How to Apply</th><th>Who</th></tr>';
+  for(var i=0;i<sources.length;i++){
+    var s=sources[i];
+    var link=s.url?'<a href="'+s.url+'" target="_blank">'+s.name+'</a>':s.name;
+    h+='<tr><td>'+link+'</td><td>'+s.what+'</td><td>'+s.how+'</td><td>'+s.who+'</td></tr>';
+  }
+  h+='</table></div>';
+
+  h+='<div class="card"><h2>Cost Estimation Tool</h2>';
+  h+='<p>Estimate the total cost of attending a conference. This helps you determine how much funding to request.</p>';
+  h+='<label>Conference city:</label><input type="text" id="ot-city" placeholder="e.g., Krakow, Chicago, Lisbon">';
+  h+='<label>Registration fee (EUR):</label><input type="number" id="ot-reg" placeholder="e.g., 200">';
+  h+='<label>Flight cost estimate (EUR):</label><input type="number" id="ot-flight" placeholder="e.g., 350">';
+  h+='<label>Number of nights:</label><input type="number" id="ot-nights" placeholder="e.g., 4">';
+  h+='<label>Cost per night (EUR):</label><input type="number" id="ot-pernight" placeholder="e.g., 80">';
+  h+='<label>Daily meals and transport (EUR):</label><input type="number" id="ot-daily" placeholder="e.g., 40">';
+  h+='<label>Other costs (visa, insurance, etc.) (EUR):</label><input type="number" id="ot-other" placeholder="e.g., 50">';
+  h+='<button class="btn" onclick="calcCost()">Calculate Total</button>';
+  h+='<div id="ot-result"></div>';
+  h+='</div>';
+  return h;
+}
+
+function calcCost(){
+  var reg=parseFloat(el("ot-reg").value)||0;
+  var flight=parseFloat(el("ot-flight").value)||0;
+  var nights=parseFloat(el("ot-nights").value)||0;
+  var pernight=parseFloat(el("ot-pernight").value)||0;
+  var daily=parseFloat(el("ot-daily").value)||0;
+  var other=parseFloat(el("ot-other").value)||0;
+  var city=el("ot-city").value||"[City]";
+  var accom=nights*pernight;
+  var meals=nights*daily;
+  var total=reg+flight+accom+meals+other;
+
+  var out="CONFERENCE COST ESTIMATE: "+city+"\n";
+  out+="=========================================\n\n";
+  out+="Registration:        EUR "+reg.toFixed(2)+"\n";
+  out+="Flights:             EUR "+flight.toFixed(2)+"\n";
+  out+="Accommodation:       EUR "+accom.toFixed(2)+" ("+nights+" nights x EUR "+pernight+")\n";
+  out+="Meals and transport: EUR "+meals.toFixed(2)+" ("+nights+" days x EUR "+daily+")\n";
+  out+="Other costs:         EUR "+other.toFixed(2)+"\n";
+  out+="-------------------------------------------\n";
+  out+="TOTAL:               EUR "+total.toFixed(2)+"\n\n";
+  out+="Use this figure in your grant application budget justification.";
+
+  el("ot-result").innerHTML='<div class="result">'+out+'</div><button class="btn btn2" onclick="copyR(\'ot-result\')">Copy to Clipboard</button>';
+}
+
+/* ========== TRACKER ========== */
+var apps=[];
+function pgTracker(){
+  var h='<div class="card"><h2>My Grant Applications Tracker</h2>';
+  h+='<p>Keep a record of every grant you apply for. Track deadlines, status, and outcomes.</p>';
+
+  h+='<label><strong>Grant name:</strong></label><input type="text" id="tr-name" placeholder="e.g., ECPR Event Participant Grant">';
+  h+='<label><strong>Event/purpose:</strong></label><input type="text" id="tr-event" placeholder="e.g., ECPR Methods School, Krakow, Sep 2026">';
+  h+='<label><strong>Amount requested:</strong></label><input type="text" id="tr-amount" placeholder="e.g., Full travel + accommodation + fee waiver">';
+  h+='<label><strong>Application deadline:</strong></label><input type="date" id="tr-deadline">';
+  h+='<label><strong>Status:</strong></label><select id="tr-status"><option>Planning</option><option>Drafting</option><option>Submitted</option><option>Awaiting Result</option><option>Awarded</option><option>Rejected</option></select>';
+  h+='<label><strong>Notes:</strong></label><textarea id="tr-notes" placeholder="Any details, reminders, or follow-up items"></textarea>';
+  h+='<button class="btn" onclick="addApp()">Add Application</button>';
+  h+='<div id="tr-log"></div>';
+  h+='</div>';
+
+  h+='<div class="card"><h2>Application Statistics</h2>';
+  h+='<div id="tr-stats"></div>';
+  h+='</div>';
+  return h;
+}
+
+function addApp(){
+  var entry={
+    name:el("tr-name").value,
+    event:el("tr-event").value,
+    amount:el("tr-amount").value,
+    deadline:el("tr-deadline").value,
+    status:el("tr-status").value,
+    notes:el("tr-notes").value
+  };
+  if(!entry.name){alert("Enter the grant name."); return;}
+  apps.push(entry);
+  el("tr-name").value="";el("tr-event").value="";el("tr-amount").value="";
+  el("tr-deadline").value="";el("tr-notes").value="";
+  renderApps();
+}
+
+function renderApps(){
+  if(apps.length===0){el("tr-log").innerHTML="";el("tr-stats").innerHTML="<p>No applications logged yet.</p>";return;}
+  var h='<table><tr><th>Grant</th><th>Event</th><th>Amount</th><th>Deadline</th><th>Status</th><th>Notes</th></tr>';
+  var stats={Planning:0,Drafting:0,Submitted:0,"Awaiting Result":0,Awarded:0,Rejected:0};
+  for(var i=0;i<apps.length;i++){
+    var a=apps[i];
+    stats[a.status]=(stats[a.status]||0)+1;
+    var sc="tb";
+    if(a.status==="Awarded") sc="tg";
+    if(a.status==="Rejected") sc="tr";
+    if(a.status==="Submitted"||a.status==="Awaiting Result") sc="ty";
+    if(a.status==="Drafting") sc="tp";
+    h+='<tr><td>'+a.name+'</td><td>'+a.event+'</td><td>'+a.amount+'</td><td>'+a.deadline+'</td><td><span class="tag '+sc+'">'+a.status+'</span></td><td>'+a.notes+'</td></tr>';
+  }
+  h+='</table>';
+  h+='<button class="btn btn2" onclick="exportApps()">Export as Text</button>';
+  el("tr-log").innerHTML=h;
+
+  var sh='<p><strong>Total applications: '+apps.length+'</strong></p>';
+  for(var k in stats){
+    if(stats[k]>0) sh+='<span class="tag '+(k==="Awarded"?"tg":k==="Rejected"?"tr":"tb")+'">'+k+': '+stats[k]+'</span> ';
+  }
+  el("tr-stats").innerHTML=sh;
+}
+
+function exportApps(){
+  var t="GRANT APPLICATION LOG\n====================\n\n";
+  for(var i=0;i<apps.length;i++){
+    var a=apps[i];
+    t+=(i+1)+". "+a.name+" | "+a.event+" | "+a.amount+" | Deadline: "+a.deadline+" | Status: "+a.status+"\n   Notes: "+a.notes+"\n\n";
+  }
+  copyToClip(t);
+}
+
+/* ========== UTILITY ========== */
+function copyR(id){
+  var box=el(id);if(!box) return;
+  var rd=box.querySelector(".result");
+  if(!rd) return;
+  copyToClip(rd.innerText||rd.textContent);
+}
+function copyToClip(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){alert("Copied to clipboard.");});
+  } else {
+    var ta=document.createElement("textarea");
+    ta.value=text;document.body.appendChild(ta);ta.select();
+    document.execCommand("copy");document.body.removeChild(ta);
+    alert("Copied to clipboard.");
+  }
+}
+
+/* ========== INIT ========== */
+buildNav();
+go("overview");
+
+// Setup word counters after ECPR tab renders
+var origGo=go;
+go=function(id){
+  origGo(id);
+  if(id==="ecpr") setTimeout(setupWC,50);
+};
+// Re-run for initial load if ecpr
+if(cur==="ecpr") setTimeout(setupWC,50);
+</script>
+</body>
+</html>
